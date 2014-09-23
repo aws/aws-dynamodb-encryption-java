@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AWS DynamoDB Encryption Client for Java
+Bundle-SymbolicName: com.amazonaws.ddbencryptionclient;singleton:=true
+Bundle-Version: 0.0.1-SNAPSHOT
+Bundle-Vendor: Amazon Technologies, Inc
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: com.amazonaws.sdk;bundle-version="1.8.10.2",
+Export-Package: com.amazonaws.services.kinesis,
+ com.amazonaws.services.dynamodbv2.datamodeling,
+ com.amazonaws.services.dynamodbv2.datamodeling.encryption,
+ com.amazonaws.services.dynamodbv2.datamodeling.internal
+

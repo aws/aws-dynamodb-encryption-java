@@ -48,6 +48,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 /**
  * The low-level API used by {@link AttributeEncryptor} to perform crypto
  * operations on the record attributes.
+ * 
+ * @author Greg Rubin 
  */
 public class DynamoDBEncryptor {
     private static final SecureRandom rnd = new SecureRandom();

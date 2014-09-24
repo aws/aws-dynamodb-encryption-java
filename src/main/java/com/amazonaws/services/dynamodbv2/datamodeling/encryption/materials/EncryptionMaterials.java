@@ -18,6 +18,9 @@ import java.security.Key;
 
 import javax.crypto.SecretKey;
 
+/**
+ * @author Greg Rubin 
+ */
 public interface EncryptionMaterials extends CryptographicMaterials {
     public SecretKey getEncryptionKey();
     public Key getSigningKey();

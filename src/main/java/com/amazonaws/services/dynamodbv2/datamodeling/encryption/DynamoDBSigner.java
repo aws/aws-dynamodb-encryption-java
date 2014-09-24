@@ -41,6 +41,9 @@ import javax.crypto.spec.SecretKeySpec;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeValueMarshaller;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
+/**
+ * @author Greg Rubin 
+ */
 // NOTE: This class must remain thread-safe.
 class DynamoDBSigner {
     private static final ConcurrentHashMap<String, DynamoDBSigner> cache =

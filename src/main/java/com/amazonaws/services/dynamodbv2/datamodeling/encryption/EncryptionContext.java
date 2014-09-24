@@ -38,6 +38,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
  * </ul>
  * 
  * This class is immutable.
+ * 
+ * @author Greg Rubin 
  */
 public final class EncryptionContext {
     private final String tableName;

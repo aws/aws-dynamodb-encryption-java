@@ -40,6 +40,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Wrapp
  * {@link SymmetricStaticProvider}.
  * 
  * @see WrappedRawMaterials
+ * 
+ * @author Greg Rubin 
  */
 public class WrappedMaterialsProvider implements EncryptionMaterialsProvider {
     private final Key wrappingKey;

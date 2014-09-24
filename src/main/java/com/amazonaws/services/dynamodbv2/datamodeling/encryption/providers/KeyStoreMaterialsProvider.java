@@ -39,6 +39,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.SymmetricRawMaterials;
 
+/**
+ * @author Greg Rubin 
+ */
 public class KeyStoreMaterialsProvider implements EncryptionMaterialsProvider {
     private final Map<String, String> description;
     private final String encryptionAlias;

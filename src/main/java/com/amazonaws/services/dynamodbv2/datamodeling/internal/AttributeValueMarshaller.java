@@ -27,6 +27,9 @@ import java.util.List;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
+/**
+ * @author Greg Rubin 
+ */
 public class AttributeValueMarshaller {
     private static final Charset UTF8 = Charset.forName("UTF-8");
     /**

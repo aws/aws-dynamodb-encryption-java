@@ -17,6 +17,9 @@ package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+/**
+ * @author Greg Rubin 
+ */
 public class ByteBufferInputStream extends InputStream {
     private final ByteBuffer buffer;
 

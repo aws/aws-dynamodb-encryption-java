@@ -24,6 +24,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Encry
  * materials, such as simply providing static material that doesn't change,
  * or more complicated implementations, such as integrating with existing
  * key management systems.
+ * 
+ * @author Greg Rubin 
  */
 public interface EncryptionMaterialsProvider {
 

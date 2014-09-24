@@ -16,6 +16,9 @@ package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
 import java.util.Map;
 
+/**
+ * @author Greg Rubin 
+ */
 public interface CryptographicMaterials {
     public Map<String, String> getMaterialDescription();
 }

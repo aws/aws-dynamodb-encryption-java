@@ -24,6 +24,8 @@ import javax.crypto.SecretKey;
  * This is a thin wrapper around the {@link WrappedMaterialsProvider}, using
  * the provided <code>encryptionKey</code> for wrapping and unwrapping the
  * record key. Please see that class for detailed documentation.
+ * 
+ * @author Greg Rubin 
  */
 public class AsymmetricStaticProvider extends WrappedMaterialsProvider {
     public AsymmetricStaticProvider(KeyPair encryptionKey, KeyPair signingPair) {

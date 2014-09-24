@@ -29,6 +29,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Symme
 /**
  * A provider which always returns the same provided symmetric
  * encryption/decryption key and the same signing/verification key(s).
+ * 
+ * @author Greg Rubin 
  */
 public class SymmetricStaticProvider implements EncryptionMaterialsProvider {
     private final SymmetricRawMaterials materials;

@@ -18,6 +18,9 @@ import java.security.Key;
 
 import javax.crypto.SecretKey;
 
+/**
+ * @author Greg Rubin 
+ */
 public interface DecryptionMaterials extends CryptographicMaterials {
     public SecretKey getDecryptionKey();
     public Key getVerificationKey();

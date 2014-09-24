@@ -30,6 +30,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
  * 
  * Other possibly implementations might use a Key-Derivation Function to derive
  * a unique key per record.
+ *
+ * @author Greg Rubin 
  */
 public class WrappedRawMaterials extends AbstractRawMaterials {
     /**

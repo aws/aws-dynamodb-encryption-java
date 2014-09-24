@@ -32,6 +32,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
+ * 
+ * @author Greg Rubin 
  */
 public class AttributeEncryptor implements AttributeTransformer {
     private static final DynamoDBReflector reflector = new DynamoDBReflector();

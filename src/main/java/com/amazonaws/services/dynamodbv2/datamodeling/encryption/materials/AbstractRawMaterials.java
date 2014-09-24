@@ -22,6 +22,9 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+/**
+ * @author Greg Rubin 
+ */
 public abstract class AbstractRawMaterials implements DecryptionMaterials, EncryptionMaterials {
     private Map<String, String> description;
     private final Key signingKey;

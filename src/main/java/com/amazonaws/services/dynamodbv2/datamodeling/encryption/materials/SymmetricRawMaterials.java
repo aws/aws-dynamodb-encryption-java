@@ -20,6 +20,9 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+/**
+ * @author Greg Rubin 
+ */
 public class SymmetricRawMaterials extends AbstractRawMaterials {
     private final SecretKey cryptoKey;
 

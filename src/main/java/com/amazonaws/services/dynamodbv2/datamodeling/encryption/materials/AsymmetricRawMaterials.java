@@ -21,7 +21,9 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
-
+/**
+ * @author Greg Rubin 
+ */
 public class AsymmetricRawMaterials extends WrappedRawMaterials {
     @SuppressWarnings("unchecked")
     public AsymmetricRawMaterials(KeyPair encryptionKey, KeyPair signingPair)

@@ -37,6 +37,8 @@ import javax.crypto.SecretKey;
  * {@link #verify(byte[], byte[], String)} and HMAC keys will generally not
  * support anything except <code>sign</code> and <code>verify</code>.)
  * {@link UnsupportedOperationException} should be thrown in these cases.
+ * 
+ * @author Greg Rubin 
  */
 public interface DelegatedKey extends SecretKey {
     /**

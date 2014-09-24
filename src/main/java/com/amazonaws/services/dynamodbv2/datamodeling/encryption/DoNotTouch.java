@@ -21,6 +21,8 @@ import java.lang.annotation.Target;
 
 /**
  * Prevents the associated item from being encrypted or signed.
+ * 
+ * @author Greg Rubin 
  */
 @Target(value = {ElementType.TYPE, ElementType.METHOD})
 @Retention(value = RetentionPolicy.RUNTIME)

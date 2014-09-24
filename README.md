@@ -1,9 +1,9 @@
 aws-dynamodb-encryption-java
 ============================
 
-AWS DynamoDB Encryption Client for Java.
+Amazon DynamoDB Encryption Client for Java.
 
-The **AWS [DynamoDB][ddb] Encryption Client for Java** supports encryption and signing of your data.
+The **[Amazon DynamoDB][ddb] Encryption Client for Java** supports encryption and signing of your data.
 
 You can either use the AttributeEncryptor with the [DynamoDBMapper][ddbmapper] for transparent protection of all objects serialized through the mapper, or use the [DynamoDBEncryptor][ddbencryptor] for tighter control over how the library works. 
 

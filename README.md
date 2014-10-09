@@ -93,7 +93,7 @@ To enable transparent encryption and signing, simply specify the necessary encry
 
 Note that by default all attributes except the primary keys are both encrypted and signed for maximum security.  To selectively disable encryption, the annotation [@DoNotEncrypt][donotencrypt] can be used as shown in the Book class above.  To disable both encryption and signing, the annotation [@DoNotTouch][donottouch] can be used.
 
-There is a variety of existing EncryptionMaterialsProvider implemenations that you can use to provide the encryption material, including the use of Java keystore.  Alternatively, you can also plug in your own for your specific use cases.
+There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implemenations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own for your specific use cases.
 
 ## Supported Algorithms
 
@@ -126,4 +126,5 @@ Currently the new data types in AmmazonDynamoDB including Map, List, Boolean, an
 [ddbmapper]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html
 [donotencrypt]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotEncrypt.java
 [donottouch]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotTouch.java
+[keystoreprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/KeyStoreMaterialsProvider.java
 [materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java

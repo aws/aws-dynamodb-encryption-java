@@ -1,6 +1,6 @@
-# Client-side Java Encryption library for Amazon DynamoDB
+# Client-side Encryption for Amazon DynamoDB
 
-The **[Amazon DynamoDB][ddb] Client-side Java Encryption Library ** supports encryption and signing of your data when stored in Amazon DynamoDB.
+The **[Amazon DynamoDB][ddb] Client-side Encryption in Java** supports encryption and signing of your data when stored in Amazon DynamoDB.
 
 A typical use of this library is when you are using [DynamoDBMapper][ddbmapper], where [AttributeEncryptor][attrencryptor] of this library can be used to enable transparent protection of all objects serialized through the mapper.
 

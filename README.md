@@ -4,7 +4,7 @@ The **[Amazon DynamoDB][ddb] Client-side Encryption in Java** supports encryptio
 
 A typical use of this library is when you are using [DynamoDBMapper][ddbmapper], where transparent protection of all objects serialized through the mapper can be enabled via configuring an [AttributeEncryptor][attrencryptor].
 
-For tighter control over the encryption and signing process, the low-level [DynamoDBEncryptor][ddbencryptor] can be used directly for more advanced use cases.
+For more advanced use cases where tighter control over the encryption and signing process is necessary, the low-level [DynamoDBEncryptor][ddbencryptor] can be used directly.
 
 ## Getting Started
 

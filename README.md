@@ -99,7 +99,7 @@ There is a variety of existing [EncryptionMaterialsProvider][materialprovider] i
 
 For content encryption, the encryption algorithm is determined by the user specified [SecretKey][secretkey], as long as it can be used with the encryption mode "CBC" with "PKCS5Padding".  Typically, this means "AES".
 
-For signing, the user specified signing key can be either symmetric or asymmetric.  For asymmetric signing (where the user would provide a signing key in the form of a [PrivateKey][privatekey]), currently the only supported algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a [SecretyKey][secretkey]), the algorithm would be determined by the specific signing key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
+For signing, the user specified signing key can be either symmetric or asymmetric.  For asymmetric signing (where the user would provide a signing key in the form of a [PrivateKey][privatekey]), currently the only supported algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a [SecretyKey][secretkey]), the algorithm would be determined by the provided key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
 
 ## FAQ
 

@@ -47,7 +47,7 @@ public class Book {
 }
 ```
 
-As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book object to and from Amazon DynamoDB _without encryption_ (nor signing).  For example,
+As a typical use case of [DynamoDBMapper][ddbmapper], you can easily save and retrieve a Book object to and from Amazon DynamoDB _without encryption (nor signing)_.  For example,
 
 ```java
     AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
@@ -67,7 +67,7 @@ As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book
 
 ```
 
-To enable transparent encryption and signing, you would need to supply the necessary encryption material.  For example:
+To enable transparent encryption and signing, simply specify the necessary encryption material via an [EncryptionMaterialsProvider][materialprovider].  For example:
 
 ```java
     AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
@@ -123,3 +123,4 @@ Currently the new data types in AmmazonDynamoDB including Map, List, Boolean, an
 [ddb]: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
 [ddbencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DynamoDBEncryptor.java
 [ddbmapper]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html
+[materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java

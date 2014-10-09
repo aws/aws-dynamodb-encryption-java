@@ -8,7 +8,7 @@ For more advanced use cases where tighter control over the encryption and signin
 
 ## Getting Started
 
-Suppose you have created ([see sample code][createtable]) a DynamoDB table "MyStore", and want to store some Book objects with the security requirements that the attributes Title and Authors need to be treated as sensitive information.  This is how the Book class may look like:
+Suppose you have created ([sample code][createtable]) a DynamoDB table "MyStore", and want to store some Book objects.  The security requirement involves classifying the attributes Title and Authors as sensitive information.  This is how the Book class may look like:
 
 ```
 @DynamoDBTable(tableName="MyStore")
@@ -47,7 +47,7 @@ public class Book {
 }
 ```
 
-As usual, you may save and retrieve a Book object to and from Amazon DynamoDB via DynamoDBMapper.  For example,
+As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book object to and from Amazon DynamoDB.  For example,
 
 ```
     AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
@@ -55,34 +55,38 @@ As usual, you may save and retrieve a Book object to and from Amazon DynamoDB vi
     Book book = new Book();
     book.setId(123);
     book.setTitle("Secret Book Title ");
-    // ... etc.
+    // ... etc. setting other properties
 
     // Saves the book unencrypted to DynamoDB
     mapper.save(book);
 
-    // Loads the book from DynamoDB
-    Book bookToLoad = new Book();
-    bookToLoad.setId(123);
-    Book bookToLoad = mapper.load(bookToLoad);
+    // Loads the book back from DynamoDB
+    Book bookTo = new Book();
+    bookTo.setId(123);
+    Book bookTo = mapper.load(bookTo);
 
 ```
 
-To enable transparent encryption and signing, simply configure DynamoDBMapper with the necessary encryption material provider.  For example:
+To enable transparent encryption and signing, you would need to supply the necessary encryption material.  For example:
 
 ```
-        AmazonDynamoDBClient client = new AmazonDynamoDBClient(awsTestCredentials());
-        SecretKey cek = ...;
-        SecretKey macKey =  ...;
-        EncryptionMaterialsProvider provider = new SymmetricStaticProvider(cek, macKey);
-        mapper = new DynamoDBMapper(client, config, new AttributeEncryptor(provider));
-        ...
+    AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
+    SecretKey cek = ...;        // Content encrypting key
+    SecretKey macKey =  ...;    // Signing key
+    EncryptionMaterialsProvider provider = new SymmetricStaticProvider(cek, macKey);
+    mapper = new DynamoDBMapper(client, config, new AttributeEncryptor(provider));
+    Book book = new Book();
+    book.setId(123);
+    book.setTitle("Secret Book Title ");
+    // ... etc. setting other properties
 
-        // Saves the book both encrypted and signed to DynamoDB
-        mapper.save(book);
+    // Saves the book both encrypted and signed to DynamoDB
+    mapper.save(bookFrom);
 
-        // Loads the book both decrypted and with signature verified from DynamoDB
-        ...
-        Book bookToLoad = mapper.load(bookToLoad);
+    // Loads the book both with signature verified and decrypted from DynamoDB
+    Book bookTo = new Book();
+    bookTo.setId(123);
+    Book bookTo = mapper.load(bookTo);
 
 ```
 

@@ -114,7 +114,7 @@ For signing, the user provided key can be either symmetric or asymmetric.  For a
 
 Currently the new data types in AmmazonDynamoDB including Map, List, Boolean, and NULL are not yet supported by this library.  This means the crypto layer would fail fast upon detecting the use of the new data types.  We expect to support the new types soon in upcoming releases.
 
-[attrencryptor]: https://github.com/awslabs/aws-dynamodb-encryption-java/blob/master/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
+[attrencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
 [ddb]: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
 [ddbencryptor]: https://github.com/awslabs/aws-dynamodb-encryption-java/blob/master/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DynamoDBEncryptor.java
 [ddbmapper]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html

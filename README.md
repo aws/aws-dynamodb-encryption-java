@@ -117,7 +117,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 ## Known Limitations
 
-Currently the new data types in [Amazon DynamoDB][ddb] including Map, List, Boolean, and NULL are not yet supported by this library.  This library would currenlty fail fast upon detecting the use of these new data types.  We expect to support the new types soon in future releases.
+Currently the new data types in [Amazon DynamoDB][ddb] including Map, List, Boolean, and NULL are not yet supported by this library.  In particular, this library would fail fast upon detecting the use of these new data types.  We expect to support the new types soon in future releases.
 
 [attrencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
 [createtable]: https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonDynamoDBDocumentAPI/quick-start/com/amazonaws/services/dynamodbv2/document/quickstart/A_CreateTableTest.java

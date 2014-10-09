@@ -74,7 +74,8 @@ To enable transparent encryption and signing, simply specify the necessary encry
     SecretKey cek = ...;        // Content encrypting key
     SecretKey macKey =  ...;    // Signing key
     EncryptionMaterialsProvider provider = new SymmetricStaticProvider(cek, macKey);
-    mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(provider));
+    mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT,
+                new AttributeEncryptor(provider));
     Book book = new Book();
     book.setId(123);
     book.setTitle("Secret Book Title ");

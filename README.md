@@ -103,7 +103,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 ## FAQ
 
-1. Is the content-encrypting key and signing key stored along side with the data in Amazon DynamoDB ?
+1. Do the content-encrypting key and signing key get encryted and stored along side with the data in Amazon DynamoDB ?
   * No.  The content-encrypting key and signing key are supplied by the user via the EncryptionMaterialsProvider, which also needs to return the corresponding "matrial descriptions" that subsequently be used by the EncryptionMaterialsProvider to identify the corresponding encryption material.  Only the material description is stored along side with the data in Amazon DynamoDB.
 
 2. How is the IV generated and where is it stored ?

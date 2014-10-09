@@ -97,9 +97,9 @@ There is a variety of existing [EncryptionMaterialsProvider][materialprovider] i
 
 ## Supported Algorithms
 
-For content encryption, the encryption algorithm is determined by the user specified SecretKey, as long as it can be used with the encryption mode "CBC" with "PKCS5Padding".  Typically, this means "AES".
+For content encryption, the encryption algorithm is determined by the user specified [SecretKey][secretkey], as long as it can be used with the encryption mode "CBC" with "PKCS5Padding".  Typically, this means "AES".
 
-For signing, the user specified signing key can be either symmetric or asymmetric.  For asymetric signing (where the user would provide a signing key in the form of a PrivateKey), currently the only supported algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a SecretyKey), the algorithm is determined by the specific signing key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
+For signing, the user specified signing key can be either symmetric or asymmetric.  For asymetric signing (where the user would provide a signing key in the form of a [PrivateKey][privatekey]), currently the only supported algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a [SecretyKey][secretkey]), the algorithm would be determined by the specific signing key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
 
 ## FAQ
 
@@ -128,3 +128,5 @@ Currently the new data types in AmmazonDynamoDB including Map, List, Boolean, an
 [donottouch]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotTouch.java
 [keystoreprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/KeyStoreMaterialsProvider.java
 [materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java
+[privatekey]: http://docs.oracle.com/javase/7/docs/api/java/security/PrivateKey.html
+[secretkey]: http://docs.oracle.com/javase/7/docs/api/javax/crypto/SecretKey.html

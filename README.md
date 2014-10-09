@@ -8,10 +8,10 @@ For more advanced use cases where tighter control over the encryption and signin
 
 ## Getting Started
 
-Suppose you have created a DynamoDB table "MixedObject", and want to store some Book objects with the security requirements that the attributes Title and Authors need to be treated as sensitive information.  This is how the Book class may look like:
+Suppose you have created ([see sample code][createtable]) a DynamoDB table "MyStore", and want to store some Book objects with the security requirements that the attributes Title and Authors need to be treated as sensitive information.  This is how the Book class may look like:
 
 ```
-@DynamoDBTable(tableName="MixedObject")
+@DynamoDBTable(tableName="MyStore")
 public class Book {
     private Integer id;
     private String title;
@@ -40,8 +40,8 @@ public class Book {
     public Set<String> getBookAuthors() { return bookAuthors; }
     public void setBookAuthors(Set<String> bookAuthors) { this.bookAuthors = bookAuthors; }
  
-    // Not stored in DynamoDB at all
-    @DynamoDBIgnore
+    // Not encrypted nor signed
+    @DoNotTouch
     public String getSomeProp() { return someProp;}
     public void setSomeProp(String someProp) {this.someProp = someProp;}
 }
@@ -115,6 +115,7 @@ For signing, the user provided key can be either symmetric or asymmetric.  For a
 Currently the new data types in AmmazonDynamoDB including Map, List, Boolean, and NULL are not yet supported by this library.  This means the crypto layer would fail fast upon detecting the use of the new data types.  We expect to support the new types soon in upcoming releases.
 
 [attrencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
+[createtable]: https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonDynamoDBDocumentAPI/quick-start/com/amazonaws/services/dynamodbv2/document/quickstart/A_CreateTableTest.java
 [ddb]: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
 [ddbencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DynamoDBEncryptor.java
 [ddbmapper]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html

@@ -110,7 +110,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
   * For each attribute that needs to be encrypted, a unique IV is randomly generated, and get stored along side with the binary representation of the attribute value.
 
 3. How many bits are used for the random IV ?
-  * The bit size used for the random IV is the as the block size of the block cipher used for content encryption, which therefore depends on the specific algorithm of the content encrypting key provided by the user.  Typically this means AES, or 128 bits.
+  * The bit size used for the random IV is the same as the block size of the block cipher used for content encryption, which therefore depends on the specific algorithm of the content encrypting key provided by the user.  Typically this means AES, or 128 bits.
 
 4. What is the key length for the content encrypting key ?
   * This depends on the specific content encrypting key provided by the user.  A typical key length of AES key is 128 bits or 256 bits.

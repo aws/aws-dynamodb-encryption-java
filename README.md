@@ -1,6 +1,3 @@
-aws-dynamodb-encryption-java
-============================
-
 # Client-side Java Encryption library for Amazon DynamoDB
 
 The **[Amazon DynamoDB][ddb] Client-side Java Encryption Library ** supports encryption and signing of your data when stored in Amazon DynamoDB.

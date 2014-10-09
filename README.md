@@ -104,7 +104,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 ## FAQ
 
 1. Do the content-encrypting key and signing key get encryted and stored along side with the data in Amazon DynamoDB ?
-  * No.  The content-encrypting key and signing key do not get persisted by this library.  However, in order to locate the material for decryption purposes, the identifying information (ie material descriptions) for the encryption material is indeed stored along side with the data in Amazon DynamoDB.  In particular, the user specified [EncryptionMaterialsProvider]materialprovider is responsible for not only providing the keys, but also the corresponding material descriptions.
+  * No.  The content-encrypting key and signing key do not get persisted by this library.  However, in order to locate the material for decryption purposes, the identifying information (ie material descriptions) for the encryption material is indeed stored along side with the data in Amazon DynamoDB.  In particular, the user specified [EncryptionMaterialsProvider][materialprovider] is responsible for not only providing the keys, but also the corresponding material descriptions.
 
 2. How is the IV generated and where is it stored ?
   * For each attribute that needs to be encrypted, a unique IV is randomly generated, and get stored along side with the binary representation of the attribute value.

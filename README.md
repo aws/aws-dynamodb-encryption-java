@@ -10,7 +10,7 @@ For more advanced use cases where tighter control over the encryption and signin
 
 Suppose you have created ([sample code][createtable]) a DynamoDB table "MyStore", and want to store some Book objects.  The security requirement involves classifying the attributes Title and Authors as sensitive information.  This is how the Book class may look like:
 
-```
+```java
 @DynamoDBTable(tableName="MyStore")
 public class Book {
     private Integer id;
@@ -47,9 +47,9 @@ public class Book {
 }
 ```
 
-As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book object to and from Amazon DynamoDB.  For example,
+As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book object to and from Amazon DynamoDB _without encryption_ (nor signing).  For example,
 
-```
+```java
     AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
     DynamoDBMapper mapper = new DynamoDBMapper(client);
     Book book = new Book();
@@ -69,7 +69,7 @@ As a typical use case of DynamoDBMapper, you can easily save and retrieve a Book
 
 To enable transparent encryption and signing, you would need to supply the necessary encryption material.  For example:
 
-```
+```java
     AmazonDynamoDBClient client = new AmazonDynamoDBClient(...);
     SecretKey cek = ...;        // Content encrypting key
     SecretKey macKey =  ...;    // Signing key

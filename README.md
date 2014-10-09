@@ -93,7 +93,7 @@ To enable transparent encryption and signing, simply specify the necessary encry
 
 Note that by default all attributes except the primary keys are both encrypted and signed for maximum security.  To selectively disable encryption, the annotation [@DoNotEncrypt][donotencrypt] can be used as shown in the [Book](#getting-started) class above.  To disable both encryption and signing, the annotation [@DoNotTouch][donottouch] can be used.
 
-There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implemenations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own custom implementation.
+There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implementations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own custom implementation.
 
 ## Supported Algorithms
 
@@ -103,8 +103,8 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 ## FAQ
 
-1. Do the content-encrypting key and signing key get encryted and stored along side with the data in Amazon DynamoDB ?
-  * No, neither the content-encrypting key nor the signing key get persisted by this library.  However, in order to locate the material for decryption purposes, the identifying information (ie material descriptions) for the encryption material is indeed stored along side with the data in Amazon DynamoDB.  In particular, the user specified [EncryptionMaterialsProvider][materialprovider] is responsible for not only providing the keys, but also the corresponding material descriptions.
+1. Do the content-encrypting key and signing key get encrypted and stored along side with the data in Amazon DynamoDB ?
+  * No, neither the content-encrypting key nor the signing key get persisted by this library.  However, in order to locate the material for decryption purposes, the identifying information (i.e. material descriptions) for the encryption material is indeed stored along side with the data in Amazon DynamoDB.  In particular, the user specified [EncryptionMaterialsProvider][materialprovider] is responsible for not only providing the keys, but also the corresponding material descriptions.
 
 2. How is the IV generated and where is it stored ?
   * For each attribute that needs to be encrypted, a unique IV is randomly generated, and get stored along side with the binary representation of the attribute value.

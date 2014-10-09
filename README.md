@@ -113,7 +113,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
   * The bit size used for each random IV is the same as the block size of the block cipher used for content encryption.  The IV bit-size therefore depends on the specific algorithm of the content encrypting key provided by the user.  Typically this means AES, or 128 bits.
 
 4. What is the key length for the content encrypting key ?
-  * This depends on the specific content encrypting key provided by the user.  A typical key length of AES key is 128 bits or 256 bits.
+  * This depends on the specific content encrypting key provided by the user.  A typical length of an AES key is 128 bits or 256 bits.
 
 ## Known Limitations
 

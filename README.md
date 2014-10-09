@@ -91,7 +91,7 @@ To enable transparent encryption and signing, simply specify the necessary encry
 
 ```
 
-Note that by default all attributes except the primary keys are both encrypted and signed for maximum security.  To selectively disable encryption, the annotation [@DoNotEncrypt][donotencrypt] can be used as shown in the Book class above.  To both encryption and signing, [@DoNotTouch][donottouch] can be used.
+Note that by default all attributes except the primary keys are both encrypted and signed for maximum security.  To selectively disable encryption, the annotation [@DoNotEncrypt][donotencrypt] can be used as shown in the Book class above.  To disable both encryption and signing, the annotation [@DoNotTouch][donottouch] can be used.
 
 There is a variety of existing EncryptionMaterialsProvider implemenations that you can use to provide the encryption material, including the use of Java keystore.  Alternatively, you can also plug in your own for your specific use cases.
 

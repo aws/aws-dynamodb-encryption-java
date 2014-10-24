@@ -54,13 +54,15 @@ class DynamoDBSigner {
     private final SecretKey hmacComparisonKey;
     private final String signingAlgorithm;
 
+    /**
+     * @param signingAlgorithm
+     *            is the algorithm used for asymmetric signing (ex:
+     *            SHA256withRSA). This is ignored for symmetric HMACs as that
+     *            algorithm is fully specified by the key.
+     */
     static DynamoDBSigner getInstance(String signingAlgorithm, SecureRandom rnd) {
         DynamoDBSigner result = cache.get(signingAlgorithm);
         if (result == null) {
-            // TODO: Support more signing algorithms.
-            if (!signingAlgorithm.equals("SHA256withRSA")) {
-                throw new UnsupportedOperationException("Only SHA256withRSA signatures currently supported.");
-            }
             result = new DynamoDBSigner(signingAlgorithm, rnd);
             cache.putIfAbsent(signingAlgorithm, result);
         }

@@ -110,8 +110,16 @@ public class AttributeValueMarshaller {
                     out.writeInt(bytes.length);
                     out.write(bytes);
                 }
+            } else if (attributeValue.getBOOL() != null) {
+                throw new UnsupportedOperationException("BOOL data type has yet to be supported");
+            } else if (attributeValue.getNULL() != null) {
+                throw new UnsupportedOperationException("NULL data type has yet to be supported");
+            } else if (attributeValue.getL() != null) {
+                throw new UnsupportedOperationException("List data type has yet to be supported");
+            } else if (attributeValue.getM() != null) {
+                throw new UnsupportedOperationException("Map data type has yet to be supported");
             } else {
-                out.writeChar('\0');
+                throw new IllegalArgumentException("A seemingly empty AttributeValue is indicative of invalid input or potential errors");
             }
             out.close();
             return ByteBuffer.wrap(resultBytes.toByteArray());

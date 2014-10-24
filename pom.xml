@@ -46,6 +46,13 @@
       <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15on</artifactId>
+      <version>1.50</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>

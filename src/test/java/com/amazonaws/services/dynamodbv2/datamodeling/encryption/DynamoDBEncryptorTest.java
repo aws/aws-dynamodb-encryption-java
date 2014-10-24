@@ -22,9 +22,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.SignatureException;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +42,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -250,6 +257,37 @@ public class DynamoDBEncryptorTest {
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
     }
     
+    @Test
+    public void EcdsaSignedOnly() throws GeneralSecurityException {
+
+        encryptor = DynamoDBEncryptor.getInstance(getMaterialProviderwithECDSA());
+        
+        Map<String, AttributeValue> encryptedAttributes = encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
+        assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+        Map<String, AttributeValue> decryptedAttributes = 
+                encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
+        
+        // Make sure keys and version are not encrypted
+        assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
+        assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
+        assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
+        
+        // Make sure String has not been encrypted (we'll assume the others are correct as well)
+        assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+    }
+    
+    @Test(expected=SignatureException.class)
+    public void EcdsaSignedOnlyBadSignature() throws GeneralSecurityException {
+
+        encryptor = DynamoDBEncryptor.getInstance(getMaterialProviderwithECDSA());
+
+        Map<String, AttributeValue> encryptedAttributes = encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
+        assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+        encryptedAttributes.get("hashKey").setN("666");
+        encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+    }
+
     private void assertAttrEquals(AttributeValue o1, AttributeValue o2) {
         Assert.assertEquals(o1.getB(), o2.getB());
         assertSetsEqual(o1.getBS(), o2.getBS());
@@ -268,6 +306,18 @@ public class DynamoDBEncryptorTest {
         }
     }
     
+    private EncryptionMaterialsProvider getMaterialProviderwithECDSA() 
+           throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException {
+            Security.addProvider(new BouncyCastleProvider());
+            ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
+            KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
+            g.initialize(ecSpec, new SecureRandom());
+            KeyPair keypair = g.generateKeyPair();
+            Map<String, String> description = new HashMap<String, String>();
+            description.put(DynamoDBEncryptor.DEFAULT_SIGNING_ALGORITHM_HEADER, "SHA384withECDSA");
+            return new SymmetricStaticProvider(null, keypair, description);
+    }
+
     private static final class InstrumentedEncryptionMaterialsProvider implements EncryptionMaterialsProvider {
         private final EncryptionMaterialsProvider delegate;
         private final ConcurrentHashMap<String, AtomicInteger> calls = new ConcurrentHashMap<>();

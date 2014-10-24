@@ -20,6 +20,7 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.SignatureException;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,6 +29,9 @@ import java.util.Set;
 
 import javax.crypto.KeyGenerator;
 
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,36 +41,44 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 public class DynamoDBSignerTest {
     // These use the Key type (rather than PublicKey, PrivateKey, and SecretKey)
     // to test the routing logic within the signer.
-    private static Key pubKey;
-    private static Key privKey;
+    private static Key pubKeyRsa;
+    private static Key privKeyRsa;
     private static Key macKey;
     private static SecureRandom rnd;
-    private DynamoDBSigner signer;
+    private DynamoDBSigner signerRsa;
+    private DynamoDBSigner signerEcdsa;
+    private static Key pubKeyEcdsa;
+    private static Key privKeyEcdsa;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
         rnd = new SecureRandom();
+        
+        //RSA key generation
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, rnd);
         KeyPair sigPair = rsaGen.generateKeyPair();
-        pubKey = sigPair.getPublic();
-        privKey = sigPair.getPrivate();
+        pubKeyRsa = sigPair.getPublic();
+        privKeyRsa = sigPair.getPrivate();
         
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
         macGen.init(256, rnd);
         macKey = macGen.generateKey();
         
+        Security.addProvider(new BouncyCastleProvider());
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
+        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
+        g.initialize(ecSpec, new SecureRandom());
+        KeyPair keypair = g.generateKeyPair();
+        pubKeyEcdsa = keypair.getPublic();
+        privKeyEcdsa = keypair.getPrivate();
         
     }
     
     @Before
     public void setUp() {
-        signer = DynamoDBSigner.getInstance("SHA256withRSA", rnd);
-    }
-
-    @Test(expected=UnsupportedOperationException.class)
-    public void testBadAlgorithm() {
-        DynamoDBSigner.getInstance("badAlgorithm", rnd);
+        signerRsa = DynamoDBSigner.getInstance("SHA256withRSA", rnd);
+        signerEcdsa = DynamoDBSigner.getInstance("SHA384withECDSA", rnd);
     }
 
     @Test
@@ -80,9 +92,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
 
     @Test
@@ -97,9 +109,9 @@ public class DynamoDBSignerTest {
         itemAttributes.put("Key3", new AttributeValue().withBS(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3}),
                                                                ByteBuffer.wrap(new byte[] { 3, 2, 1})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -114,7 +126,7 @@ public class DynamoDBSignerTest {
         itemAttributes.put("Key3", new AttributeValue().withBS(ByteBuffer.wrap(new byte[] { 3, 2, 1}),
                                                                ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
         Map<String, AttributeValue> scrambledAttributes = new HashMap<String, AttributeValue>();
         scrambledAttributes.put("Key1", new AttributeValue().withSS("Value1", "Value2", "Value3"));
@@ -122,7 +134,7 @@ public class DynamoDBSignerTest {
         scrambledAttributes.put("Key3", new AttributeValue().withBS(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3}),
                                                                ByteBuffer.wrap(new byte[] { 3, 2, 1})));
 
-        signer.verifySignature(scrambledAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(scrambledAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -136,9 +148,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, null, macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, null, macKey);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -153,11 +165,11 @@ public class DynamoDBSignerTest {
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
         itemAttributes.put("Key4", new AttributeValue().withS("Ignored Value"));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
         
         itemAttributes.put("Key4", new AttributeValue().withS("New Ignored Value"));
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -171,10 +183,10 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
         itemAttributes.get("Key2").setN("99");
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -188,10 +200,10 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], macKey);
         
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -205,9 +217,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[] {3, 2, 1}, macKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[] {3, 2, 1}, macKey);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[] {1, 2, 3}, macKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[] {1, 2, 3}, macKey, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -221,9 +233,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -237,9 +249,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature).asReadOnlyBuffer());
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature).asReadOnlyBuffer());
     }
     
     @Test
@@ -253,9 +265,9 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, null, privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, null, privKeyRsa);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
     
     @Test
@@ -270,10 +282,10 @@ public class DynamoDBSignerTest {
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
         itemAttributes.put("Key4", new AttributeValue().withS("Ignored Value"));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
         itemAttributes.put("Key4", new AttributeValue().withS("New Ignored Value"));
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -287,10 +299,10 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
         itemAttributes.get("Key2").setN("99");
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -304,10 +316,10 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
     
     @Test(expected=SignatureException.class)
@@ -321,8 +333,107 @@ public class DynamoDBSignerTest {
         attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
         itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
         attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN, EncryptionFlags.ENCRYPT));
-        byte[] signature = signer.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKey);
+        byte[] signature = signerRsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyRsa);
         
-        signer.verifySignature(itemAttributes, attributeFlags, new byte[] {1, 2, 3}, pubKey, ByteBuffer.wrap(signature));
+        signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[] {1, 2, 3}, pubKeyRsa, ByteBuffer.wrap(signature));
+    }
+    
+    @Test
+    public void sigEcdsa() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyEcdsa);
+        
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
+    }
+    
+    @Test
+    public void sigEcdsaWithReadOnlySignature() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyEcdsa);
+        
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature).asReadOnlyBuffer());
+    }
+    
+    @Test
+    public void sigEcdsaNoAdMatchesEmptyAd() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, null, privKeyEcdsa);
+        
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
+    }
+    
+    @Test
+    public void sigEcdsaWithIgnoredChange() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key4", new AttributeValue().withS("Ignored Value"));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyEcdsa);
+        
+        itemAttributes.put("Key4", new AttributeValue().withS("New Ignored Value"));
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
+    }
+    
+    @Test(expected=SignatureException.class)
+    public void sigEcdsaChangedValue() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyEcdsa);
+        
+        itemAttributes.get("Key2").setN("99");
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
+    }
+    
+    @Test(expected=SignatureException.class)
+    public void sigEcdsaChangedAssociatedData() throws GeneralSecurityException {
+        Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
+        Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
+        
+        itemAttributes.put("Key1", new AttributeValue().withS("Value1"));
+        attributeFlags.put("Key1", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key2", new AttributeValue().withN("100"));
+        attributeFlags.put("Key2", EnumSet.of(EncryptionFlags.SIGN));
+        itemAttributes.put("Key3", new AttributeValue().withB(ByteBuffer.wrap(new byte[] { 0, 1, 2, 3})));
+        attributeFlags.put("Key3", EnumSet.of(EncryptionFlags.SIGN));
+        byte[] signature = signerEcdsa.calculateSignature(itemAttributes, attributeFlags, new byte[0], privKeyEcdsa);
+        
+        signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[] {1, 2, 3}, pubKeyEcdsa, ByteBuffer.wrap(signature));
     }
 }

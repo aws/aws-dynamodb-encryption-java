@@ -70,6 +70,8 @@ public class DynamoDBEncryptor {
     private final String symmetricEncryptionModeHeader;
     private final String signingAlgorithmHeader;
     
+    public static final String DEFAULT_SIGNING_ALGORITHM_HEADER = DEFAULT_DESCRIPTION_BASE + "signingAlg";
+    
     protected DynamoDBEncryptor(EncryptionMaterialsProvider provider, String descriptionBase) {
         this.encryptionMaterialsProvider = provider;
         this.descriptionBase = descriptionBase;
@@ -306,8 +308,10 @@ public class DynamoDBEncryptor {
 
         // The description must be stored after encryption because its data
         // is necessary for proper decryption.
-        DynamoDBSigner signer = DynamoDBSigner.getInstance(DEFAULT_SIGNATURE_ALGORITHM, rnd);
-        if (materials.getSigningKey() instanceof PrivateKey) {
+        final String signingAlgo = materialDescription.get(signingAlgorithmHeader);
+        DynamoDBSigner signer = DynamoDBSigner.getInstance(signingAlgo == null ? DEFAULT_SIGNATURE_ALGORITHM : signingAlgo, rnd);
+        
+        if (materials.getSigningKey() instanceof PrivateKey ) {
             materialDescription.put(signingAlgorithmHeader, signer.getSigningAlgorithm());
         }
         if (!materialDescription.isEmpty()) {
@@ -483,6 +487,9 @@ public class DynamoDBEncryptor {
         }
     }
 
+    public String getSigningAlgorithmHeader() {
+        return signingAlgorithmHeader;
+    }
     /**
      * @see #marshallDescription(Map)
      */

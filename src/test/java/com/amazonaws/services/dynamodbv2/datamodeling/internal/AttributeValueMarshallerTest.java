@@ -21,7 +21,9 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -30,10 +32,10 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 public class AttributeValueMarshallerTest {
-    @Test
+    @Test(expected=IllegalArgumentException.class)
     public void testEmpty() {
         AttributeValue av = new AttributeValue();
-        assertEquals(av, unmarshall(marshall(av)));
+        marshall(av);
     }
     
     @Test
@@ -77,6 +79,31 @@ public class AttributeValueMarshallerTest {
         assertEquals(av, unmarshall(marshall(av)));
     }
     
+    @Test(expected=UnsupportedOperationException.class)
+    public void testBOOL() {
+        AttributeValue av = new AttributeValue().withBOOL(Boolean.TRUE);
+        marshall(av);
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testNULL() {
+        AttributeValue av = new AttributeValue().withNULL(Boolean.TRUE);
+        marshall(av);
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testList() {
+        AttributeValue av = new AttributeValue().withL();
+        marshall(av);
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testMap() {
+        Map<String,AttributeValue> map = new HashMap<String,AttributeValue>();
+        AttributeValue av = new AttributeValue().withM(map);
+        marshall(av);
+    }
+
     private void assertEquals(AttributeValue o1, AttributeValue o2) {
         Assert.assertEquals(o1.getB(), o2.getB());
         assertSetsEqual(o1.getBS(), o2.getBS());

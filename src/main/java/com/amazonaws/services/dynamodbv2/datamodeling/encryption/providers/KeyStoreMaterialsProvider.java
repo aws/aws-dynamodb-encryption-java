@@ -14,14 +14,14 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.ProtectionParameter;
-import java.security.KeyStore.TrustedCertificateEntry;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore.SecretKeyEntry;
+import java.security.KeyStore.TrustedCertificateEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;

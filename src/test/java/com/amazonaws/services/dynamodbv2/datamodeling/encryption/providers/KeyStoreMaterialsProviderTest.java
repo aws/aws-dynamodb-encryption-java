@@ -37,7 +37,6 @@ import java.util.Map;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,6 +44,7 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.util.Base64;
 
 public class KeyStoreMaterialsProviderTest {
     private static final String certPem = 
@@ -124,10 +124,10 @@ public class KeyStoreMaterialsProviderTest {
         keyStore.load(null, password.toCharArray());
         
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec rsaSpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(keyPem));
+        PKCS8EncodedKeySpec rsaSpec = new PKCS8EncodedKeySpec(Base64.decode(keyPem));
         privateKey = kf.generatePrivate(rsaSpec);
         CertificateFactory cf = CertificateFactory.getInstance("X509");
-        certificate = cf.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(certPem)));
+        certificate = cf.generateCertificate(new ByteArrayInputStream(Base64.decode(certPem)));
         
         
         keyStore.setEntry("enc", new SecretKeyEntry(encryptionKey), passwordProtection);

@@ -255,7 +255,7 @@ public class DynamoDBEncryptor {
         if (!itemAttributes.containsKey(signatureFieldName) || itemAttributes.get(signatureFieldName).getB() == null) {
             signature = ByteBuffer.allocate(0);
         } else {
-            signature = itemAttributes.get(signatureFieldName).getB();
+            signature = itemAttributes.get(signatureFieldName).getB().asReadOnlyBuffer();
         }
         itemAttributes.remove(signatureFieldName);
 
@@ -344,7 +344,7 @@ public class DynamoDBEncryptor {
                     throw new IllegalArgumentException("All encrypted fields must be signed. Bad field: " + entry.getKey());
                 }
                 ByteBuffer plainText;
-                ByteBuffer cipherText = entry.getValue().getB();
+                ByteBuffer cipherText = entry.getValue().getB().asReadOnlyBuffer();
                 cipherText.rewind();
                 if (encryptionKey instanceof DelegatedKey) {
                     plainText = ByteBuffer.wrap(((DelegatedKey)encryptionKey).decrypt(toByteArray(cipherText), null, encryptionMode));

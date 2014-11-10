@@ -122,25 +122,37 @@ public class DynamoDBEncryptorTest {
         Map<String, AttributeValue> encryptedAttributes = 
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+
         Map<String, AttributeValue> decryptedAttributes =
                 encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-        
+
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
         assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
-        
+
         // Make sure String has been encrypted (we'll assume the others are correct as well)
         assertTrue(encryptedAttributes.containsKey("stringValue"));
         assertNull(encryptedAttributes.get("stringValue").getS());
         assertNotNull(encryptedAttributes.get("stringValue").getB());
-        
+
         // Make sure we're calling the proper getEncryptionMaterials method
         assertEquals("Wrong getEncryptionMaterials() called", 
                 1, prov.getCallCount("getEncryptionMaterials(EncryptionContext context)"));
     }
-    
+
+    @Test
+    public void ensureEncryptedAttributesUnmodified() throws GeneralSecurityException {
+        Map<String, AttributeValue> encryptedAttributes =
+                encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
+        String encryptedString = encryptedAttributes.toString();
+        Map<String, AttributeValue> decryptedAttributes =
+                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
+
+        assertEquals(encryptedString, encryptedAttributes.toString());
+    }
+
     @Test(expected=SignatureException.class)
     public void fullEncryptionBadSignature() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
@@ -305,7 +317,7 @@ public class DynamoDBEncryptorTest {
             Assert.assertEquals(s1, s2);
         }
     }
-    
+
     private EncryptionMaterialsProvider getMaterialProviderwithECDSA() 
            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException {
             Security.addProvider(new BouncyCastleProvider());

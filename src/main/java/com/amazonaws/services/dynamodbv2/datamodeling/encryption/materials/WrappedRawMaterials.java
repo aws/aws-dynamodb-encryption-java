@@ -14,7 +14,6 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -30,9 +29,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.apache.commons.codec.binary.Base64;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
+import com.amazonaws.util.Base64;
 
 /**
  * Represents cryptographic materials used to manage unique record-level keys.
@@ -64,7 +62,6 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
      * key.
      */
     protected static final String ENVELOPE_KEY = "amzn-ddb-env-key";
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private static final String DEFAULT_ALGORITHM = "AES/256";
     private static final SecureRandom rand = new SecureRandom();
 
@@ -125,7 +122,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
             if (unwrappingKey == null) {
                 throw new IllegalStateException("No private decryption key provided.");
             }
-            byte[] encryptedKey = Base64.decodeBase64(description.get(ENVELOPE_KEY).getBytes(UTF8));
+            byte[] encryptedKey = Base64.decode(description.get(ENVELOPE_KEY));
             String wrappingAlgorithm = unwrappingKey.getAlgorithm();
             if (description.containsKey(KEY_WRAPPING_ALGORITHM)) {
                 wrappingAlgorithm = description.get(KEY_WRAPPING_ALGORITHM);
@@ -140,7 +137,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
                     description.get(KEY_WRAPPING_ALGORITHM) :
                     getTransformation(wrappingKey.getAlgorithm());
             byte[] encryptedKey = wrapKey(key, wrappingAlg);
-            description.put(ENVELOPE_KEY, new String(Base64.encodeBase64(encryptedKey), UTF8));
+            description.put(ENVELOPE_KEY, Base64.encodeAsString(encryptedKey));
             description.put(CONTENT_KEY_ALGORITHM, key.getAlgorithm());
             description.put(KEY_WRAPPING_ALGORITHM, wrappingAlg);
             setMaterialDescription(description);

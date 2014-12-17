@@ -214,4 +214,12 @@ public final class EncryptionContext {
             return materialDescription;
         }
     }
+
+    @Override
+    public String toString() {
+        return "EncryptionContext [tableName=" + tableName + ", attributeValues=" + attributeValues
+                + ", modeledClass=" + modeledClass + ", developerContext=" + developerContext
+                + ", hashKeyName=" + hashKeyName + ", rangeKeyName=" + rangeKeyName
+                + ", materialDescription=" + materialDescription + "]";
+    }
 }

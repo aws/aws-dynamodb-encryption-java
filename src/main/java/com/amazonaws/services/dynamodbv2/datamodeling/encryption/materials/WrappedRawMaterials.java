@@ -61,7 +61,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
      * The key-name in the Description which which contains the wrapped content
      * key.
      */
-    protected static final String ENVELOPE_KEY = "amzn-ddb-env-key";
+    public  static final String ENVELOPE_KEY = "amzn-ddb-env-key";
     private static final String DEFAULT_ALGORITHM = "AES/256";
     private static final SecureRandom rand = new SecureRandom();
 

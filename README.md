@@ -95,7 +95,9 @@ Note that by default all attributes except the primary keys are both encrypted a
 
 There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implementations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own custom implementation.
 
-### Maven Dependency
+### Downloads
+
+You can download the [latest snapshot release][download] or pick it up from Maven:
 
 ```xml
   <dependency>
@@ -142,3 +144,4 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 [materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java
 [privatekey]: http://docs.oracle.com/javase/7/docs/api/java/security/PrivateKey.html
 [secretkey]: http://docs.oracle.com/javase/7/docs/api/javax/crypto/SecretKey.html
+[download]: https://github.com/awslabs/aws-dynamodb-encryption-java/releases/tag/0.0.3-SNAPSHOT

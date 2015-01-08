@@ -95,6 +95,16 @@ Note that by default all attributes except the primary keys are both encrypted a
 
 There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implementations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own custom implementation.
 
+### Maven Dependency
+
+```xml
+  <dependency>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-dynamodb-encryption-java</artifactId>
+    <version>0.0.3-SNAPSHOT</version>
+  </dependency>
+```
+
 ## Supported Algorithms
 
 For content encryption, the encryption algorithm is determined by the user specified [SecretKey][secretkey], as long as it is a block cipher that can be used with the encryption mode "CBC" and "PKCS5Padding".  Typically, this means "AES".

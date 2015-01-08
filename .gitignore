@@ -1,2 +1,3 @@
-target
 cleanup.sh
+release.sh
+target

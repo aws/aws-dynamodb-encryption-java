@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
@@ -41,6 +42,7 @@ import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.Base64;
+import com.amazonaws.util.VersionInfoUtils;
 
 /**
  * Generates a unique data key for each record in DynamoDB and protects that key
@@ -51,6 +53,9 @@ import com.amazonaws.util.Base64;
  * @see <a href="http://docs.aws.amazon.com/kms/latest/developerguide/encrypt-context.html">KMS Encryption Context</a>
  */
 public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
+    private static final String VERSION_STRING = "1.0";
+    private static final String USER_AGENT = DirectKmsMaterialProvider.class.getName()
+            + "/" + VERSION_STRING + "/" + VersionInfoUtils.getVersion();
     private static final String COVERED_ATTR_CTX_KEY = "aws-kms-ec-attr";
     private static final String SIGNING_KEY_ALGORITHM = "amzn-ddb-sig-alg";
     private static final String TABLE_NAME_EC_KEY = "*aws-kms-table*";
@@ -117,7 +122,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
 
         populateKmsEcFromEc(context, ec);
 
-        DecryptRequest request = new DecryptRequest();
+        DecryptRequest request = appendUserAgent(new DecryptRequest());
         request.setCiphertextBlob(ByteBuffer.wrap(Base64.decode(materialDescription.get(ENVELOPE_KEY))));
         request.setEncryptionContext(ec);
         final DecryptResult decryptResult = kms.decrypt(request);
@@ -148,7 +153,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         ec.put("*" + SIGNING_KEY_ALGORITHM + "*", sigKeyDesc);
         populateKmsEcFromEc(context, ec);
 
-        final GenerateDataKeyRequest req = new GenerateDataKeyRequest();
+        final GenerateDataKeyRequest req = appendUserAgent(new GenerateDataKeyRequest());
         req.setKeyId(encryptionKeyId);
         req.setNumberOfBytes(256);
         req.setEncryptionContext(ec);
@@ -227,6 +232,11 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         byte[] result = new byte[dup.remaining()];
         dup.get(result);
         return result;
+    }
+
+    private final <X extends AmazonWebServiceRequest> X appendUserAgent(final X request) {
+        request.getRequestClientOptions().appendUserAgent(USER_AGENT);
+        return request;
     }
 
     @Override

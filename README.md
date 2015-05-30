@@ -107,7 +107,7 @@ You can download the [latest snapshot release][download] or pick it up from Mave
   </dependency>
 ```
 
-To enable the download of snapshot jars from Maven:
+Don't forget to enable the download of snapshot jars from Maven:
 
 ```xml
   <profiles>

@@ -105,6 +105,22 @@ You can download the [latest snapshot release][download] or pick it up from Mave
     <artifactId>aws-dynamodb-encryption-java</artifactId>
     <version>0.0.3-SNAPSHOT</version>
   </dependency>
+  ...
+  <!-- To enable maven dependency on snapshot jar -->
+  <profiles>
+    <profile>
+       <id>allow-snapshots</id>
+          <activation><activeByDefault>true</activeByDefault></activation>
+       <repositories>
+         <repository>
+           <id>snapshots-repo</id>
+           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+           <releases><enabled>false</enabled></releases>
+           <snapshots><enabled>true</enabled></snapshots>
+         </repository>
+       </repositories>
+     </profile>
+  </profiles>
 ```
 
 ## Supported Algorithms

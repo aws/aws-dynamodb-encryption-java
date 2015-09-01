@@ -1,11 +1,11 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- *
+ * 
  * http://aws.amazon.com/apache2.0
- *
+ * 
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -85,15 +85,16 @@ public final class LRUCache<T> {
     public void clear() {
         // The more complicated logic is to ensure that the listener is
         // actually called for all entries.
-        Set<Map.Entry<String, T>> entries = null;
         if (listener != null) {
-            entries = new HashSet<Map.Entry<String, T>>(map.entrySet());
-        }
-        if (listener != null && entries != null) {
-            for (final Map.Entry<String, T> e : entries) {
-                listener.onRemoval(e);
-                map.remove(e.getKey());
+            Set<Map.Entry<String, T>> entries = new HashSet<Map.Entry<String, T>>(map.entrySet());
+            if (entries != null) {
+                for (final Map.Entry<String, T> e : entries) {
+                    listener.onRemoval(e);
+                    map.remove(e.getKey());
+                }
             }
+        } else {
+            map.clear();
         }
     }
 

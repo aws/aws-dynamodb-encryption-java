@@ -99,6 +99,9 @@ public class MostRecentProviderTests {
 
         assertEquals(eMat1.getSigningKey(), eMat2.getSigningKey());
         assertEquals(eMat1.getSigningKey(), eMat3.getSigningKey());
+        // Check algorithms. Right now we only support AES and HmacSHA256
+        assertEquals("AES", eMat1.getEncryptionKey().getAlgorithm());
+        assertEquals("HmacSHA256", eMat1.getSigningKey().getAlgorithm());
 
         // Ensure we can decrypt all of them without hitting ddb more than the minimum
         final MostRecentProvider prov2 = new MostRecentProvider(store, MATERIAL_NAME, 500);

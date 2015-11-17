@@ -191,7 +191,7 @@ public class MetaStore extends ProviderStore {
         plaintext.put(ENCRYPTION_ALGORITHM_FIELD, new AttributeValue().withS(encryptionKey.getAlgorithm()));
         plaintext
         .put(INTEGRITY_KEY_FIELD, new AttributeValue().withB(ByteBuffer.wrap(integrityKey.getEncoded())));
-        plaintext.put(INTEGRITY_ALGORITHM_FIELD, new AttributeValue().withS(encryptionKey.getAlgorithm()));
+        plaintext.put(INTEGRITY_ALGORITHM_FIELD, new AttributeValue().withS(integrityKey.getAlgorithm()));
 
         try {
             return encryptor.encryptAllFieldsExcept(plaintext, ddbCtx, DEFAULT_HASH_KEY,

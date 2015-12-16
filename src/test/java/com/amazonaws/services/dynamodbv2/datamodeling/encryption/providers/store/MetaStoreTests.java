@@ -27,7 +27,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.amazonaws.services.dynamodb.mock.AmazonDynamoDBMock;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
@@ -38,6 +37,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.Encry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
+import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 
 public class MetaStoreTests {
@@ -56,7 +56,7 @@ public class MetaStoreTests {
 
     @Before
     public void setup() {
-        client = synchronize(new AmazonDynamoDBMock(), AmazonDynamoDB.class);
+        client = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
         MetaStore.createTable(client, TABLE_NAME, new ProvisionedThroughput(1L, 1L));
         store = new MetaStore(client, TABLE_NAME, ENCRYPTOR);
         ctx = new EncryptionContext.Builder().build();

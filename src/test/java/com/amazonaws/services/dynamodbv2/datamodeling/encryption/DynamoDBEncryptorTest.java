@@ -95,6 +95,10 @@ public class DynamoDBEncryptorTest {
         attribs.put("hashKey", new AttributeValue().withN("5"));
         attribs.put("rangeKey", new AttributeValue().withN("7"));
         attribs.put("version", new AttributeValue().withN("0"));
+        Map<String, AttributeValue> map = new HashMap<>();
+        map.put("key1", new AttributeValue().withS("value1"));
+        map.put("key2", new AttributeValue().withS("value2"));
+        attribs.put("map", new AttributeValue().withM(map));
 
         context = new EncryptionContext.Builder()
             .withTableName("TableName")
@@ -136,6 +140,11 @@ public class DynamoDBEncryptorTest {
         assertTrue(encryptedAttributes.containsKey("stringValue"));
         assertNull(encryptedAttributes.get("stringValue").getS());
         assertNotNull(encryptedAttributes.get("stringValue").getB());
+
+        assertNull(encryptedAttributes.get("map").getM().get("key1").getS());
+        assertNull(encryptedAttributes.get("map").getM().get("key2").getS());
+        assertNotNull(encryptedAttributes.get("map").getM().get("key1").getB());
+        assertNotNull(encryptedAttributes.get("map").getM().get("key2").getB());
 
         // Make sure we're calling the proper getEncryptionMaterials method
         assertEquals("Wrong getEncryptionMaterials() called", 
@@ -190,6 +199,7 @@ public class DynamoDBEncryptorTest {
         
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+        assertAttrEquals(attribs.get("map"), encryptedAttributes.get("map"));
     }
     
     @Test
@@ -210,6 +220,7 @@ public class DynamoDBEncryptorTest {
         
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+        assertAttrEquals(attribs.get("map"), encryptedAttributes.get("map"));
     }
     
     @Test(expected=SignatureException.class)
@@ -252,6 +263,7 @@ public class DynamoDBEncryptorTest {
         
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+        assertAttrEquals(attribs.get("map"), encryptedAttributes.get("map"));
     }
     
     @Test(expected=SignatureException.class)
@@ -287,6 +299,7 @@ public class DynamoDBEncryptorTest {
         
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+        assertAttrEquals(attribs.get("map"), encryptedAttributes.get("map"));
     }
     
     @Test(expected=SignatureException.class)
@@ -307,6 +320,7 @@ public class DynamoDBEncryptorTest {
         assertSetsEqual(o1.getNS(), o2.getNS());
         Assert.assertEquals(o1.getS(), o2.getS());
         assertSetsEqual(o1.getSS(), o2.getSS());
+        Assert.assertEquals(o1.getM(), o2.getM());
     }
     
     private <T> void assertSetsEqual(Collection<T> c1, Collection<T> c2) {

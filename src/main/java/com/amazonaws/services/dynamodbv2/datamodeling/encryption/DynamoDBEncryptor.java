@@ -21,10 +21,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,8 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.AttributeEncryptor;
@@ -343,28 +339,47 @@ public class DynamoDBEncryptor {
                 if (!flags.contains(EncryptionFlags.SIGN)) {
                     throw new IllegalArgumentException("All encrypted fields must be signed. Bad field: " + entry.getKey());
                 }
-                ByteBuffer plainText;
-                ByteBuffer cipherText = entry.getValue().getB().asReadOnlyBuffer();
-                cipherText.rewind();
-                if (encryptionKey instanceof DelegatedKey) {
-                    plainText = ByteBuffer.wrap(((DelegatedKey)encryptionKey).decrypt(toByteArray(cipherText), null, encryptionMode));
-                } else {
-                    if (cipher == null) {
-                        cipher = Cipher.getInstance(
-                                encryptionMode);
-                        ivSize = cipher.getBlockSize();
-                    }
-                    byte[] iv = new byte[ivSize];
-                    cipherText.get(iv);
-                    cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
-                    plainText = ByteBuffer.allocate(
-                            cipher.getOutputSize(cipherText.remaining()));
-                    cipher.doFinal(cipherText, plainText);
-                    plainText.rewind();
-                }
-                entry.setValue(AttributeValueMarshaller.unmarshall(plainText));
+
+                AttributeValue unencryptedValue = decryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize);
+                entry.setValue(unencryptedValue);
             }
         }
+    }
+
+    private AttributeValue decryptAttributeValue(AttributeValue value,
+                                                 SecretKey encryptionKey,
+                                                 String encryptionMode,
+                                                 Cipher cipher,
+                                                 int ivSize) throws GeneralSecurityException {
+        // Recursively call through map attributes
+        if (value.getM() != null) {
+            Map<String, AttributeValue> decryptedMap = new HashMap<>(value.getM());
+            for (Map.Entry<String, AttributeValue> entry : decryptedMap.entrySet()) {
+                entry.setValue(decryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize));
+            }
+            return new AttributeValue().withM(decryptedMap);
+        }
+
+        ByteBuffer plainText;
+        ByteBuffer cipherText = value.getB().asReadOnlyBuffer();
+        cipherText.rewind();
+        if (encryptionKey instanceof DelegatedKey) {
+            plainText = ByteBuffer.wrap(((DelegatedKey)encryptionKey).decrypt(toByteArray(cipherText), null, encryptionMode));
+        } else {
+            if (cipher == null) {
+                cipher = Cipher.getInstance(
+                        encryptionMode);
+                ivSize = cipher.getBlockSize();
+            }
+            byte[] iv = new byte[ivSize];
+            cipherText.get(iv);
+            cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
+            plainText = ByteBuffer.allocate(
+                    cipher.getOutputSize(cipherText.remaining()));
+            cipher.doFinal(cipherText, plainText);
+            plainText.rewind();
+        }
+        return AttributeValueMarshaller.unmarshall(plainText);
     }
 
     /**
@@ -389,31 +404,49 @@ public class DynamoDBEncryptor {
                 if (!flags.contains(EncryptionFlags.SIGN)) {
                     throw new IllegalArgumentException("All encrypted fields must be signed. Bad field: " + entry.getKey());
                 }
-                ByteBuffer plainText = AttributeValueMarshaller.marshall(entry.getValue());
-                plainText.rewind();
-                ByteBuffer cipherText;
-                if (encryptionKey instanceof DelegatedKey) {
-                    DelegatedKey dk = (DelegatedKey) encryptionKey;
-                    cipherText = ByteBuffer.wrap(
-                            dk.encrypt(toByteArray(plainText), null, encryptionMode));
-                } else {
-                    if (cipher == null) {
-                        cipher = Cipher.getInstance(encryptionMode);
-                        ivSize = cipher.getBlockSize();
-                    }
-                    // Encryption format: <iv><ciphertext>
-                    // Note a unique iv is generated per attribute
-                    byte[] iv = getRandom(ivSize);
-                    cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
-                    cipherText = ByteBuffer.allocate(ivSize + cipher.getOutputSize(plainText.remaining()));
-                    cipherText.put(iv);
-                    cipher.doFinal(plainText, cipherText);
-                    cipherText.rewind();
-                }
-                // Replace the plaintext attribute value with the encrypted content
-                entry.setValue(new AttributeValue().withB(cipherText));
+
+                AttributeValue attributeValue = encryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize);
+                entry.setValue(attributeValue);
             }
         }
+    }
+
+    private AttributeValue encryptAttributeValue(AttributeValue value,
+                                                 SecretKey encryptionKey,
+                                                 String encryptionMode,
+                                                 Cipher cipher,
+                                                 int ivSize) throws GeneralSecurityException {
+        // Recursively call through map attributes
+        if (value.getM() != null) {
+            Map<String, AttributeValue> encryptedMap = new HashMap<>(value.getM());
+            for (Map.Entry<String, AttributeValue> entry : encryptedMap.entrySet()) {
+                entry.setValue(encryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize));
+            }
+            return new AttributeValue().withM(encryptedMap);
+        }
+
+        ByteBuffer plainText = AttributeValueMarshaller.marshall(value);
+        plainText.rewind();
+        ByteBuffer cipherText;
+        if (encryptionKey instanceof DelegatedKey) {
+            DelegatedKey dk = (DelegatedKey) encryptionKey;
+            cipherText = ByteBuffer.wrap(
+                    dk.encrypt(toByteArray(plainText), null, encryptionMode));
+        } else {
+            if (cipher == null) {
+                cipher = Cipher.getInstance(encryptionMode);
+                ivSize = cipher.getBlockSize();
+            }
+            // Encryption format: <iv><ciphertext>
+            // Note a unique iv is generated per attribute
+            byte[] iv = getRandom(ivSize);
+            cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
+            cipherText = ByteBuffer.allocate(ivSize + cipher.getOutputSize(plainText.remaining()));
+            cipherText.put(iv);
+            cipher.doFinal(plainText, cipherText);
+            cipherText.rewind();
+        }
+        return new AttributeValue().withB(cipherText);
     }
     
     /**

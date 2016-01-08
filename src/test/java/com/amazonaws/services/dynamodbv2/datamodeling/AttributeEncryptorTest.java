@@ -113,8 +113,6 @@ public class AttributeEncryptorTest {
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         params = FakeParameters.getInstance(BaseClass.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
-        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
 
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get(HASH_KEY), encryptedAttributes.get(HASH_KEY));
@@ -129,6 +127,9 @@ public class AttributeEncryptorTest {
         assertNull(encryptedAttributes.get("mapValue").getM().get("key2").getS());
         assertNotNull(encryptedAttributes.get("mapValue").getM().get("key1").getB());
         assertNotNull(encryptedAttributes.get("mapValue").getM().get("key2").getB());
+
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
     @Test(expected = DynamoDBMappingException.class)
@@ -284,8 +285,6 @@ public class AttributeEncryptorTest {
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         params = FakeParameters.getInstance(Mixed.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
-        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
 
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get(HASH_KEY), encryptedAttributes.get(HASH_KEY));
@@ -310,7 +309,7 @@ public class AttributeEncryptorTest {
 
         params = FakeParameters.getInstance(Mixed.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        decryptedAttributes = encryptor.untransform(params);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 

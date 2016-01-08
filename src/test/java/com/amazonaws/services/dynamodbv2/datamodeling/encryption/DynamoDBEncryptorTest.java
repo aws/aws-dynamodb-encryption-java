@@ -127,10 +127,6 @@ public class DynamoDBEncryptorTest {
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
 
-        Map<String, AttributeValue> decryptedAttributes =
-                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
-        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
@@ -149,6 +145,10 @@ public class DynamoDBEncryptorTest {
         // Make sure we're calling the proper getEncryptionMaterials method
         assertEquals("Wrong getEncryptionMaterials() called", 
                 1, prov.getCallCount("getEncryptionMaterials(EncryptionContext context)"));
+
+        Map<String, AttributeValue> decryptedAttributes =
+                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
+        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
     @Test
@@ -156,10 +156,11 @@ public class DynamoDBEncryptorTest {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
         String encryptedString = encryptedAttributes.toString();
-        Map<String, AttributeValue> decryptedAttributes =
-                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
 
         assertEquals(encryptedString, encryptedAttributes.toString());
+
+        Map<String, AttributeValue> decryptedAttributes =
+                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
     }
 
     @Test(expected=SignatureException.class)

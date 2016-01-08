@@ -353,11 +353,10 @@ public class DynamoDBEncryptor {
                                                  int ivSize) throws GeneralSecurityException {
         // Recursively call through map attributes
         if (value.getM() != null) {
-            Map<String, AttributeValue> decryptedMap = new HashMap<>(value.getM());
-            for (Map.Entry<String, AttributeValue> entry : decryptedMap.entrySet()) {
+            for (Map.Entry<String, AttributeValue> entry : value.getM().entrySet()) {
                 entry.setValue(decryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize));
             }
-            return new AttributeValue().withM(decryptedMap);
+            return value;
         }
 
         ByteBuffer plainText;
@@ -418,11 +417,10 @@ public class DynamoDBEncryptor {
                                                  int ivSize) throws GeneralSecurityException {
         // Recursively call through map attributes
         if (value.getM() != null) {
-            Map<String, AttributeValue> encryptedMap = new HashMap<>(value.getM());
-            for (Map.Entry<String, AttributeValue> entry : encryptedMap.entrySet()) {
+            for (Map.Entry<String, AttributeValue> entry : value.getM().entrySet()) {
                 entry.setValue(encryptAttributeValue(entry.getValue(), encryptionKey, encryptionMode, cipher, ivSize));
             }
-            return new AttributeValue().withM(encryptedMap);
+            return value;
         }
 
         ByteBuffer plainText = AttributeValueMarshaller.marshall(value);

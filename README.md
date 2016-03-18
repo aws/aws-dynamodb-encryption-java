@@ -130,7 +130,7 @@ Don't forget to enable the download of snapshot jars from Maven:
 
 For content encryption, the encryption algorithm is determined by the user specified [SecretKey][secretkey], as long as it is a block cipher that can be used with the encryption mode "CBC" and "PKCS5Padding".  Typically, this means "AES".
 
-For signing, the user specified signing key can be either symmetric or asymmetric.  For asymmetric signing (where the user would provide a signing key in the form of a [PrivateKey][privatekey]), the default algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a [SecretyKey][secretkey]), the algorithm would be determined by the provided key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
+For signing, the user specified signing key can be either symmetric or asymmetric.  For asymmetric signing (where the user would provide a signing key in the form of a [PrivateKey][privatekey]), the default algorithm is "SHA256withRSA".  For symmetric signing (where the user would provide the signing key in the form of a [SecretKey][secretkey]), the algorithm would be determined by the provided key.  A typical algorithm for a symmetric signing key is "HmacSHA256".
 
 ## FAQ
 

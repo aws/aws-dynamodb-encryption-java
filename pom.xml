@@ -102,7 +102,7 @@
 
       <distributionManagement>
         <snapshotRepository>
-          <id>ossrh</id>
+          <id>sonatype-nexus-staging</id>
           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
       </distributionManagement>
@@ -129,9 +129,8 @@
             <version>1.6.3</version>
             <extensions>true</extensions>
             <configuration>
-               <serverId>ossrh</serverId>
+               <serverId>sonatype-nexus-staging</serverId>
                <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-               <autoReleaseAfterClose>true</autoReleaseAfterClose>
             </configuration>
           </plugin>
      

@@ -51,6 +51,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValueUpdate;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
@@ -250,7 +251,8 @@ public class TransformerHolisticTests {
         
         client.createTable(new CreateTableRequest().withTableName("TableName")
                 .withAttributeDefinitions(attrDef)
-                .withKeySchema(keySchema));
+                .withKeySchema(keySchema)
+                .withProvisionedThroughput(new ProvisionedThroughput(100L, 100L)));
         
         attrDef = new ArrayList<AttributeDefinition>();
         attrDef.add(new AttributeDefinition().withAttributeName("hashKey").withAttributeType(ScalarAttributeType.S));
@@ -259,7 +261,8 @@ public class TransformerHolisticTests {
         
         client.createTable(new CreateTableRequest().withTableName("HashKeyOnly")
                 .withAttributeDefinitions(attrDef)
-                .withKeySchema(keySchema));
+                .withKeySchema(keySchema)
+                .withProvisionedThroughput(new ProvisionedThroughput(100L, 100L)));
         
         attrDef = new ArrayList<AttributeDefinition>();
         attrDef.add(new AttributeDefinition().withAttributeName("hashKey").withAttributeType(ScalarAttributeType.B));
@@ -271,7 +274,8 @@ public class TransformerHolisticTests {
         
         client.createTable(new CreateTableRequest().withTableName("DeterministicTable")
                 .withAttributeDefinitions(attrDef)
-                .withKeySchema(keySchema));
+                .withKeySchema(keySchema)
+                .withProvisionedThroughput(new ProvisionedThroughput(100L, 100L)));
     }
 
     @Test

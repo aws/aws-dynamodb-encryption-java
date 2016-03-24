@@ -1,22 +1,25 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
- * in compliance with the License. A copy of the License is located at
- * 
- * http://aws.amazon.com/apache2.0
- * 
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.amazonaws.annotation.ThreadSafe;
 
@@ -28,16 +31,25 @@ import com.amazonaws.annotation.ThreadSafe;
  */
 @ThreadSafe
 public final class LRUCache<T> {
+    /**
+     * Used for the internal cache.
+     */
     private final Map<String, T> map;
+    /**
+     * Listener for cache entry eviction.
+     */
     private final RemovalListener<T> listener;
+    /**
+     * Maximum size of the cache.
+     */
     private final int maxSize;
 
     /**
      * @param maxSize
      *            the maximum number of entries of the cache
      * @param listener
-     *            object which is notified immediately prior to the removal of any objects from the
-     *            cache
+     *            object which is notified immediately prior to the removal of
+     *            any objects from the cache
      */
     public LRUCache(final int maxSize, final RemovalListener<T> listener) {
         if (maxSize < 1) {
@@ -86,12 +98,11 @@ public final class LRUCache<T> {
         // The more complicated logic is to ensure that the listener is
         // actually called for all entries.
         if (listener != null) {
-            Set<Map.Entry<String, T>> entries = new HashSet<Map.Entry<String, T>>(map.entrySet());
-            if (entries != null) {
-                for (final Map.Entry<String, T> e : entries) {
-                    listener.onRemoval(e);
-                    map.remove(e.getKey());
-                }
+            Set<String> keys = new TreeSet<String>(map.keySet());
+            for (String key : keys) {
+                T val = map.get(key);
+                listener.onRemoval(new SimpleImmutableEntry<String, T>(key, val));
+                map.remove(key);
             }
         } else {
             map.clear();

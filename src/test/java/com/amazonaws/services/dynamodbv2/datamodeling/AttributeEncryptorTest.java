@@ -47,9 +47,17 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
 import com.amazonaws.services.dynamodbv2.testing.FakeParameters;
 import com.amazonaws.services.dynamodbv2.testing.types.BaseClass;
+import com.amazonaws.services.dynamodbv2.testing.types.BaseClassWithNewAttribute;
+import com.amazonaws.services.dynamodbv2.testing.types.BaseClassWithUnknownAttributeAnnotation;
 import com.amazonaws.services.dynamodbv2.testing.types.Mixed;
 import com.amazonaws.services.dynamodbv2.testing.types.SignOnly;
+import com.amazonaws.services.dynamodbv2.testing.types.SignOnlyWithUnknownAttributeAnnotation;
+import com.amazonaws.services.dynamodbv2.testing.types.SignOnlyWithUnknownAttributeAnnotationWithNewAttribute;
+import com.amazonaws.services.dynamodbv2.testing.types.TableOverride;
 import com.amazonaws.services.dynamodbv2.testing.types.Untouched;
+import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithNewAttribute;
+import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithUnknownAttributeAnnotation;
+import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithUnknownAttributeAnnotationWithNewAttribute;
 
 public class AttributeEncryptorTest {
     private static final String RANGE_KEY = "rangeKey";
@@ -302,6 +310,141 @@ public class AttributeEncryptorTest {
         encryptedAttributes.get("stringValue").setS("666");
         params = FakeParameters.getInstance(Mixed.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
+        encryptor.untransform(params);
+    }
+
+    @Test(expected = DynamoDBMappingException.class)
+    public void tableNameRespected() {
+        Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null, "firstTable",
+                HASH_KEY, RANGE_KEY);       
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+        params = FakeParameters.getInstance(BaseClass.class, encryptedAttributes, null, "secondTable",
+                HASH_KEY, RANGE_KEY);
+        encryptor.untransform(params);
+    }
+
+    @Test
+    public void tableNameOverridden() {
+        Parameters<TableOverride> params = FakeParameters.getInstance(TableOverride.class, attribs, null, "firstTable",
+                HASH_KEY, RANGE_KEY);       
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+        params = FakeParameters.getInstance(TableOverride.class, encryptedAttributes, null, "secondTable",
+                HASH_KEY, RANGE_KEY);
+        encryptor.untransform(params);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
+    }
+    
+    @Test(expected = DynamoDBMappingException.class)
+    public void testUnknownAttributeFails() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foobar"));
+        Parameters<? extends BaseClass> params = FakeParameters.getInstance(
+                BaseClassWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        params = FakeParameters.getInstance(BaseClass.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        encryptor.untransform(params);
+    }
+
+    @Test
+    public void testUntouchedWithUnknownAttribute() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foobar"));
+        Parameters<? extends Untouched> params = FakeParameters.getInstance(
+                UntouchedWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.match(attributes));
+        params = FakeParameters.getInstance(Untouched.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+
+    @Test
+    public void testUntouchedWithUnknownAttributeAnnotation() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foobar"));
+        Parameters<? extends UntouchedWithUnknownAttributeAnnotation> params = FakeParameters.getInstance(
+                UntouchedWithUnknownAttributeAnnotationWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.match(attributes));
+        params = FakeParameters.getInstance(
+                UntouchedWithUnknownAttributeAnnotation.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+
+    @Test
+    public void testSignOnlyWithUnknownAttributeAnnotation() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foobar"));
+        Parameters<? extends SignOnlyWithUnknownAttributeAnnotation> params = FakeParameters.getInstance(
+                SignOnlyWithUnknownAttributeAnnotationWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(new AttributeValue().withS("foobar"), encryptedAttributes.get("newAttribute"));
+        params = FakeParameters.getInstance(
+                SignOnlyWithUnknownAttributeAnnotation.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+    
+    @Test(expected = DynamoDBMappingException.class)
+    public void testSignOnlyWithUnknownAttributeAnnotationBadSignature() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foo"));
+        Parameters<? extends SignOnlyWithUnknownAttributeAnnotation> params = FakeParameters.getInstance(
+                SignOnlyWithUnknownAttributeAnnotationWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(new AttributeValue().withS("foo"), encryptedAttributes.get("newAttribute"));
+        params = FakeParameters.getInstance(
+                SignOnlyWithUnknownAttributeAnnotation.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        encryptedAttributes.get("newAttribute").setS("bar");
+        encryptor.untransform(params);
+    }
+
+    @Test
+    public void testEncryptWithUnknownAttributeAnnotation() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foo"));
+        Parameters<? extends BaseClassWithUnknownAttributeAnnotation> params = FakeParameters.getInstance(
+                BaseClassWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        params = FakeParameters.getInstance(
+                BaseClassWithUnknownAttributeAnnotation.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+    
+    @Test(expected = DynamoDBMappingException.class)
+    public void testEncryptWithUnknownAttributeAnnotationBadSignature() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("newAttribute", new AttributeValue().withS("foo"));
+        Parameters<? extends BaseClassWithUnknownAttributeAnnotation> params = FakeParameters.getInstance(
+                BaseClassWithNewAttribute.class, attributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        params = FakeParameters.getInstance(
+                BaseClassWithUnknownAttributeAnnotation.class, encryptedAttributes, null,
+                TABLE_NAME, HASH_KEY, RANGE_KEY);
+        encryptedAttributes.get("newAttribute").setB(ByteBuffer.allocate(0));
         encryptor.untransform(params);
     }
 

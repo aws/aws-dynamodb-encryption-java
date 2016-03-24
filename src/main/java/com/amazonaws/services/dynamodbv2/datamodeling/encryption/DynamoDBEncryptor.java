@@ -377,9 +377,12 @@ public class DynamoDBEncryptor {
             Map<String, Set<EncryptionFlags>> attributeFlags,
             Map<String, String> materialDescription,
             SecretKey encryptionKey) throws GeneralSecurityException {
-        materialDescription.put(symmetricEncryptionModeHeader,
-                SYMMETRIC_ENCRYPTION_MODE);
-        final String encryptionMode = encryptionKey != null ? encryptionKey.getAlgorithm() + SYMMETRIC_ENCRYPTION_MODE : null;
+        String encryptionMode = null;
+        if (encryptionKey != null) {
+            materialDescription.put(this.symmetricEncryptionModeHeader,
+                    SYMMETRIC_ENCRYPTION_MODE);
+            encryptionMode = encryptionKey.getAlgorithm() + SYMMETRIC_ENCRYPTION_MODE;
+        }
         Cipher cipher = null;
         int ivSize = -1;
 

@@ -30,6 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
@@ -40,7 +41,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.MostR
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
-import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 
 public class MostRecentProviderTests {

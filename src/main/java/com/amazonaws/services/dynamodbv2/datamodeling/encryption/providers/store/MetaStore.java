@@ -1,11 +1,11 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -91,7 +91,7 @@ public class MetaStore extends ProviderStore {
         tmpExpected.put(DEFAULT_RANGE_KEY, new ExpectedAttributeValue().withExists(false));
         doesNotExist = Collections.unmodifiableMap(tmpExpected);
     }
-    
+
     @Override
     public EncryptionMaterialsProvider getProvider(final String materialName, final long version) {
         final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
@@ -134,7 +134,7 @@ public class MetaStore extends ProviderStore {
         if (items.isEmpty()) {
             return -1L;
         } else {
-            return Long.valueOf(items.get(0).get(DEFAULT_RANGE_KEY).getN());
+            return Long.parseLong(items.get(0).get(DEFAULT_RANGE_KEY).getN());
         }
     }
 
@@ -142,7 +142,7 @@ public class MetaStore extends ProviderStore {
     public long getVersionFromMaterialDescription(final Map<String, String> description) {
         final Matcher m = COMBINED_PATTERN.matcher(description.get(META_ID));
         if (m.matches()) {
-            return Long.valueOf(m.group(2));
+            return Long.parseLong(m.group(2));
         } else {
             throw new IllegalArgumentException("No meta id found");
         }

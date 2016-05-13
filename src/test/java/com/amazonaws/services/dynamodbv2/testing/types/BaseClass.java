@@ -15,12 +15,15 @@
 package com.amazonaws.services.dynamodbv2.testing.types;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 @DynamoDBTable(tableName = "TableName")
 public class BaseClass {
@@ -40,6 +43,8 @@ public class BaseClass {
         result = prime * result + Double.valueOf(doubleValue).hashCode();
         result = prime * result
                 + ((doubleSet == null) ? 0 : doubleSet.hashCode());
+        result = prime * result
+                + ((mapValue == null) ? 0 : mapValue.hashCode());
         return result;
     }
     @Override
@@ -79,6 +84,11 @@ public class BaseClass {
                 return false;
         } else if (!doubleSet.equals(other.doubleSet))
             return false;
+        if (mapValue == null) {
+            if (other.mapValue != null)
+                return false;
+        } else if (!mapValue.equals(other.mapValue))
+            return false;
         return true;
     }
     private int hashKey;
@@ -91,6 +101,7 @@ public class BaseClass {
     private Integer version;
     private double doubleValue;
     private Set<Double> doubleSet;
+    private Map<String, AttributeValue> mapValue = new HashMap();
 
     @DynamoDBHashKey
     public int getHashKey() {
@@ -149,6 +160,15 @@ public class BaseClass {
     public void setDoubleValue(double doubleValue) {
         this.doubleValue = doubleValue;
     }
+
+    public Map<String, AttributeValue> getMapValue() {
+        return mapValue;
+    }
+
+    public void setMapValue(Map<String, AttributeValue> mapValue) {
+        this.mapValue = mapValue;
+    }
+
     @DynamoDBVersionAttribute
     public Integer getVersion() {
         return version;
@@ -162,6 +182,7 @@ public class BaseClass {
                 + ", stringValue=" + stringValue + ", intValue=" + intValue
                 + ", byteArrayValue=" + Arrays.toString(byteArrayValue)
                 + ", stringSet=" + stringSet + ", intSet=" + intSet
-                + ", doubleSet=" + doubleSet + ", version=" + version + "]";
+                + ", doubleSet=" + doubleSet + ", version=" + version
+                + ", mapValue=" + mapValue + "]";
     }
 }

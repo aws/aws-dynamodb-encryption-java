@@ -99,6 +99,10 @@ public class AttributeEncryptorTest {
         attribs.put(HASH_KEY, new AttributeValue().withN("5"));
         attribs.put(RANGE_KEY, new AttributeValue().withN("7"));
         attribs.put("version", new AttributeValue().withN("0"));
+        Map<String, AttributeValue> map = new HashMap<>();
+        map.put("key1", new AttributeValue().withS("value1"));
+        map.put("key2", new AttributeValue().withS("value2"));
+        attribs.put("mapValue", new AttributeValue().withM(map));
     }
 
     @Test
@@ -117,8 +121,6 @@ public class AttributeEncryptorTest {
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         params = FakeParameters.getInstance(BaseClass.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
-        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
 
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get(HASH_KEY), encryptedAttributes.get(HASH_KEY));
@@ -129,6 +131,13 @@ public class AttributeEncryptorTest {
         assertTrue(encryptedAttributes.containsKey("stringValue"));
         assertNull(encryptedAttributes.get("stringValue").getS());
         assertNotNull(encryptedAttributes.get("stringValue").getB());
+        assertNull(encryptedAttributes.get("mapValue").getM().get("key1").getS());
+        assertNull(encryptedAttributes.get("mapValue").getM().get("key2").getS());
+        assertNotNull(encryptedAttributes.get("mapValue").getM().get("key1").getB());
+        assertNotNull(encryptedAttributes.get("mapValue").getM().get("key2").getB());
+
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
     @Test(expected = DynamoDBMappingException.class)
@@ -178,6 +187,9 @@ public class AttributeEncryptorTest {
 
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key1").getS(), "value1");
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key2").getS(), "value2");
     }
 
     @Test
@@ -200,6 +212,9 @@ public class AttributeEncryptorTest {
 
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key1").getS(), "value1");
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key2").getS(), "value2");
     }
 
     @Test(expected = DynamoDBMappingException.class)
@@ -248,6 +263,9 @@ public class AttributeEncryptorTest {
 
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
+
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key1").getS(), "value1");
+        assertEquals(encryptedAttributes.get("mapValue").getM().get("key2").getS(), "value2");
     }
 
     @Test(expected = DynamoDBMappingException.class)
@@ -275,8 +293,6 @@ public class AttributeEncryptorTest {
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         params = FakeParameters.getInstance(Mixed.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
-        assertThat(decryptedAttributes, AttrMatcher.match(attribs));
 
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get(HASH_KEY), encryptedAttributes.get(HASH_KEY));
@@ -287,6 +303,10 @@ public class AttributeEncryptorTest {
         assertTrue(encryptedAttributes.containsKey("stringSet"));
         assertNull(encryptedAttributes.get("stringSet").getSS());
         assertNotNull(encryptedAttributes.get("stringSet").getB());
+        assertNull(encryptedAttributes.get("mapValue").getM().get("key1").getS());
+        assertNull(encryptedAttributes.get("mapValue").getM().get("key2").getS());
+        assertNotNull(encryptedAttributes.get("mapValue").getM().get("key1").getB());
+        assertNotNull(encryptedAttributes.get("mapValue").getM().get("key2").getB());
 
         // Test those not encrypted
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
@@ -297,7 +317,7 @@ public class AttributeEncryptorTest {
 
         params = FakeParameters.getInstance(Mixed.class, encryptedAttributes, null, TABLE_NAME,
                 HASH_KEY, RANGE_KEY);
-        decryptedAttributes = encryptor.untransform(params);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
@@ -455,6 +475,7 @@ public class AttributeEncryptorTest {
         assertSetsEqual(o1.getNS(), o2.getNS());
         Assert.assertEquals(o1.getS(), o2.getS());
         assertSetsEqual(o1.getSS(), o2.getSS());
+        Assert.assertEquals(o1.getM(), o2.getM());
     }
 
     private <T> void assertSetsEqual(Collection<T> c1, Collection<T> c2) {

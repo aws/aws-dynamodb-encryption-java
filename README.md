@@ -148,7 +148,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 ## Known Limitations
 
-1. Currently the new data types in [Amazon DynamoDB][ddb] including Map, List, Boolean, and NULL are not yet supported by this library.  In particular, this library would fail fast upon detecting the use of these new data types.  We expect to support the new types soon in future releases.
+1. Currently the new data types in [Amazon DynamoDB][ddb] including List, Boolean, and NULL are supported, but not fully tested by this library.  Map support has been added and tested.  We expect to support the other new types soon in future releases.
 
 2. During retrieval of an item, all the attributes of the item that have been involved for encryption or signing must also be included for signature verification.  Otherwise, the signature would fail to verify.
 

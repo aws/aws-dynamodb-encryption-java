@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,12 +41,12 @@ import org.junit.Test;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
 import com.amazonaws.services.dynamodbv2.testing.TestDelegatedKey;
 
 public class DelegatedEncryptionTest {
-    private static final SecureRandom rnd = new SecureRandom();
     private static SecretKeySpec rawEncryptionKey;
     private static SecretKeySpec rawMacKey;
     private static DelegatedKey encryptionKey;
@@ -60,13 +59,10 @@ public class DelegatedEncryptionTest {
     
     @BeforeClass
     public static void setupClass() throws Exception {
-        byte[] buff = new byte[32];
-        rnd.nextBytes(buff);
-        rawEncryptionKey = new SecretKeySpec(buff, "AES");
+        rawEncryptionKey = new SecretKeySpec(Utils.getRandom(32), "AES");
         encryptionKey = new TestDelegatedKey(rawEncryptionKey);
         
-        rnd.nextBytes(buff);
-        rawMacKey = new SecretKeySpec(buff, "HmacSHA256");
+        rawMacKey = new SecretKeySpec(Utils.getRandom(32), "HmacSHA256");
         macKey = new TestDelegatedKey(rawMacKey);
     }
     
@@ -206,7 +202,7 @@ public class DelegatedEncryptionTest {
     @Test
     public void RsaSignedOnly() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
                 new SymmetricStaticProvider(encryptionKey, sigPair, 
@@ -230,7 +226,7 @@ public class DelegatedEncryptionTest {
     @Test(expected=SignatureException.class)
     public void RsaSignedOnlyBadSignature() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
                 new SymmetricStaticProvider(encryptionKey, sigPair, 

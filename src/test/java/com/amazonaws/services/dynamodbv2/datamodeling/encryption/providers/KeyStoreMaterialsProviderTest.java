@@ -26,7 +26,6 @@ import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.SecretKeyEntry;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -44,6 +43,7 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.util.Base64;
 
 public class KeyStoreMaterialsProviderTest {
@@ -95,7 +95,6 @@ public class KeyStoreMaterialsProviderTest {
         "zoHbPHJyOn1SgC5tARD/1vm5CsG2hATRpWRQCTJFg5VRJ4R7Pz+HuxY4SoABcPQd" +
         "K+MP8GlGqTldC6NaB1s7KuAX";
     
-    private static SecureRandom rnd;
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
     private static KeyStore keyStore;
@@ -110,14 +109,13 @@ public class KeyStoreMaterialsProviderTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        rnd = new SecureRandom();
         
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, rnd);
+        macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
         
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
-        aesGen.init(128, rnd);
+        aesGen.init(128, Utils.getRng());
         encryptionKey = aesGen.generateKey();
         
         keyStore = KeyStore.getInstance("jceks");

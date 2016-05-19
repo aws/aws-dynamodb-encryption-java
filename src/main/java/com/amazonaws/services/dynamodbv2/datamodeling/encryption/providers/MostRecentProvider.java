@@ -12,11 +12,14 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.internal.LRUCache;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.LRUCache;
 
 /**
  * This meta-Provider encrypts data with the most recent version of keying materials from a
@@ -25,14 +28,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store
  * is not currently configurable.
  */
 public class MostRecentProvider implements EncryptionMaterialsProvider {
-    private final Object lock;
+    private static final long MILLI_TO_NANO = 1000000L;
+    private static final long TTL_GRACE_IN_NANO = 500 * MILLI_TO_NANO;
+    private final ReentrantLock lock = new ReentrantLock(true);
     private final ProviderStore keystore;
     private final String materialName;
-    private final long ttlInMillis;
+    private final long ttlInNanos;
     private final LRUCache<EncryptionMaterialsProvider> cache;
-    private EncryptionMaterialsProvider currentProvider;
-    private long currentVersion;
-    private long lastUpdated;
+    private final AtomicReference<State> state = new AtomicReference<>(new State());
 
     /**
      * Creates a new {@link MostRecentProvider}.
@@ -43,30 +46,45 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
     public MostRecentProvider(final ProviderStore keystore, final String materialName, final long ttlInMillis) {
         this.keystore = checkNotNull(keystore, "keystore must not be null");
         this.materialName = checkNotNull(materialName, "materialName must not be null");
-        this.ttlInMillis = ttlInMillis;
+        this.ttlInNanos = ttlInMillis * MILLI_TO_NANO;
         this.cache = new LRUCache<EncryptionMaterialsProvider>(1000);
-        this.lock = new Object();
-        currentProvider = null;
-        currentVersion = -1;
-        lastUpdated = 0;
     }
 
     @Override
     public EncryptionMaterials getEncryptionMaterials(EncryptionContext context) {
-        synchronized (lock) {
-            if ((System.currentTimeMillis() - lastUpdated) > ttlInMillis) {
-                long newVersion = keystore.getMaxVersion(materialName);
-                if (newVersion < 0) {
-                    currentVersion = 0;
-                    currentProvider = keystore.getOrCreate(materialName, currentVersion);
-                } else if (newVersion != currentVersion) {
-                    currentVersion = newVersion;
-                    currentProvider = keystore.getProvider(materialName, currentVersion);
-                    cache.add(Long.toString(currentVersion), currentProvider);
-                }
-                lastUpdated = System.currentTimeMillis();
+        State s = state.get();
+        if (System.nanoTime() - s.lastUpdated <= ttlInNanos) {
+            return s.provider.getEncryptionMaterials(context);
+        }
+        if (s.provider == null || System.nanoTime() - s.lastUpdated > ttlInNanos + TTL_GRACE_IN_NANO) {
+            // Either we don't have a provider at all, or we're more than 500 milliseconds past
+            // our update time. Either way, grab the lock and force an update.
+            lock.lock();
+        } else if (!lock.tryLock()) {
+            // If we can't get the lock immediately, just use the current provider
+            return s.provider.getEncryptionMaterials(context);
+        }
+
+        try {
+            final long newVersion = keystore.getMaxVersion(materialName);
+            final long currentVersion;
+            final EncryptionMaterialsProvider currentProvider;
+            if (newVersion < 0) {
+                currentVersion = 0;
+                currentProvider = keystore.getOrCreate(materialName, currentVersion);
+                s = new State(currentProvider, currentVersion);
+                state.set(s);
+            } else if (newVersion != s.currentVersion) {
+                currentVersion = newVersion;
+                currentProvider = keystore.getProvider(materialName, currentVersion);
+                cache.add(Long.toString(currentVersion), currentProvider);
+                s = new State(currentProvider, currentVersion);
+                state.set(s);
             }
-            return currentProvider.getEncryptionMaterials(context);
+
+            return s.provider.getEncryptionMaterials(context);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -86,11 +104,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      */
     @Override
     public void refresh() {
-        synchronized (lock) {
-            lastUpdated = 0;
-            currentVersion = -1;
-            currentProvider = null;
-        }
+        state.set(new State());
         cache.clear();
     }
 
@@ -99,7 +113,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
     }
 
     public long getTtlInMills() {
-        return ttlInMillis;
+        return ttlInNanos / MILLI_TO_NANO;
     }
 
     /**
@@ -107,9 +121,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      * currently have a current version.
      */
     public long getCurrentVersion() {
-        synchronized (lock) {
-            return currentVersion;
-        }
+        return state.get().currentVersion;
     }
 
     /**
@@ -117,9 +129,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      * current version.
      */
     public long getLastUpdated() {
-        synchronized (lock) {
-            return lastUpdated;
-        }
+        return state.get().lastUpdated / MILLI_TO_NANO;
     }
 
     private static <V> V checkNotNull(final V ref, final String errMsg) {
@@ -127,6 +137,22 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
             throw new NullPointerException(errMsg);
         } else {
             return ref;
+        }
+    }
+
+    private static class State {
+        public final EncryptionMaterialsProvider provider;
+        public final long currentVersion;
+        public final long lastUpdated;
+
+        public State() {
+            this(null, -1);
+        }
+
+        public State(EncryptionMaterialsProvider provider, long currentVersion) {
+            this.provider = provider;
+            this.currentVersion = currentVersion;
+            this.lastUpdated = currentVersion == -1 ? 0 : System.nanoTime();
         }
     }
 }

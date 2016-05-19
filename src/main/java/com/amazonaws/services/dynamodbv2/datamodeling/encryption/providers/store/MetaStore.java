@@ -14,7 +14,6 @@ package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.stor
 
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncrypt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.WrappedMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
@@ -70,7 +70,6 @@ public class MetaStore extends ProviderStore {
     private static final String DEFAULT_HASH_KEY = "N";
     private static final String DEFAULT_RANGE_KEY = "V";
 
-    private final SecureRandom rng = new SecureRandom();
     private final Map<String, ExpectedAttributeValue> doesNotExist;
     private final String tableName;
     private final AmazonDynamoDB ddb;
@@ -106,12 +105,8 @@ public class MetaStore extends ProviderStore {
 
     @Override
     public EncryptionMaterialsProvider getOrCreate(final String materialName, final long nextId) {
-        final byte[] rawEncKey = new byte[32];
-        rng.nextBytes(rawEncKey);
-        final byte[] rawIntKey = new byte[32];
-        rng.nextBytes(rawIntKey);
-        final SecretKeySpec encryptionKey = new SecretKeySpec(rawEncKey, DEFAULT_ENCRYPTION);
-        final SecretKeySpec integrityKey = new SecretKeySpec(rawIntKey, DEFAULT_INTEGRITY);
+        final SecretKeySpec encryptionKey = new SecretKeySpec(Utils.getRandom(32), DEFAULT_ENCRYPTION);
+        final SecretKeySpec integrityKey = new SecretKeySpec(Utils.getRandom(32), DEFAULT_INTEGRITY);
         final Map<String, AttributeValue> ciphertext = conditionalPut(encryptKeys(materialName,
                 nextId, encryptionKey, integrityKey));
         return decryptProvider(ciphertext);

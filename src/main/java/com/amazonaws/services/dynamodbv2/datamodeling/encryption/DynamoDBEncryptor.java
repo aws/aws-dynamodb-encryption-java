@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +42,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Encry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeValueMarshaller;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.ByteBufferInputStream;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 /**
@@ -52,7 +52,6 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
  * @author Greg Rubin 
  */
 public class DynamoDBEncryptor {
-    private static final SecureRandom rnd = new SecureRandom();
     private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA";
     private static final String DEFAULT_METADATA_FIELD = "*amzn-ddb-map-desc*";
     private static final String DEFAULT_SIGNATURE_FIELD = "*amzn-ddb-map-sig*";
@@ -233,7 +232,7 @@ public class DynamoDBEncryptor {
         DecryptionMaterials materials;
         SecretKey decryptionKey;
 
-        DynamoDBSigner signer = DynamoDBSigner.getInstance(DEFAULT_SIGNATURE_ALGORITHM, rnd);
+        DynamoDBSigner signer = DynamoDBSigner.getInstance(DEFAULT_SIGNATURE_ALGORITHM, Utils.getRng());
 
         if (itemAttributes.containsKey(materialDescriptionFieldName)) {
             materialDescription = unmarshallDescription(itemAttributes.get(materialDescriptionFieldName));
@@ -248,7 +247,7 @@ public class DynamoDBEncryptor {
         decryptionKey = materials.getDecryptionKey();
         if (materialDescription.containsKey(signingAlgorithmHeader)) {
             String signingAlg = materialDescription.get(signingAlgorithmHeader);
-            signer = DynamoDBSigner.getInstance(signingAlg, rnd);
+            signer = DynamoDBSigner.getInstance(signingAlg, Utils.getRng());
         }
         
         ByteBuffer signature;
@@ -309,7 +308,7 @@ public class DynamoDBEncryptor {
         // The description must be stored after encryption because its data
         // is necessary for proper decryption.
         final String signingAlgo = materialDescription.get(signingAlgorithmHeader);
-        DynamoDBSigner signer = DynamoDBSigner.getInstance(signingAlgo == null ? DEFAULT_SIGNATURE_ALGORITHM : signingAlgo, rnd);
+        DynamoDBSigner signer = DynamoDBSigner.getInstance(signingAlgo == null ? DEFAULT_SIGNATURE_ALGORITHM : signingAlgo, Utils.getRng());
         
         if (materials.getSigningKey() instanceof PrivateKey ) {
             materialDescription.put(signingAlgorithmHeader, signer.getSigningAlgorithm());
@@ -356,7 +355,7 @@ public class DynamoDBEncryptor {
                     }
                     byte[] iv = new byte[ivSize];
                     cipherText.get(iv);
-                    cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
+                    cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv), Utils.getRng());
                     plainText = ByteBuffer.allocate(
                             cipher.getOutputSize(cipherText.remaining()));
                     cipher.doFinal(cipherText, plainText);
@@ -406,8 +405,8 @@ public class DynamoDBEncryptor {
                     }
                     // Encryption format: <iv><ciphertext>
                     // Note a unique iv is generated per attribute
-                    byte[] iv = getRandom(ivSize);
-                    cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv), rnd);
+                    byte[] iv = Utils.getRandom(ivSize);
+                    cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv), Utils.getRng());
                     cipherText = ByteBuffer.allocate(ivSize + cipher.getOutputSize(plainText.remaining()));
                     cipherText.put(iv);
                     cipher.doFinal(plainText, cipherText);
@@ -534,12 +533,6 @@ public class DynamoDBEncryptor {
         } finally {
             attributeValue.getB().reset();
         }
-    }
-
-    private static byte[] getRandom(int bytes) {
-        byte[] result = new byte[bytes];
-        rnd.nextBytes(result);
-        return result;
     }
     
     private static byte[] toByteArray(ByteBuffer buffer) {

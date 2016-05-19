@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +33,9 @@ import org.junit.Test;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 
 public class SymmetricStaticProviderTest {
-    private static SecureRandom rnd;
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
     private static KeyPair sigPair;
@@ -45,17 +44,16 @@ public class SymmetricStaticProviderTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        rnd = new SecureRandom();
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         sigPair = rsaGen.generateKeyPair();
         
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, rnd);
+        macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
         
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
-        aesGen.init(128, rnd);
+        aesGen.init(128, Utils.getRng());
         encryptionKey = aesGen.generateKey();
     }
     

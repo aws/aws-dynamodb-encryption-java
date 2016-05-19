@@ -39,6 +39,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeValueMarshaller;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 /**
@@ -77,7 +78,7 @@ class DynamoDBSigner {
      */
     private DynamoDBSigner(String signingAlgorithm, SecureRandom rnd) {
         if (rnd == null) {
-            rnd = new SecureRandom();
+            rnd = Utils.getRng();
         }
         this.rnd = rnd;
         this.signingAlgorithm = signingAlgorithm;

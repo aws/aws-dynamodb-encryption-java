@@ -19,7 +19,6 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.util.Base64;
 
 /**
@@ -63,7 +63,6 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
      */
     public  static final String ENVELOPE_KEY = "amzn-ddb-env-key";
     private static final String DEFAULT_ALGORITHM = "AES/256";
-    private static final SecureRandom rand = new SecureRandom();
 
     protected final Key wrappingKey;
     protected final Key unwrappingKey;
@@ -151,7 +150,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
             return ((DelegatedKey)wrappingKey).wrap(key, null, wrappingAlg);
         } else {
             Cipher cipher = Cipher.getInstance(wrappingAlg);
-            cipher.init(Cipher.WRAP_MODE, wrappingKey, rand);
+            cipher.init(Cipher.WRAP_MODE, wrappingKey, Utils.getRng());
             byte[] encryptedKey = cipher.wrap(key);
             return encryptedKey;
         }
@@ -164,7 +163,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
                     description.get(CONTENT_KEY_ALGORITHM), Cipher.SECRET_KEY, null, wrappingAlgorithm);
         } else {
             Cipher cipher = Cipher.getInstance(wrappingAlgorithm);
-            cipher.init(Cipher.UNWRAP_MODE, unwrappingKey, rand);
+            cipher.init(Cipher.UNWRAP_MODE, unwrappingKey, Utils.getRng());
             return (SecretKey) cipher.unwrap(encryptedKey,
                     description.get(CONTENT_KEY_ALGORITHM), Cipher.SECRET_KEY);
         }
@@ -183,9 +182,9 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
         }
         
         if (keyLen > 0) {
-            kg.init(keyLen, rand);
+            kg.init(keyLen, Utils.getRng());
         } else {
-            kg.init(rand);
+            kg.init(Utils.getRng());
         }
         return kg.generateKey();
     }

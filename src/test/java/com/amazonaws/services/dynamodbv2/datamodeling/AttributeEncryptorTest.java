@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.datamodeling.AttributeTransformer.Parameters;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
 import com.amazonaws.services.dynamodbv2.testing.FakeParameters;
@@ -63,7 +63,6 @@ public class AttributeEncryptorTest {
     private static final String RANGE_KEY = "rangeKey";
     private static final String HASH_KEY = "hashKey";
     private static final String TABLE_NAME = "TableName";
-    private static SecureRandom rnd;
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
 
@@ -73,13 +72,12 @@ public class AttributeEncryptorTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        rnd = new SecureRandom();
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
-        aesGen.init(128, rnd);
+        aesGen.init(128, Utils.getRng());
         encryptionKey = aesGen.generateKey();
 
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, rnd);
+        macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
     }
 
@@ -227,7 +225,7 @@ public class AttributeEncryptorTest {
     @Test
     public void RsaSignedOnly() throws NoSuchAlgorithmException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = new AttributeEncryptor(new SymmetricStaticProvider(encryptionKey, sigPair,
                 Collections.<String, String> emptyMap()));
@@ -253,7 +251,7 @@ public class AttributeEncryptorTest {
     @Test(expected = DynamoDBMappingException.class)
     public void RsaSignedOnlyBadSignature() throws NoSuchAlgorithmException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = new AttributeEncryptor(new SymmetricStaticProvider(encryptionKey, sigPair,
                 Collections.<String, String> emptyMap()));

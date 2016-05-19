@@ -54,11 +54,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
 
 public class DynamoDBEncryptorTest {
-    private static SecureRandom rnd;
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
     
@@ -69,13 +69,12 @@ public class DynamoDBEncryptorTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        rnd = new SecureRandom();
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
-        aesGen.init(128, rnd);
+        aesGen.init(128, Utils.getRng());
         encryptionKey = aesGen.generateKey();
         
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, rnd);
+        macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
     }
     
@@ -147,8 +146,7 @@ public class DynamoDBEncryptorTest {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
         String encryptedString = encryptedAttributes.toString();
-        Map<String, AttributeValue> decryptedAttributes =
-                encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
+        encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
 
         assertEquals(encryptedString, encryptedAttributes.toString());
     }
@@ -233,7 +231,7 @@ public class DynamoDBEncryptorTest {
     @Test
     public void RsaSignedOnly() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
                 new SymmetricStaticProvider(encryptionKey, sigPair, 
@@ -257,7 +255,7 @@ public class DynamoDBEncryptorTest {
     @Test(expected=SignatureException.class)
     public void RsaSignedOnlyBadSignature() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
                 new SymmetricStaticProvider(encryptionKey, sigPair, 
@@ -323,7 +321,7 @@ public class DynamoDBEncryptorTest {
             Security.addProvider(new BouncyCastleProvider());
             ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
             KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
-            g.initialize(ecSpec, new SecureRandom());
+            g.initialize(ecSpec, Utils.getRng());
             KeyPair keypair = g.generateKeyPair();
             Map<String, String> description = new HashMap<String, String>();
             description.put(DynamoDBEncryptor.DEFAULT_SIGNING_ALGORITHM_HEADER, "SHA384withECDSA");

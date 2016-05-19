@@ -19,7 +19,6 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.util.EnumSet;
@@ -36,6 +35,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 public class DynamoDBSignerTest {
@@ -44,7 +44,6 @@ public class DynamoDBSignerTest {
     private static Key pubKeyRsa;
     private static Key privKeyRsa;
     private static Key macKey;
-    private static SecureRandom rnd;
     private DynamoDBSigner signerRsa;
     private DynamoDBSigner signerEcdsa;
     private static Key pubKeyEcdsa;
@@ -52,23 +51,22 @@ public class DynamoDBSignerTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        rnd = new SecureRandom();
         
         //RSA key generation
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, rnd);
+        rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         pubKeyRsa = sigPair.getPublic();
         privKeyRsa = sigPair.getPrivate();
         
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, rnd);
+        macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
         
         Security.addProvider(new BouncyCastleProvider());
         ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
         KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
-        g.initialize(ecSpec, new SecureRandom());
+        g.initialize(ecSpec, Utils.getRng());
         KeyPair keypair = g.generateKeyPair();
         pubKeyEcdsa = keypair.getPublic();
         privKeyEcdsa = keypair.getPrivate();
@@ -77,8 +75,8 @@ public class DynamoDBSignerTest {
     
     @Before
     public void setUp() {
-        signerRsa = DynamoDBSigner.getInstance("SHA256withRSA", rnd);
-        signerEcdsa = DynamoDBSigner.getInstance("SHA384withECDSA", rnd);
+        signerRsa = DynamoDBSigner.getInstance("SHA256withRSA", Utils.getRng());
+        signerEcdsa = DynamoDBSigner.getInstance("SHA384withECDSA", Utils.getRng());
     }
 
     @Test

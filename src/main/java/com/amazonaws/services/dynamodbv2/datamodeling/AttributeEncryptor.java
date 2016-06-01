@@ -39,7 +39,6 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
  * @author Greg Rubin 
  */
 public class AttributeEncryptor implements AttributeTransformer {
-    private static final DynamoDBReflector reflector = new DynamoDBReflector();
     private final DynamoDBEncryptor encryptor;
     private final Map<Class<?>, ModelClassMetadata> metadataCache = new ConcurrentHashMap<>();
 

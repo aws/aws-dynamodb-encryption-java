@@ -70,17 +70,25 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
             final long currentVersion;
             final EncryptionMaterialsProvider currentProvider;
             if (newVersion < 0) {
+                // First version of the material, so we want to allow creation
                 currentVersion = 0;
                 currentProvider = keystore.getOrCreate(materialName, currentVersion);
-                s = new State(currentProvider, currentVersion);
-                state.set(s);
+                cache.add(Long.toString(currentVersion), currentProvider);
             } else if (newVersion != s.currentVersion) {
+                // We're retrieving an existing version, so we avoid the creation
+                // flow as it is slower
                 currentVersion = newVersion;
                 currentProvider = keystore.getProvider(materialName, currentVersion);
                 cache.add(Long.toString(currentVersion), currentProvider);
-                s = new State(currentProvider, currentVersion);
-                state.set(s);
+            } else {
+                // Our version hasn't changed, so we'll just re-use the existing
+                // provider to avoid the overhead of retrieving and building a new one
+                currentVersion = newVersion;
+                currentProvider = s.provider;
+                // There is no need to add this to the cache as it's already there
             }
+            s = new State(currentProvider, currentVersion);
+            state.set(s);
 
             return s.provider.getEncryptionMaterials(context);
         } finally {

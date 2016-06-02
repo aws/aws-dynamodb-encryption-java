@@ -120,7 +120,7 @@ public class MostRecentProviderTests {
 
     @Test
     public void singleMaterialWithRefresh() throws InterruptedException {
-        final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 100);
+        final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 500);
         assertNull(methodCalls.get("putItem"));
         final EncryptionMaterials eMat1 = prov.getEncryptionMaterials(ctx);
         // It's a new provider, so we see a single putItem
@@ -136,9 +136,24 @@ public class MostRecentProviderTests {
         assertEquals(1, (int) methodCalls.get("query")); // To find current version
         assertEquals(1, (int) methodCalls.get("getItem"));
         assertEquals(0, store.getVersionFromMaterialDescription(eMat3.getMaterialDescription()));
+        prov.refresh();
 
         assertEquals(eMat1.getSigningKey(), eMat2.getSigningKey());
         assertEquals(eMat1.getSigningKey(), eMat3.getSigningKey());
+
+        // Ensure that after cache refresh  we only get one more hit as opposed to multiple
+        prov.getEncryptionMaterials(ctx);
+        Thread.sleep(700);
+        // Force refresh
+        prov.getEncryptionMaterials(ctx);
+        methodCalls.clear();
+        // Check to ensure no more hits
+        assertEquals(eMat1.getSigningKey(), prov.getEncryptionMaterials(ctx).getSigningKey());
+        assertEquals(eMat1.getSigningKey(), prov.getEncryptionMaterials(ctx).getSigningKey());
+        assertEquals(eMat1.getSigningKey(), prov.getEncryptionMaterials(ctx).getSigningKey());
+        assertEquals(eMat1.getSigningKey(), prov.getEncryptionMaterials(ctx).getSigningKey());
+        assertEquals(eMat1.getSigningKey(), prov.getEncryptionMaterials(ctx).getSigningKey());
+        assertTrue(methodCalls.isEmpty());
 
         // Ensure we can decrypt all of them without hitting ddb more than the minimum
         final MostRecentProvider prov2 = new MostRecentProvider(store, MATERIAL_NAME, 500);

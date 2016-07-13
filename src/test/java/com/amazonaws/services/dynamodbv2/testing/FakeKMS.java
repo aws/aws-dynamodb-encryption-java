@@ -25,7 +25,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.ResponseMetadata;
 import com.amazonaws.regions.Region;
-import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.AbstractAWSKMS;
 import com.amazonaws.services.kms.model.CancelKeyDeletionRequest;
 import com.amazonaws.services.kms.model.CancelKeyDeletionResult;
 import com.amazonaws.services.kms.model.CreateAliasRequest;
@@ -77,27 +77,10 @@ import com.amazonaws.services.kms.model.ScheduleKeyDeletionResult;
 import com.amazonaws.services.kms.model.UpdateAliasRequest;
 import com.amazonaws.services.kms.model.UpdateKeyDescriptionRequest;
 
-public class FakeKMS implements AWSKMS {
+public class FakeKMS extends AbstractAWSKMS {
     private static final SecureRandom rnd = new SecureRandom();
     private static final String ACCOUNT_ID = "01234567890";
     private final Map<DecryptMapKey, DecryptResult> results_ = new HashMap<>();
-
-    @Override
-    public void createAlias(CreateAliasRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public CreateGrantResult createGrant(CreateGrantRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public CreateKeyResult createKey() throws AmazonServiceException, AmazonClientException {
-        return createKey(new CreateKeyRequest());
-    }
 
     @Override
     public CreateKeyResult createKey(CreateKeyRequest req) throws AmazonServiceException,
@@ -121,42 +104,6 @@ public class FakeKMS implements AWSKMS {
         } else {
             throw new InvalidCiphertextException("Invalid Ciphertext");
         }
-    }
-
-    @Override
-    public void deleteAlias(DeleteAliasRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DescribeKeyResult describeKey(DescribeKeyRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void disableKey(DisableKeyRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void disableKeyRotation(DisableKeyRotationRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void enableKey(EnableKeyRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void enableKeyRotation(EnableKeyRotationRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -209,123 +156,6 @@ public class FakeKMS implements AWSKMS {
     }
 
     @Override
-    public GenerateRandomResult generateRandom() throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public GenerateRandomResult generateRandom(GenerateRandomRequest arg0)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ResponseMetadata getCachedResponseMetadata(AmazonWebServiceRequest arg0) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public GetKeyPolicyResult getKeyPolicy(GetKeyPolicyRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public GetKeyRotationStatusResult getKeyRotationStatus(GetKeyRotationStatusRequest arg0)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListAliasesResult listAliases() throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListAliasesResult listAliases(ListAliasesRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListGrantsResult listGrants(ListGrantsRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListKeyPoliciesResult listKeyPolicies(ListKeyPoliciesRequest arg0)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListKeysResult listKeys() throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListKeysResult listKeys(ListKeysRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void putKeyPolicy(PutKeyPolicyRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ReEncryptResult reEncrypt(ReEncryptRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void retireGrant() throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void retireGrant(RetireGrantRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void revokeGrant(RevokeGrantRequest arg0) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateAlias(UpdateAliasRequest req) throws AmazonServiceException,
-            AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ScheduleKeyDeletionResult scheduleKeyDeletion(ScheduleKeyDeletionRequest scheduleKeyDeletionRequest)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ListRetirableGrantsResult listRetirableGrants(ListRetirableGrantsRequest listRetirableGrantsRequest)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public CancelKeyDeletionResult cancelKeyDeletion(CancelKeyDeletionRequest cancelKeyDeletionRequest)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void setEndpoint(String arg0) throws IllegalArgumentException {
         // Do nothing
     }
@@ -338,12 +168,6 @@ public class FakeKMS implements AWSKMS {
     @Override
     public void shutdown() {
         // Do nothing
-    }
-
-    @Override
-    public void updateKeyDescription(UpdateKeyDescriptionRequest arg0)
-            throws AmazonServiceException, AmazonClientException {
-        throw new UnsupportedOperationException();
     }
 
     public void dump() {

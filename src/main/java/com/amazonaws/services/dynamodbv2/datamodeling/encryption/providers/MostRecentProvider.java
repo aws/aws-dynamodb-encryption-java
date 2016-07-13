@@ -53,7 +53,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
     @Override
     public EncryptionMaterials getEncryptionMaterials(EncryptionContext context) {
         State s = state.get();
-        if (System.nanoTime() - s.lastUpdated <= ttlInNanos) {
+        if (s.provider != null && System.nanoTime() - s.lastUpdated <= ttlInNanos) {
             return s.provider.getEncryptionMaterials(context);
         }
         if (s.provider == null || System.nanoTime() - s.lastUpdated > ttlInNanos + TTL_GRACE_IN_NANO) {

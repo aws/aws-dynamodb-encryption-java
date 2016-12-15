@@ -308,8 +308,13 @@ public class DynamoDBEncryptor {
         // The description must be stored after encryption because its data
         // is necessary for proper decryption.
         final String signingAlgo = materialDescription.get(signingAlgorithmHeader);
-        DynamoDBSigner signer = DynamoDBSigner.getInstance(signingAlgo == null ? DEFAULT_SIGNATURE_ALGORITHM : signingAlgo, Utils.getRng());
-        
+        DynamoDBSigner signer;
+        if (signingAlgo != null) {
+            signer = DynamoDBSigner.getInstance(signingAlgo, Utils.getRng());
+        } else {
+            signer = DynamoDBSigner.getInstance(DEFAULT_SIGNATURE_ALGORITHM, Utils.getRng());
+        }
+
         if (materials.getSigningKey() instanceof PrivateKey ) {
             materialDescription.put(signingAlgorithmHeader, signer.getSigningAlgorithm());
         }

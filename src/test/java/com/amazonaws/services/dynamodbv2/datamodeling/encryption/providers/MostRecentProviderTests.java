@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,11 +42,13 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.MostR
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 
 public class MostRecentProviderTests {
     private static final String TABLE_NAME = "keystoreTable";
     private static final String MATERIAL_NAME = "material";
+    private static final String MATERIAL_PARAM = "materialName";
     private static final SecretKey AES_KEY = new SecretKeySpec(new byte[] { 0,
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, "AES");
     private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[] { 0,
@@ -78,12 +81,12 @@ public class MostRecentProviderTests {
     }
 
     @Test
-    public void singleMaterial() throws InterruptedException {
+    public void singleVersion() throws InterruptedException {
         final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 500);
         assertNull(methodCalls.get("putItem"));
         final EncryptionMaterials eMat1 = prov.getEncryptionMaterials(ctx);
         // It's a new provider, so we see a single putItem
-        assertEquals(1, (int) methodCalls.get("putItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
         methodCalls.clear();
         // Ensure the cache is working
         final EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
@@ -94,7 +97,7 @@ public class MostRecentProviderTests {
         Thread.sleep(500);
         final EncryptionMaterials eMat3 = prov.getEncryptionMaterials(ctx);
         assertEquals(1, methodCalls.size());
-        assertEquals(1, (int) methodCalls.get("query")); // To find current version
+        assertEquals(1, (int) methodCalls.getOrDefault("query", 0)); // To find current version
         assertEquals(0, store.getVersionFromMaterialDescription(eMat3.getMaterialDescription()));
 
         assertEquals(eMat1.getSigningKey(), eMat2.getSigningKey());
@@ -115,16 +118,16 @@ public class MostRecentProviderTests {
         final DecryptionMaterials dMat3 = prov2.getDecryptionMaterials(ctx(eMat3));
         assertEquals(eMat3.getEncryptionKey(), dMat3.getDecryptionKey());
         assertEquals(eMat3.getSigningKey(), dMat3.getVerificationKey());
-        assertTrue(methodCalls.isEmpty());
+        assertTrue("Expected no calls but was " + methodCalls.toString(), methodCalls.isEmpty());
     }
 
     @Test
-    public void singleMaterialWithRefresh() throws InterruptedException {
+    public void singleVersionWithRefresh() throws InterruptedException {
         final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 500);
         assertNull(methodCalls.get("putItem"));
         final EncryptionMaterials eMat1 = prov.getEncryptionMaterials(ctx);
         // It's a new provider, so we see a single putItem
-        assertEquals(1, (int) methodCalls.get("putItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
         methodCalls.clear();
         // Ensure the cache is working
         final EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
@@ -133,8 +136,8 @@ public class MostRecentProviderTests {
         assertEquals(0, store.getVersionFromMaterialDescription(eMat2.getMaterialDescription()));
         prov.refresh();
         final EncryptionMaterials eMat3 = prov.getEncryptionMaterials(ctx);
-        assertEquals(1, (int) methodCalls.get("query")); // To find current version
-        assertEquals(1, (int) methodCalls.get("getItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0));
         assertEquals(0, store.getVersionFromMaterialDescription(eMat3.getMaterialDescription()));
         prov.refresh();
 
@@ -171,12 +174,12 @@ public class MostRecentProviderTests {
     }
 
     @Test
-    public void twoMaterials() throws InterruptedException {
+    public void twoVersions() throws InterruptedException {
         final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 500);
         assertNull(methodCalls.get("putItem"));
         final EncryptionMaterials eMat1 = prov.getEncryptionMaterials(ctx);
         // It's a new provider, so we see a single putItem
-        assertEquals(1, (int) methodCalls.get("putItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
         methodCalls.clear();
         // Create the new material
         store.newProvider(MATERIAL_NAME);
@@ -192,8 +195,8 @@ public class MostRecentProviderTests {
         Thread.sleep(500);
         final EncryptionMaterials eMat3 = prov.getEncryptionMaterials(ctx);
 
-        assertEquals(1, (int) methodCalls.get("query")); // To find current version
-        assertEquals(1, (int) methodCalls.get("getItem")); // To retrieve current version
+        assertEquals(1, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0)); // To retrieve current version
         assertNull(methodCalls.get("putItem")); // No attempt to create a new item
         assertEquals(1, store.getVersionFromMaterialDescription(eMat3.getMaterialDescription()));
 
@@ -214,16 +217,16 @@ public class MostRecentProviderTests {
         assertEquals(eMat3.getSigningKey(), dMat3.getVerificationKey());
         // Get item will be hit once for the one old key
         assertEquals(1, methodCalls.size());
-        assertEquals(1, (int) methodCalls.get("getItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0));
     }
 
     @Test
-    public void twoMaterialsWithRefresh() throws InterruptedException {
+    public void twoVersionsWithRefresh() throws InterruptedException {
         final MostRecentProvider prov = new MostRecentProvider(store, MATERIAL_NAME, 100);
         assertNull(methodCalls.get("putItem"));
         final EncryptionMaterials eMat1 = prov.getEncryptionMaterials(ctx);
         // It's a new provider, so we see a single putItem
-        assertEquals(1, (int) methodCalls.get("putItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
         methodCalls.clear();
         // Create the new material
         store.newProvider(MATERIAL_NAME);
@@ -235,8 +238,8 @@ public class MostRecentProviderTests {
         assertEquals(0, store.getVersionFromMaterialDescription(eMat2.getMaterialDescription()));
         prov.refresh();
         final EncryptionMaterials eMat3 = prov.getEncryptionMaterials(ctx);
-        assertEquals(1, (int) methodCalls.get("query")); // To find current version
-        assertEquals(1, (int) methodCalls.get("getItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0));
         assertEquals(1, store.getVersionFromMaterialDescription(eMat3.getMaterialDescription()));
 
         assertEquals(eMat1.getSigningKey(), eMat2.getSigningKey());
@@ -256,12 +259,275 @@ public class MostRecentProviderTests {
         assertEquals(eMat3.getSigningKey(), dMat3.getVerificationKey());
         // Get item will be hit once for the one old key
         assertEquals(1, methodCalls.size());
-        assertEquals(1, (int) methodCalls.get("getItem"));
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0));
+    }
+
+    @Test
+    public void singleVersionTwoMaterials() throws InterruptedException {
+        final Map<String, AttributeValue> attr1 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material1"));
+        final EncryptionContext ctx1 = ctx(attr1);
+        final Map<String, AttributeValue> attr2 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material2"));
+        final EncryptionContext ctx2 = ctx(attr2);
+
+        final MostRecentProvider prov = new ExtendedProvider(store, 500);
+        assertNull(methodCalls.get("putItem"));
+        final EncryptionMaterials eMat1_1 = prov.getEncryptionMaterials(ctx1);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        final EncryptionMaterials eMat1_2 = prov.getEncryptionMaterials(ctx2);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        // Ensure the two materials are, in fact, different
+        assertFalse(eMat1_1.getSigningKey().equals(eMat1_2.getSigningKey()));
+
+        // Ensure the cache is working
+        final EncryptionMaterials eMat2_1 = prov.getEncryptionMaterials(ctx1);
+        assertTrue(methodCalls.isEmpty());
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_1.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_1.getMaterialDescription()));
+        final EncryptionMaterials eMat2_2 = prov.getEncryptionMaterials(ctx2);
+        assertTrue(methodCalls.isEmpty());
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_2.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_2.getMaterialDescription()));
+
+        // Let the TTL be exceeded
+        Thread.sleep(500);
+        final EncryptionMaterials eMat3_1 = prov.getEncryptionMaterials(ctx1);
+        assertEquals(1, methodCalls.size());
+        assertEquals(1, (int) methodCalls.get("query")); // To find current version
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat3_1.getMaterialDescription()));
+        methodCalls.clear();
+        final EncryptionMaterials eMat3_2 = prov.getEncryptionMaterials(ctx2);
+        assertEquals(1, methodCalls.size());
+        assertEquals(1, (int) methodCalls.get("query")); // To find current version
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat3_2.getMaterialDescription()));
+
+        assertEquals(eMat1_1.getSigningKey(), eMat2_1.getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), eMat2_2.getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), eMat3_1.getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), eMat3_2.getSigningKey());
+        // Check algorithms. Right now we only support AES and HmacSHA256
+        assertEquals("AES", eMat1_1.getEncryptionKey().getAlgorithm());
+        assertEquals("AES", eMat1_2.getEncryptionKey().getAlgorithm());
+        assertEquals("HmacSHA256", eMat1_1.getSigningKey().getAlgorithm());
+        assertEquals("HmacSHA256", eMat1_2.getSigningKey().getAlgorithm());
+
+        // Ensure we can decrypt all of them without hitting ddb more than the minimum
+        final MostRecentProvider prov2 = new ExtendedProvider(store, 500);
+        final DecryptionMaterials dMat1_1 = prov2.getDecryptionMaterials(ctx(eMat1_1, attr1));
+        final DecryptionMaterials dMat1_2 = prov2.getDecryptionMaterials(ctx(eMat1_2, attr2));
+        methodCalls.clear();
+        assertEquals(eMat1_1.getEncryptionKey(), dMat1_1.getDecryptionKey());
+        assertEquals(eMat1_2.getEncryptionKey(), dMat1_2.getDecryptionKey());
+        assertEquals(eMat1_1.getSigningKey(), dMat1_1.getVerificationKey());
+        assertEquals(eMat1_2.getSigningKey(), dMat1_2.getVerificationKey());
+        final DecryptionMaterials dMat2_1 = prov2.getDecryptionMaterials(ctx(eMat2_1, attr1));
+        final DecryptionMaterials dMat2_2 = prov2.getDecryptionMaterials(ctx(eMat2_2, attr2));
+        assertEquals(eMat2_1.getEncryptionKey(), dMat2_1.getDecryptionKey());
+        assertEquals(eMat2_2.getEncryptionKey(), dMat2_2.getDecryptionKey());
+        assertEquals(eMat2_1.getSigningKey(), dMat2_1.getVerificationKey());
+        assertEquals(eMat2_2.getSigningKey(), dMat2_2.getVerificationKey());
+        final DecryptionMaterials dMat3_1 = prov2.getDecryptionMaterials(ctx(eMat3_1, attr1));
+        final DecryptionMaterials dMat3_2 = prov2.getDecryptionMaterials(ctx(eMat3_2, attr2));
+        assertEquals(eMat3_1.getEncryptionKey(), dMat3_1.getDecryptionKey());
+        assertEquals(eMat3_2.getEncryptionKey(), dMat3_2.getDecryptionKey());
+        assertEquals(eMat3_1.getSigningKey(), dMat3_1.getVerificationKey());
+        assertEquals(eMat3_2.getSigningKey(), dMat3_2.getVerificationKey());
+        assertTrue("Expected no calls but was " + methodCalls.toString(), methodCalls.isEmpty());
+    }
+
+    @Test
+    public void singleVersionWithTwoMaterialsWithRefresh() throws InterruptedException {
+        final Map<String, AttributeValue> attr1 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material1"));
+        final EncryptionContext ctx1 = ctx(attr1);
+        final Map<String, AttributeValue> attr2 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material2"));
+        final EncryptionContext ctx2 = ctx(attr2);
+
+        final MostRecentProvider prov = new ExtendedProvider(store, 500);
+        assertNull(methodCalls.get("putItem"));
+        final EncryptionMaterials eMat1_1 = prov.getEncryptionMaterials(ctx1);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        final EncryptionMaterials eMat1_2 = prov.getEncryptionMaterials(ctx2);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        // Ensure the two materials are, in fact, different
+        assertFalse(eMat1_1.getSigningKey().equals(eMat1_2.getSigningKey()));
+
+        // Ensure the cache is working
+        final EncryptionMaterials eMat2_1 = prov.getEncryptionMaterials(ctx1);
+        assertTrue(methodCalls.isEmpty());
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_1.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_1.getMaterialDescription()));
+        final EncryptionMaterials eMat2_2 = prov.getEncryptionMaterials(ctx2);
+        assertTrue(methodCalls.isEmpty());
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_2.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_2.getMaterialDescription()));
+
+        prov.refresh();
+        final EncryptionMaterials eMat3_1 = prov.getEncryptionMaterials(ctx1);
+        assertEquals(1, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(1, (int) methodCalls.getOrDefault("getItem", 0));
+        final EncryptionMaterials eMat3_2 = prov.getEncryptionMaterials(ctx2);
+        assertEquals(2, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(2, (int) methodCalls.getOrDefault("getItem", 0));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat3_1.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat3_2.getMaterialDescription()));
+        prov.refresh();
+
+        assertEquals(eMat1_1.getSigningKey(), eMat2_1.getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), eMat3_1.getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), eMat2_2.getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), eMat3_2.getSigningKey());
+
+        // Ensure that after cache refresh  we only get one more hit as opposed to multiple
+        prov.getEncryptionMaterials(ctx1);
+        prov.getEncryptionMaterials(ctx2);
+        Thread.sleep(700);
+        // Force refresh
+        prov.getEncryptionMaterials(ctx1);
+        prov.getEncryptionMaterials(ctx2);
+        methodCalls.clear();
+        // Check to ensure no more hits
+        assertEquals(eMat1_1.getSigningKey(), prov.getEncryptionMaterials(ctx1).getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), prov.getEncryptionMaterials(ctx1).getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), prov.getEncryptionMaterials(ctx1).getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), prov.getEncryptionMaterials(ctx1).getSigningKey());
+        assertEquals(eMat1_1.getSigningKey(), prov.getEncryptionMaterials(ctx1).getSigningKey());
+
+        assertEquals(eMat1_2.getSigningKey(), prov.getEncryptionMaterials(ctx2).getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), prov.getEncryptionMaterials(ctx2).getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), prov.getEncryptionMaterials(ctx2).getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), prov.getEncryptionMaterials(ctx2).getSigningKey());
+        assertEquals(eMat1_2.getSigningKey(), prov.getEncryptionMaterials(ctx2).getSigningKey());
+        assertTrue(methodCalls.isEmpty());
+
+        // Ensure we can decrypt all of them without hitting ddb more than the minimum
+        final MostRecentProvider prov2 = new ExtendedProvider(store, 500);
+        final DecryptionMaterials dMat1_1 = prov2.getDecryptionMaterials(ctx(eMat1_1, attr1));
+        final DecryptionMaterials dMat1_2 = prov2.getDecryptionMaterials(ctx(eMat1_2, attr2));
+        methodCalls.clear();
+        assertEquals(eMat1_1.getEncryptionKey(), dMat1_1.getDecryptionKey());
+        assertEquals(eMat1_2.getEncryptionKey(), dMat1_2.getDecryptionKey());
+        assertEquals(eMat1_1.getSigningKey(), dMat1_1.getVerificationKey());
+        assertEquals(eMat1_2.getSigningKey(), dMat1_2.getVerificationKey());
+        final DecryptionMaterials dMat2_1 = prov2.getDecryptionMaterials(ctx(eMat2_1, attr1));
+        final DecryptionMaterials dMat2_2 = prov2.getDecryptionMaterials(ctx(eMat2_2, attr2));
+        assertEquals(eMat2_1.getEncryptionKey(), dMat2_1.getDecryptionKey());
+        assertEquals(eMat2_2.getEncryptionKey(), dMat2_2.getDecryptionKey());
+        assertEquals(eMat2_1.getSigningKey(), dMat2_1.getVerificationKey());
+        assertEquals(eMat2_2.getSigningKey(), dMat2_2.getVerificationKey());
+        final DecryptionMaterials dMat3_1 = prov2.getDecryptionMaterials(ctx(eMat3_1, attr1));
+        final DecryptionMaterials dMat3_2 = prov2.getDecryptionMaterials(ctx(eMat3_2, attr2));
+        assertEquals(eMat3_1.getEncryptionKey(), dMat3_1.getDecryptionKey());
+        assertEquals(eMat3_2.getEncryptionKey(), dMat3_2.getDecryptionKey());
+        assertEquals(eMat3_1.getSigningKey(), dMat3_1.getVerificationKey());
+        assertEquals(eMat3_2.getSigningKey(), dMat3_2.getVerificationKey());
+        assertTrue(methodCalls.isEmpty());
+    }
+
+    @Test
+    public void twoVersionsWithTwoMaterialsWithRefresh() throws InterruptedException {
+        final Map<String, AttributeValue> attr1 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material1"));
+        final EncryptionContext ctx1 = ctx(attr1);
+        final Map<String, AttributeValue> attr2 = Collections.singletonMap(MATERIAL_PARAM, new AttributeValue("material2"));
+        final EncryptionContext ctx2 = ctx(attr2);
+
+        final MostRecentProvider prov = new ExtendedProvider(store, 500);
+        assertNull(methodCalls.get("putItem"));
+        final EncryptionMaterials eMat1_1 = prov.getEncryptionMaterials(ctx1);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        final EncryptionMaterials eMat1_2 = prov.getEncryptionMaterials(ctx2);
+        // It's a new provider, so we see a single putItem
+        assertEquals(1, (int) methodCalls.getOrDefault("putItem", 0));
+        methodCalls.clear();
+        // Create the new material
+        store.newProvider("material1");
+        store.newProvider("material2");
+        methodCalls.clear();
+        // Ensure the cache is working
+        final EncryptionMaterials eMat2_1 = prov.getEncryptionMaterials(ctx1);
+        final EncryptionMaterials eMat2_2 = prov.getEncryptionMaterials(ctx2);
+        assertTrue(methodCalls.isEmpty());
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_1.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_1.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat1_2.getMaterialDescription()));
+        assertEquals(0, store.getVersionFromMaterialDescription(eMat2_2.getMaterialDescription()));
+        prov.refresh();
+        final EncryptionMaterials eMat3_1 = prov.getEncryptionMaterials(ctx1);
+        final EncryptionMaterials eMat3_2 = prov.getEncryptionMaterials(ctx2);
+        assertEquals(2, (int) methodCalls.getOrDefault("query", 0)); // To find current version
+        assertEquals(2, (int) methodCalls.getOrDefault("getItem", 0));
+        assertEquals(1, store.getVersionFromMaterialDescription(eMat3_1.getMaterialDescription()));
+        assertEquals(1, store.getVersionFromMaterialDescription(eMat3_2.getMaterialDescription()));
+
+        assertEquals(eMat1_1.getSigningKey(), eMat2_1.getSigningKey());
+        assertFalse(eMat1_1.getSigningKey().equals(eMat3_1.getSigningKey()));
+        assertEquals(eMat1_2.getSigningKey(), eMat2_2.getSigningKey());
+        assertFalse(eMat1_2.getSigningKey().equals(eMat3_2.getSigningKey()));
+
+        // Ensure we can decrypt all of them without hitting ddb more than the minimum
+        final MostRecentProvider prov2 = new ExtendedProvider(store, 500);
+        final DecryptionMaterials dMat1_1 = prov2.getDecryptionMaterials(ctx(eMat1_1, attr1));
+        final DecryptionMaterials dMat1_2 = prov2.getDecryptionMaterials(ctx(eMat1_2, attr2));
+        methodCalls.clear();
+        assertEquals(eMat1_1.getEncryptionKey(), dMat1_1.getDecryptionKey());
+        assertEquals(eMat1_2.getEncryptionKey(), dMat1_2.getDecryptionKey());
+        assertEquals(eMat1_1.getSigningKey(), dMat1_1.getVerificationKey());
+        assertEquals(eMat1_2.getSigningKey(), dMat1_2.getVerificationKey());
+        final DecryptionMaterials dMat2_1 = prov2.getDecryptionMaterials(ctx(eMat2_1, attr1));
+        final DecryptionMaterials dMat2_2 = prov2.getDecryptionMaterials(ctx(eMat2_2, attr2));
+        assertEquals(eMat2_1.getEncryptionKey(), dMat2_1.getDecryptionKey());
+        assertEquals(eMat2_2.getEncryptionKey(), dMat2_2.getDecryptionKey());
+        assertEquals(eMat2_1.getSigningKey(), dMat2_1.getVerificationKey());
+        assertEquals(eMat2_2.getSigningKey(), dMat2_2.getVerificationKey());
+        final DecryptionMaterials dMat3_1 = prov2.getDecryptionMaterials(ctx(eMat3_1, attr1));
+        final DecryptionMaterials dMat3_2 = prov2.getDecryptionMaterials(ctx(eMat3_2, attr2));
+        assertEquals(eMat3_1.getEncryptionKey(), dMat3_1.getDecryptionKey());
+        assertEquals(eMat3_2.getEncryptionKey(), dMat3_2.getDecryptionKey());
+        assertEquals(eMat3_1.getSigningKey(), dMat3_1.getVerificationKey());
+        assertEquals(eMat3_2.getSigningKey(), dMat3_2.getVerificationKey());
+        // Get item will be hit once for the one old key
+        assertEquals(1, methodCalls.size());
+        assertEquals(2, (int) methodCalls.getOrDefault("getItem", 0));
+    }
+
+    private static EncryptionContext ctx(final Map<String, AttributeValue> attr) {
+        return new EncryptionContext.Builder()
+            .withAttributeValues(attr).build();
+    }
+
+    private static EncryptionContext ctx(final EncryptionMaterials mat, Map<String, AttributeValue> attr) {
+        return new EncryptionContext.Builder()
+            .withAttributeValues(attr)
+            .withMaterialDescription(mat.getMaterialDescription()).build();
     }
 
     private static EncryptionContext ctx(final EncryptionMaterials mat) {
         return new EncryptionContext.Builder()
-        .withMaterialDescription(mat.getMaterialDescription()).build();
+            .withMaterialDescription(mat.getMaterialDescription()).build();
+    }
+
+    private static class ExtendedProvider extends MostRecentProvider {
+        public ExtendedProvider(ProviderStore keystore, long ttlInMillis) {
+            super(keystore, null, ttlInMillis);
+        }
+
+        @Override
+        public long getCurrentVersion() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        protected String getMaterialName(final EncryptionContext context) {
+            return context.getAttributeValues().get(MATERIAL_PARAM).getS();
+        }
     }
 
     @SuppressWarnings("unchecked")

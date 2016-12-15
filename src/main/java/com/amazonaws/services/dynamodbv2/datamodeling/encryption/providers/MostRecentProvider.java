@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
@@ -30,12 +30,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.internal.LRUCache;
 public class MostRecentProvider implements EncryptionMaterialsProvider {
     private static final long MILLI_TO_NANO = 1000000L;
     private static final long TTL_GRACE_IN_NANO = 500 * MILLI_TO_NANO;
-    private final ReentrantLock lock = new ReentrantLock(true);
     private final ProviderStore keystore;
-    private final String materialName;
+    protected final String defaultMaterialName;
     private final long ttlInNanos;
     private final LRUCache<EncryptionMaterialsProvider> cache;
-    private final AtomicReference<State> state = new AtomicReference<>(new State());
+    private final LRUCache<LockedState> currentVersions;
 
     /**
      * Creates a new {@link MostRecentProvider}.
@@ -45,22 +44,26 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      */
     public MostRecentProvider(final ProviderStore keystore, final String materialName, final long ttlInMillis) {
         this.keystore = checkNotNull(keystore, "keystore must not be null");
-        this.materialName = checkNotNull(materialName, "materialName must not be null");
+        this.defaultMaterialName = materialName;
         this.ttlInNanos = ttlInMillis * MILLI_TO_NANO;
         this.cache = new LRUCache<EncryptionMaterialsProvider>(1000);
+        this.currentVersions = new LRUCache<>(1000);
     }
 
     @Override
     public EncryptionMaterials getEncryptionMaterials(EncryptionContext context) {
-        State s = state.get();
+        final String materialName = getMaterialName(context);
+        final LockedState ls = getCurrentVersion(materialName);
+
+        final State s = ls.getState();
         if (s.provider != null && System.nanoTime() - s.lastUpdated <= ttlInNanos) {
             return s.provider.getEncryptionMaterials(context);
         }
         if (s.provider == null || System.nanoTime() - s.lastUpdated > ttlInNanos + TTL_GRACE_IN_NANO) {
             // Either we don't have a provider at all, or we're more than 500 milliseconds past
             // our update time. Either way, grab the lock and force an update.
-            lock.lock();
-        } else if (!lock.tryLock()) {
+            ls.lock();
+        } else if (!ls.tryLock()) {
             // If we can't get the lock immediately, just use the current provider
             return s.provider.getEncryptionMaterials(context);
         }
@@ -73,13 +76,13 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
                 // First version of the material, so we want to allow creation
                 currentVersion = 0;
                 currentProvider = keystore.getOrCreate(materialName, currentVersion);
-                cache.add(Long.toString(currentVersion), currentProvider);
+                cache.add(buildCacheKey(materialName, currentVersion), currentProvider);
             } else if (newVersion != s.currentVersion) {
                 // We're retrieving an existing version, so we avoid the creation
                 // flow as it is slower
                 currentVersion = newVersion;
                 currentProvider = keystore.getProvider(materialName, currentVersion);
-                cache.add(Long.toString(currentVersion), currentProvider);
+                cache.add(buildCacheKey(materialName, currentVersion), currentProvider);
             } else {
                 // Our version hasn't changed, so we'll just re-use the existing
                 // provider to avoid the overhead of retrieving and building a new one
@@ -87,22 +90,23 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
                 currentProvider = s.provider;
                 // There is no need to add this to the cache as it's already there
             }
-            s = new State(currentProvider, currentVersion);
-            state.set(s);
 
-            return s.provider.getEncryptionMaterials(context);
+            ls.update(currentProvider, currentVersion);
+
+            return ls.getState().provider.getEncryptionMaterials(context);
         } finally {
-            lock.unlock();
+            ls.unlock();
         }
     }
 
     public DecryptionMaterials getDecryptionMaterials(EncryptionContext context) {
+        final String materialName = getMaterialName(context);
         final long version = keystore.getVersionFromMaterialDescription(
                 context.getMaterialDescription());
-        EncryptionMaterialsProvider provider = cache.get(Long.toString(version));
+        EncryptionMaterialsProvider provider = cache.get(buildCacheKey(materialName, version));
         if (provider == null) {
             provider = keystore.getProvider(materialName, version);
-            cache.add(Long.toString(version), provider);
+            cache.add(buildCacheKey(materialName, version), provider);
         }
         return provider.getDecryptionMaterials(context);
     }
@@ -112,12 +116,12 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      */
     @Override
     public void refresh() {
-        state.set(new State());
+        currentVersions.clear();
         cache.clear();
     }
 
     public String getMaterialName() {
-        return materialName;
+        return defaultMaterialName;
     }
 
     public long getTtlInMills() {
@@ -129,7 +133,7 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      * currently have a current version.
      */
     public long getCurrentVersion() {
-        return state.get().currentVersion;
+        return getCurrentVersion(getMaterialName()).getState().currentVersion;
     }
 
     /**
@@ -137,7 +141,28 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
      * current version.
      */
     public long getLastUpdated() {
-        return state.get().lastUpdated / MILLI_TO_NANO;
+        return getCurrentVersion(getMaterialName()).getState().lastUpdated / MILLI_TO_NANO;
+    }
+
+    protected String getMaterialName(final EncryptionContext context) {
+        return defaultMaterialName;
+    }
+
+    private LockedState getCurrentVersion(final String materialName) {
+        final LockedState result = currentVersions.get(materialName);
+        if (result == null) {
+            currentVersions.add(materialName, new LockedState());
+            return currentVersions.get(materialName);
+        } else {
+            return result;
+        }
+    }
+
+    private static String buildCacheKey(final String materialName, final long version) {
+        StringBuilder result = new StringBuilder(materialName);
+        result.append('#');
+        result.append(version);
+        return result.toString();
     }
 
     private static <V> V checkNotNull(final V ref, final String errMsg) {
@@ -145,6 +170,34 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
             throw new NullPointerException(errMsg);
         } else {
             return ref;
+        }
+    }
+
+    private static class LockedState {
+        private final ReentrantLock lock = new ReentrantLock(true);
+        private volatile AtomicReference<State> state = new AtomicReference<>(new State());
+
+        public State getState() {
+            return state.get();
+        }
+
+        public void unlock() {
+            lock.unlock();
+        }
+
+        public boolean tryLock() {
+            return lock.tryLock();
+        }
+
+        public void lock() {
+            lock.lock();
+        }
+
+        public void update(EncryptionMaterialsProvider provider, long currentVersion) {
+            if (!lock.isHeldByCurrentThread()) {
+                throw new IllegalStateException("Lock not held by current thread");
+            }
+            state.set(new State(provider, currentVersion));
         }
     }
 

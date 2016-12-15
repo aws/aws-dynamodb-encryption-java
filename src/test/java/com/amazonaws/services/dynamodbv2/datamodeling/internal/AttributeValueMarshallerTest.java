@@ -136,6 +136,11 @@ public class AttributeValueMarshallerTest {
         assertEquals(av, unmarshall(marshall(av)));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testActualNULL() {
+        unmarshall(marshall(null));
+    }
+
     @Test
     public void testEmptyList() {
         AttributeValue av = new AttributeValue().withL();
@@ -155,6 +160,23 @@ public class AttributeValueMarshallerTest {
                 new AttributeValue().withN("1000"),
                 new AttributeValue().withBOOL(Boolean.TRUE));
         assertEquals(av, unmarshall(marshall(av)));
+    }
+
+    @Test
+    public void testListWithNull() {
+        final AttributeValue av = new AttributeValue().withL(
+                new AttributeValue().withS("StringValue"),
+                new AttributeValue().withN("1000"),
+                new AttributeValue().withBOOL(Boolean.TRUE),
+                null);
+        
+        try {
+            marshall(av);
+            Assert.fail("Unexpected success");
+        } catch (final NullPointerException npe) {
+            Assert.assertEquals("Encountered null list entry value while marshalling attribute value {L: [{S: StringValue,}, {N: 1000,}, {BOOL: true}, null],}",
+                                npe.getMessage());
+        }
     }
 
     @Test
@@ -203,6 +225,23 @@ public class AttributeValueMarshallerTest {
         map.put("KeyValue", new AttributeValue().withS("ValueValue"));
         AttributeValue av = new AttributeValue().withM(map);
         assertEquals(av, unmarshall(marshall(av)));
+    }
+
+    @Test
+    public void testSimpleMapWithNull() {
+        final Map<String, AttributeValue> map = new HashMap<String,AttributeValue>();
+        map.put("KeyValue", new AttributeValue().withS("ValueValue"));
+        map.put("NullKeyValue", null);
+        
+        final AttributeValue av = new AttributeValue().withM(map);
+        
+        try {
+            marshall(av);
+            Assert.fail("Unexpected success");
+        } catch (final NullPointerException npe) {
+            Assert.assertEquals("Encountered null map value for key NullKeyValue while marshalling attribute value {M: {KeyValue={S: ValueValue,}, NullKeyValue=null},}",
+                                npe.getMessage());
+        }
     }
 
     @Test

@@ -12,6 +12,24 @@
  */
 package com.amazonaws.services.dynamodbv2.testing;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.regions.Region;
+import com.amazonaws.services.kms.AbstractAWSKMS;
+import com.amazonaws.services.kms.model.CreateKeyRequest;
+import com.amazonaws.services.kms.model.CreateKeyResult;
+import com.amazonaws.services.kms.model.DecryptRequest;
+import com.amazonaws.services.kms.model.DecryptResult;
+import com.amazonaws.services.kms.model.EncryptRequest;
+import com.amazonaws.services.kms.model.EncryptResult;
+import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
+import com.amazonaws.services.kms.model.GenerateDataKeyResult;
+import com.amazonaws.services.kms.model.GenerateDataKeyWithoutPlaintextRequest;
+import com.amazonaws.services.kms.model.GenerateDataKeyWithoutPlaintextResult;
+import com.amazonaws.services.kms.model.InvalidCiphertextException;
+import com.amazonaws.services.kms.model.KeyMetadata;
+import com.amazonaws.services.kms.model.KeyUsageType;
+
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -20,67 +38,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.AmazonWebServiceRequest;
-import com.amazonaws.ResponseMetadata;
-import com.amazonaws.regions.Region;
-import com.amazonaws.services.kms.AbstractAWSKMS;
-import com.amazonaws.services.kms.model.CancelKeyDeletionRequest;
-import com.amazonaws.services.kms.model.CancelKeyDeletionResult;
-import com.amazonaws.services.kms.model.CreateAliasRequest;
-import com.amazonaws.services.kms.model.CreateGrantRequest;
-import com.amazonaws.services.kms.model.CreateGrantResult;
-import com.amazonaws.services.kms.model.CreateKeyRequest;
-import com.amazonaws.services.kms.model.CreateKeyResult;
-import com.amazonaws.services.kms.model.DecryptRequest;
-import com.amazonaws.services.kms.model.DecryptResult;
-import com.amazonaws.services.kms.model.DeleteAliasRequest;
-import com.amazonaws.services.kms.model.DescribeKeyRequest;
-import com.amazonaws.services.kms.model.DescribeKeyResult;
-import com.amazonaws.services.kms.model.DisableKeyRequest;
-import com.amazonaws.services.kms.model.DisableKeyRotationRequest;
-import com.amazonaws.services.kms.model.EnableKeyRequest;
-import com.amazonaws.services.kms.model.EnableKeyRotationRequest;
-import com.amazonaws.services.kms.model.EncryptRequest;
-import com.amazonaws.services.kms.model.EncryptResult;
-import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
-import com.amazonaws.services.kms.model.GenerateDataKeyResult;
-import com.amazonaws.services.kms.model.GenerateDataKeyWithoutPlaintextRequest;
-import com.amazonaws.services.kms.model.GenerateDataKeyWithoutPlaintextResult;
-import com.amazonaws.services.kms.model.GenerateRandomRequest;
-import com.amazonaws.services.kms.model.GenerateRandomResult;
-import com.amazonaws.services.kms.model.GetKeyPolicyRequest;
-import com.amazonaws.services.kms.model.GetKeyPolicyResult;
-import com.amazonaws.services.kms.model.GetKeyRotationStatusRequest;
-import com.amazonaws.services.kms.model.GetKeyRotationStatusResult;
-import com.amazonaws.services.kms.model.InvalidCiphertextException;
-import com.amazonaws.services.kms.model.KeyMetadata;
-import com.amazonaws.services.kms.model.KeyUsageType;
-import com.amazonaws.services.kms.model.ListAliasesRequest;
-import com.amazonaws.services.kms.model.ListAliasesResult;
-import com.amazonaws.services.kms.model.ListGrantsRequest;
-import com.amazonaws.services.kms.model.ListGrantsResult;
-import com.amazonaws.services.kms.model.ListKeyPoliciesRequest;
-import com.amazonaws.services.kms.model.ListKeyPoliciesResult;
-import com.amazonaws.services.kms.model.ListKeysRequest;
-import com.amazonaws.services.kms.model.ListKeysResult;
-import com.amazonaws.services.kms.model.ListRetirableGrantsRequest;
-import com.amazonaws.services.kms.model.ListRetirableGrantsResult;
-import com.amazonaws.services.kms.model.PutKeyPolicyRequest;
-import com.amazonaws.services.kms.model.ReEncryptRequest;
-import com.amazonaws.services.kms.model.ReEncryptResult;
-import com.amazonaws.services.kms.model.RetireGrantRequest;
-import com.amazonaws.services.kms.model.RevokeGrantRequest;
-import com.amazonaws.services.kms.model.ScheduleKeyDeletionRequest;
-import com.amazonaws.services.kms.model.ScheduleKeyDeletionResult;
-import com.amazonaws.services.kms.model.UpdateAliasRequest;
-import com.amazonaws.services.kms.model.UpdateKeyDescriptionRequest;
-
 public class FakeKMS extends AbstractAWSKMS {
     private static final SecureRandom rnd = new SecureRandom();
     private static final String ACCOUNT_ID = "01234567890";
     private final Map<DecryptMapKey, DecryptResult> results_ = new HashMap<>();
+
+    @Override
+    public CreateKeyResult createKey() throws AmazonServiceException, AmazonClientException {
+        return createKey(new CreateKeyRequest());
+    }
 
     @Override
     public CreateKeyResult createKey(CreateKeyRequest req) throws AmazonServiceException,

@@ -80,6 +80,7 @@ public class AttributeValueMarshaller {
 
     private static void marshall(final AttributeValue attributeValue, final DataOutputStream out)
             throws IOException {
+        
         if (attributeValue.getB() != null) {
             out.writeChar('b');
             writeBytes(attributeValue.getB(), out);
@@ -92,8 +93,8 @@ public class AttributeValueMarshaller {
         } else if (attributeValue.getNS() != null) {
             out.writeChar('N');
 
-            List<String> ns = new ArrayList<String>(attributeValue.getNS().size());
-            for (String n : attributeValue.getNS()) {
+            final List<String> ns = new ArrayList<String>(attributeValue.getNS().size());
+            for (final String n : attributeValue.getNS()) {
                 ns.add(trimZeros(n));
             }
             writeStringList(ns, out);
@@ -113,6 +114,11 @@ public class AttributeValueMarshaller {
             out.writeChar('L');
             out.writeInt(l.size());
             for (final AttributeValue attr : l) {
+                if (attr == null) {
+                    throw new NullPointerException(
+                        "Encountered null list entry value while marshalling attribute value "
+                        + attributeValue);
+                }
                 marshall(attr, out);
             }
         } else if (attributeValue.getM() != null) {
@@ -123,7 +129,17 @@ public class AttributeValueMarshaller {
             out.writeInt(m.size());
             for (final String mKey : mKeys) {
                 marshall(new AttributeValue().withS(mKey), out);
-                marshall(m.get(mKey), out);
+                
+                final AttributeValue mValue = m.get(mKey);
+                
+                if (mValue == null) {
+                    throw new NullPointerException(
+                        "Encountered null map value for key "
+                        + mKey
+                        + " while marshalling attribute value "
+                        + attributeValue);
+                }
+                marshall(mValue, out);
             }
         } else {
             throw new IllegalArgumentException("A seemingly empty AttributeValue is indicative of invalid input or potential errors");

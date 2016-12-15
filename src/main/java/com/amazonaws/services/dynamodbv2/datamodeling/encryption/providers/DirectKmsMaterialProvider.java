@@ -42,6 +42,7 @@ import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.Base64;
+import com.amazonaws.util.StringUtils;
 import com.amazonaws.util.VersionInfoUtils;
 
 /**
@@ -126,6 +127,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         request.setCiphertextBlob(ByteBuffer.wrap(Base64.decode(materialDescription.get(ENVELOPE_KEY))));
         request.setEncryptionContext(ec);
         final DecryptResult decryptResult = kms.decrypt(request);
+        validateEncryptionKeyId(decryptResult.getKeyId(), context);
 
         final Hkdf kdf;
         try {
@@ -153,9 +155,16 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         ec.put("*" + SIGNING_KEY_ALGORITHM + "*", sigKeyDesc);
         populateKmsEcFromEc(context, ec);
 
+        final String keyId = selectEncryptionKeyId(context);
+        if (StringUtils.isNullOrEmpty(keyId)) {
+            throw new DynamoDBMappingException("Encryption key id is empty.");
+        }
+
         final GenerateDataKeyRequest req = appendUserAgent(new GenerateDataKeyRequest());
-        req.setKeyId(encryptionKeyId);
-        req.setNumberOfBytes(256);
+        req.setKeyId(keyId);
+        // NumberOfBytes parameter is used because we're not using this key as an AES-256 key,
+        // we're using it as an HKDF-SHA256 key.
+        req.setNumberOfBytes(256 / 8);
         req.setEncryptionContext(ec);
 
         final GenerateDataKeyResult dataKeyResult = kms.generateDataKey(req);
@@ -180,6 +189,36 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         final SecretKey encryptionKey = new SecretKeySpec(kdf.deriveKey(KDF_ENC_INFO, dataKeyLength / 8), dataKeyAlg);
         final SecretKey signatureKey = new SecretKeySpec(kdf.deriveKey(KDF_SIG_INFO, sigKeyLength / 8), sigKeyAlg);
         return new SymmetricRawMaterials(encryptionKey, signatureKey, materialDescription);
+    }
+
+    /**
+     * Get encryption key id.
+     * @return encryption key id.
+     */
+    protected String getEncryptionKeyId() {
+        return this.encryptionKeyId;
+    }
+
+    /**
+     * Select encryption key id to be used to generate data key. The default implementation of this method returns
+     * {@link DirectKmsMaterialProvider#encryptionKeyId}.
+     * @param context encryption context.
+     * @return the encryptionKeyId.
+     * @throws DynamoDBMappingException when we fails to select a valid encryption key id.
+     */
+    protected String selectEncryptionKeyId(EncryptionContext context) throws DynamoDBMappingException {
+        return getEncryptionKeyId();
+    }
+
+    /**
+     * Validate the encryption key id. The default implementation of this method does nothing.
+     * @param encryptionKeyId encryption key id from {@link DecryptResult}.
+     * @param context encryption context.
+     * @throws DynamoDBMappingException when encryptionKeyId is invalid.
+     */
+    protected void validateEncryptionKeyId(String encryptionKeyId, EncryptionContext context)
+            throws DynamoDBMappingException {
+        // No action taken.
     }
 
     /**
@@ -234,7 +273,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         return result;
     }
 
-    private final <X extends AmazonWebServiceRequest> X appendUserAgent(final X request) {
+    private static <X extends AmazonWebServiceRequest> X appendUserAgent(final X request) {
         request.getRequestClientOptions().appendUserAgent(USER_AGENT);
         return request;
     }

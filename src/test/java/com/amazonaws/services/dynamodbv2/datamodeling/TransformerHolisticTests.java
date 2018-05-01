@@ -40,10 +40,13 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.AsymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.MostRecentProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.WrappedMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeValueMarshaller;
 import com.amazonaws.services.dynamodbv2.model.AttributeAction;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -121,6 +124,8 @@ public class TransformerHolisticTests {
     private static final Mixed MIXED_TEST_VALUE_2 = new Mixed();
     private static final SignOnly SIGNED_TEST_VALUE_2 = new SignOnly();
     private static final Untouched UNTOUCHED_TEST_VALUE_2 = new Untouched();
+
+    private EncryptionMaterialsProvider mrProv;
 
     static {
         try {
@@ -266,7 +271,7 @@ public class TransformerHolisticTests {
                 .withAttributeDefinitions(attrDef)
                 .withKeySchema(keySchema)
                 .withProvisionedThroughput(new ProvisionedThroughput(100L, 100L)));
-        
+
         attrDef = new ArrayList<AttributeDefinition>();
         attrDef.add(new AttributeDefinition().withAttributeName("hashKey").withAttributeType(ScalarAttributeType.B));
         attrDef.add(new AttributeDefinition().withAttributeName("rangeKey").withAttributeType(ScalarAttributeType.N));
@@ -274,11 +279,15 @@ public class TransformerHolisticTests {
         keySchema = new ArrayList<KeySchemaElement>();
         keySchema.add(new KeySchemaElement().withAttributeName("hashKey").withKeyType(KeyType.HASH));
         keySchema.add(new KeySchemaElement().withAttributeName("rangeKey").withKeyType(KeyType.RANGE));
-        
+
         client.createTable(new CreateTableRequest().withTableName("DeterministicTable")
                 .withAttributeDefinitions(attrDef)
                 .withKeySchema(keySchema)
                 .withProvisionedThroughput(new ProvisionedThroughput(100L, 100L)));
+
+        MetaStore.createTable(client, "metastore", new ProvisionedThroughput(100L, 100L));
+        mrProv = new MostRecentProvider(new MetaStore(client, "metastore", DynamoDBEncryptor.getInstance(symProv)), "materialName", 1000);
+
     }
 
     @Test
@@ -433,6 +442,11 @@ public class TransformerHolisticTests {
         generateStandardData(symWrappedProv);
     }
 
+//    @Test
+    public void generateStandardMetastoreData() {
+      generateStandardData(mrProv);
+    }
+
     public void generateStandardData(EncryptionMaterialsProvider prov) {
         DynamoDBMapper mapper = new DynamoDBMapper(client,
                 new DynamoDBMapperConfig(SaveBehavior.CLOBBER), new AttributeEncryptor(prov));
@@ -516,6 +530,14 @@ public class TransformerHolisticTests {
         DynamoDBMapper mapper = new DynamoDBMapper(client,
                 new DynamoDBMapperConfig(SaveBehavior.CLOBBER), new AttributeEncryptor(asymProv));
         insertV0FixedDoubleAsymData(client);
+        assertVersionCompatibility_2(mapper);
+    }
+
+    @Test
+    public void testV0MetastoreCompatibility() {
+        DynamoDBMapper mapper = new DynamoDBMapper(client,
+                new DynamoDBMapperConfig(SaveBehavior.CLOBBER), new AttributeEncryptor(mrProv));
+        insertV0MetastoreData(client);
         assertVersionCompatibility_2(mapper);
     }
 
@@ -1783,6 +1805,162 @@ public class TransformerHolisticTests {
       ddb.putItem(new PutItemRequest("TableName", item));
       item.clear();
     }
+
+    private void insertV0MetastoreData(AmazonDynamoDB ddb) {
+      Map<String, AttributeValue> item = new HashMap<>();
+
+      item.put("hashKey", b642Av("AHMAAAADQmFy"));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGR5Y1YrQW42bUVFVzJLK3RjVE1EQWw2MUNRSzNPZ2hpQ2Z2YTBYeGFVaU9odWJnRDhMelFwdz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgiBDp77rZmalAcIlg0htWCjJ0BcYgMdPgzJj8fie5Ai0="));
+      ddb.putItem(new PutItemRequest("HashKeyOnly", item));
+      item.clear();
+
+      item.put("hashKey", b642Av("AHMAAAADQmF6"));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODlPZG50TUIwbHpoMUtKNHlYZXhrNXZsWVF4RUlWRDJZRWVybHlQNThXWkg1OUtxelM2MUIvdz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgNo2a+yFlcr1phtcCGNXKfcUrfyMtPdihhh7UPWQNLog="));
+      ddb.putItem(new PutItemRequest("HashKeyOnly", item));
+      item.clear();
+
+      item.put("hashKey", b642Av("AHMAAAADRm9v"));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGtUMFY2bklwSHh2WTZ6bjMycHJHd0NJVFJRb1NyR3BsWGtoTlcxdUJZWnA2QVFUSURiT3dVUT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgfy9BE3X7MyBJCQLvCN8TNUTf/zJvKEQQOdf9VhJbWdU="));
+      ddb.putItem(new PutItemRequest("HashKeyOnly", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMQ=="));
+      item.put("hashKey", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODJLUkJKQlBxbEFEM0ZYL2RiSjhlRHFoL2NvdVZhUnJUZmpISE0rWFRtbS9xYThybHZ3Rkw1UT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgQv9omCLGhrq2cxeP+elq4UgbloK03bV+knv8uE9P7Mw="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMg=="));
+      item.put("hashKey", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHZyckFUOHhzOTJJNlpMdVFtcGs2SDR2RTJ6WlljMVRjZkNXb2VUVXdPcVN3K29Gb0JTWFlQUT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgtgkdLHwtDS/NzFDFLQR8GQLsw4LURQMB/8yBoD4kKSI="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMw=="));
+      item.put("hashKey", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOENTT0dQcXZZM0d5QUJSZTB1MXVTLzR4ZGtQRlRSQlh0M3dkSGJ2bXoveUNCcEk3bGY3Qit1dz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgUPLAdN9KAJNJRZzAtfpaloOYNa+gCVXg1diT6CGSqrU="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMQ=="));
+      item.put("hashKey", b642Av("AG4AAAABNQ=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOG1WcldlSy9CYkxsSDlnY0Zvb1Fjb0I4V082anlSa0hRT2NqN0NaZjFzMUk0RWRuV0NGai9CQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgDY8cXYd+66/OeHT+dOOh4FnJgwD4mMj/0EOZZdlrDGU="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABNw=="));
+      item.put("stringValue", b642Av("AGIAAAAwjmiBDtOhOzwPbKbPx15zZ+HeW0ElgRnRiGykEvmvpFux0U/LJQFRQ9KncAWd4nJM"));
+      item.put("hashKey", b642Av("AG4AAAABNQ=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGNaYlhrb0ZDLzZjVzlpNWNBanViTHdZaW1vNE9SdlUxQjZOSWRpRHovc1BsMUQwU1F2ajhWQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("doubleSet", b642Av("AGIAAABAS4kDtlVOu6tLMGoBhqD8oDGY8WnnUnZ6gN2E0TLmTn6+rJeFBQ3R0NfJtsXtx8pKKOZRG7z5nkJqVCXWA0YEtg=="));
+      item.put("intSet", b642Av("AGIAAABAuU3x6fQO9kF37qXb+KdB50EvDsAQSr7JEkKFo76XSF3q1jRNuXTvNL1MmCagMicOn8hGXWf3uXr3l/jeMXXTxw=="));
+      item.put("byteArrayValue", b642Av("AGIAAAAg1v7mQNUIJrvRrBqSBP8Ges17M8ylNfERqjAhpBtmtEg="));
+      item.put("stringSet", b642Av("AGIAAABAMSooPgKThBmQfGl+MZ0PcPhwCWpykLn5VIYK8y17sa7S9HPC+ZZaXSZWAeEIe9tCsazs/GhYPNAk+J9+Ehr83A=="));
+      item.put("intValue", b642Av("AGIAAAAgFLAPKKtgQS0xyDmVtg8TM8NsK5Zt7HSPorfyxIzw920="));
+      item.put("doubleValue", b642Av("AGIAAAAgIKFrRJV/QQ6bN880QRBKXR/K84kwc5O8cAFduodO5dU="));
+      item.put("version", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgzZEKidI2XCh5bvadadW99btbRcOVSuavthxLMEIN86c="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAACMTA="));
+      item.put("stringValue", b642Av("AHMAAAAMSGVsbG8gd29ybGQh"));
+      item.put("hashKey", b642Av("AG4AAAABOA=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODlqNDlhRG51M1hBNVE0M0xxMDMvaTF3eUIzbHdSbng4eDNEK29JamM3Qlpxbno5VmhoRHc2Zz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("doubleSet", b642Av("AE4AAAAFAAAAAi0zAAAABS0zNC4yAAAAATAAAAACMTUAAAADNy42"));
+      item.put("intSet", b642Av("AE4AAAAFAAAAATAAAAABMQAAAAIxMAAAAAIxNQAAAAMyMDA="));
+      item.put("byteArrayValue", b642Av("AGIAAAAGAAECAwQF"));
+      item.put("stringSet", b642Av("AFMAAAAEAAAAAT8AAAAFQ3J1ZWwAAAAHR29vZGJ5ZQAAAAVXb3JsZA=="));
+      item.put("intValue", b642Av("AG4AAAADMTIz"));
+      item.put("doubleValue", b642Av("AG4AAAACMTU="));
+      item.put("version", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgTUBX7q3xvSd+K/nMBdipsX+6nTyt+htT/qJUK5sPos0="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMw=="));
+      item.put("hashKey", b642Av("AG4AAAABNw=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHA3N1pGSEh5Wk5qZXErWDdHdHhsRkNzZDVqemhTSFVQVFc1V3YzU0xPaHFFdzQzUmJEdUVOUT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgc4AE+L/ysYL+maoJmXJkaMeJ3Chh1Ed8KQA148yZK6M="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABOQ=="));
+      item.put("stringValue", b642Av("AHMAAAAMSGVsbG8gd29ybGQh"));
+      item.put("hashKey", b642Av("AG4AAAABNw=="));
+      item.put("doubleSet", b642Av("AE4AAAAFAAAAAi0zAAAABS0zNC4yAAAAATAAAAACMTUAAAADNy42"));
+      item.put("intSet", b642Av("AE4AAAAFAAAAATAAAAABMQAAAAIxMAAAAAIxNQAAAAMyMDA="));
+      item.put("byteArrayValue", b642Av("AGIAAAAGAAECAwQF"));
+      item.put("stringSet", b642Av("AFMAAAAEAAAAAT8AAAAFQ3J1ZWwAAAAHR29vZGJ5ZQAAAAVXb3JsZA=="));
+      item.put("intValue", b642Av("AG4AAAADMTIz"));
+      item.put("doubleValue", b642Av("AG4AAAACMTU="));
+      item.put("version", b642Av("AG4AAAABMQ=="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMQ=="));
+      item.put("hashKey", b642Av("AG4AAAABMA=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOFI3eGxEWmZCTTRoMWhaa0EreldTQ0VNV3ZCVnV2Vm03Z25wVnlmTVBRMW5hYi9KQWhiRUs3UT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgRU3MCwYYxRFxZT7GmHBG7j+pgK14aMfEIsmrbgB8+Wk="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMg=="));
+      item.put("hashKey", b642Av("AG4AAAABMA=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGkxcGFYZUtNRXlTTDFDOUdwaS9QWFVDMk15ZHdUeUxKTGQ3RXNIeWUrazJrRWlxTnBRdFZnZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAg5gNtdXLSncuZDK3EvpFos08QRhOsOnKDVNR9jogw/Bk="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMw=="));
+      item.put("hashKey", b642Av("AG4AAAABMA=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGxCdUFkQ0pYSk9yVS9JelM4TEV1RlFoWDhnVVVCMG5jZDNxZ0FUQ0xjMjVrYTE0RFRTVjNKQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAg6zpNDAHNoQUzrP6YE6g47Y7CDom04EWXUTGuhPU7Wd8="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABMg=="));
+      item.put("hashKey", b642Av("AG4AAAABNg=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOFdsRU5LNlNmY096R3owYTRwL2RyRHF5REo4LzJ0REJ0WTRRL0wxdUpRc1lYeldRQ2pUcExkQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgtvX4UthmBwymnAZ7CuTpJdLTASr1lRj1MvRwAesjtMM="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("rangeKey", b642Av("AG4AAAABOA=="));
+      item.put("stringValue", b642Av("AHMAAAAMSGVsbG8gd29ybGQh"));
+      item.put("hashKey", b642Av("AG4AAAABNg=="));
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAADjAAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGpyLzI2c1V1NW5udlQwcmVzY0NPWEhXTHZwZzlySjNkeURSVHQxRFFMcnAvTG9STkRyNk5EQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEGFtem4tZGRiLW1ldGEtaWQAAAAObWF0ZXJpYWxOYW1lIzAAAAARYW16bi1kZGItd3JhcC1hbGcAAAAHQUVTV3JhcAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("doubleSet", b642Av("AE4AAAAFAAAAAi0zAAAABS0zNC4yAAAAATAAAAACMTUAAAADNy42"));
+      item.put("intSet", b642Av("AGIAAABAUBGZEIoWzYKTFCsFoZYXzRUJsNuy3xr64nCwsL14lZNk62Aff5n3+ETtWm8U9E3PMOp9LozkDwZcnzs0rnYIeA=="));
+      item.put("byteArrayValue", b642Av("AGIAAAAgl9wQf/r6vivuTCvIz0Jeqd80xPII30sf317fED7Xrrs="));
+      item.put("intValue", b642Av("AG4AAAADMTIz"));
+      item.put("stringSet", b642Av("AGIAAABAAijuavOYfNvcle2WbG8I2a4W1af+UPxhKguG3YMW5E6MoXsdO5ddSAifAPbVLmv92VyJnx/o817m1IOSs+LccA=="));
+      item.put("doubleValue", b642Av("AG4AAAACMTU="));
+      item.put("version", b642Av("AG4AAAABMQ=="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgpzB3S616mcP6HQrkeaUYdV5Qo2UYWF6p04GZhSzcpV8="));
+      ddb.putItem(new PutItemRequest("TableName", item));
+      item.clear();
+
+      item.put("*amzn-ddb-map-desc*", b642Av("AGIAAAAyAAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="));
+      item.put("t", b642Av("AGIAAAAgeJcKzY3SHwBIhXdfxeYWd9UE5yX+RxaPJQ7L2TdgDxs="));
+      item.put("V", b642Av("AG4AAAABMA=="));
+      item.put("encAlg", b642Av("AGIAAAAgXJilRkdsIP0bqzvqutJc8AC8YhY1YApJCgTLXgAqtwU="));
+      item.put("enc", b642Av("AGIAAABADvDUW2Ao1YWp7uxxEL+mv5uqHCrSNIDR18CgBD8XHCuNlBPC6GXxk9YnFmv3kgVDlMdEo0wE79zRoETB7GmjcA=="));
+      item.put("intAlg", b642Av("AGIAAAAwI//7G2LUrAQ2EwQGQr7ZIKyXl1AlGeB+kfvZGmCj6wShZpMKPXjyBF/9RvIz3clQ"));
+      item.put("N", b642Av("AHMAAAAMbWF0ZXJpYWxOYW1l"));
+      item.put("int", b642Av("AGIAAABAzFha4J4gPaiwhjiQs47L0bTf4WSNemVAxKJJnBnujl7OajvO7ZW3zehGJlaai4tCLxTwoLPI+Ig/a+zCdau4iw=="));
+      item.put("*amzn-ddb-map-sig*", b642Av("AGIAAAAgaklO+h7kSUjXEt6pBA03G4wiIU20XKT/sP+rKSeNAKc="));
+      ddb.putItem(new PutItemRequest("metastore", item));
+      item.clear();
+    }
+
     private static AttributeValue b642Av(String b64) {
         return AttributeValueMarshaller.unmarshall(ByteBuffer.wrap(Base64
                 .decode(b64)));

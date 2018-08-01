@@ -3,12 +3,12 @@
   
   <groupId>com.amazonaws</groupId>
   <artifactId>aws-dynamodb-encryption-java</artifactId>
-  <version>1.11.0</version>
+  <version>1.11.1</version>
   <packaging>jar</packaging>
   
   <name>aws-dynamodb-encryption-java</name>
   <description>AWS DynamoDB Encryption Client for Java</description>
-  <url>https://github.com/awslabs/aws-dynamodb-encryption-java</url>
+  <url>https://github.com/aws/aws-dynamodb-encryption-java</url>
   
   <licenses>
     <license>
@@ -30,7 +30,7 @@
   </developers>
 
   <scm>
-    <url>https://github.com/awslabs/aws-dynamodb-encryption-java.git</url>
+    <url>https://github.com/aws/aws-dynamodb-encryption-java.git</url>
   </scm>
   
   <properties>

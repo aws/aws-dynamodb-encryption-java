@@ -161,4 +161,4 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 [materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java
 [privatekey]: http://docs.oracle.com/javase/7/docs/api/java/security/PrivateKey.html
 [secretkey]: http://docs.oracle.com/javase/7/docs/api/javax/crypto/SecretKey.html
-[download]: https://github.com/awslabs/aws-dynamodb-encryption-java/releases/tag/1.11.0
+[download]: https://github.com/aws/aws-dynamodb-encryption-java/releases/tag/1.11.0

@@ -72,6 +72,10 @@ public class AttributeEncryptor implements AttributeTransformer {
             return attributeValues;
         }
 
+        // When AttributeEncryptor is used without SaveBehavior.CLOBBER, it is trying to transform only a subset
+        // of the actual fields stored in DynamoDB. This means that the generated signature will not cover any
+        // unmodified fields. Thus, upon untransform, the signature verification will fail as it won't cover all
+        // expected fields.
         if (parameters.isPartialUpdate()) {
             LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and can result in data-corruption. " +
                     "This occured while trying to save " + parameters.getModelClass());

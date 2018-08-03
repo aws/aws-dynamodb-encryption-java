@@ -115,6 +115,9 @@ public class TransformerHolisticTests {
     private static final EncryptionMaterialsProvider symWrappedProv;
 
     private AmazonDynamoDB client;
+    // AttributeEncryptor *must* be used with SaveBehavior.CLOBBER to avoid the risk of data corruption.
+    private static final DynamoDBMapperConfig CLOBBER_CONFIG =
+            DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.CLOBBER).build();
     private static final BaseClass ENCRYPTED_TEST_VALUE = new BaseClass();
     private static final Mixed MIXED_TEST_VALUE = new Mixed();
     private static final SignOnly SIGNED_TEST_VALUE = new SignOnly();
@@ -292,7 +295,7 @@ public class TransformerHolisticTests {
 
     @Test
     public void simpleSaveLoad() {
-        DynamoDBMapper mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(symProv));
+        DynamoDBMapper mapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(symProv));
         Mixed obj = new Mixed();
         obj.setHashKey(0);
         obj.setRangeKey(15);
@@ -322,7 +325,7 @@ public class TransformerHolisticTests {
 
     @Test
     public void leadingAndTrailingZeros() {
-        DynamoDBMapper mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(symProv));
+        DynamoDBMapper mapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(symProv));
         Mixed obj = new Mixed();
         obj.setHashKey(0);
         obj.setRangeKey(15);
@@ -364,7 +367,7 @@ public class TransformerHolisticTests {
     
     @Test
     public void simpleSaveLoadAsym() {
-        DynamoDBMapper mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(asymProv));
+        DynamoDBMapper mapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(asymProv));
         
         BaseClass obj = new BaseClass();
         obj.setHashKey(0);
@@ -394,7 +397,7 @@ public class TransformerHolisticTests {
 
     @Test
     public void simpleSaveLoadHashOnly() {
-        DynamoDBMapper mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(
+        DynamoDBMapper mapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(
                 symProv));
         
         HashKeyOnly obj = new HashKeyOnly("");
@@ -411,7 +414,7 @@ public class TransformerHolisticTests {
 
     @Test
     public void simpleSaveLoadKeysOnly() {
-        DynamoDBMapper mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.DEFAULT, new AttributeEncryptor(
+        DynamoDBMapper mapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(
                 asymProv));
         
         KeysOnly obj = new KeysOnly();

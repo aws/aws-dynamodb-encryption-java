@@ -14,13 +14,10 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mapping;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mappings;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
@@ -32,13 +29,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.TableAadOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
+ * <em>It is critically important that this is only used with @{link SaveBehavior#CLOBBER}. Use of
+ * any other @{code SaveBehavior} may result in data-corruption.</em>
  * 
  * @author Greg Rubin 
  */
 public class AttributeEncryptor implements AttributeTransformer {
+    private static final Log LOG = LogFactory.getLog(AttributeEncryptor.class);
     private final DynamoDBEncryptor encryptor;
     private final Map<Class<?>, ModelClassMetadata> metadataCache = new ConcurrentHashMap<>();
 
@@ -58,9 +60,20 @@ public class AttributeEncryptor implements AttributeTransformer {
     public Map<String, AttributeValue> transform(final Parameters<?> parameters) {
         // one map of attributeFlags per model class
         final ModelClassMetadata metadata = getModelClassMetadata(parameters);
+
+        final Map<String, AttributeValue> attributeValues = parameters.getAttributeValues();
+        if (metadata.doNotTouch) {
+            return attributeValues;
+        }
+
+        if (parameters.isPartialUpdate()) {
+            LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and may result in data-corruption. " +
+                    "This occured while trying to save " + parameters.getModelClass());
+        }
+
         try {
             return encryptor.encryptRecord(
-                    parameters.getAttributeValues(),
+                    attributeValues,
                     metadata.getEncryptionFlags(),
                     paramsToContext(parameters));
         } catch (Exception ex) {

@@ -14,14 +14,15 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import com.amazonaws.annotation.ThreadSafe;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A bounded cache that has a LRU eviction policy when the cache is full.
@@ -98,11 +99,16 @@ public final class LRUCache<T> {
         // The more complicated logic is to ensure that the listener is
         // actually called for all entries.
         if (listener != null) {
-            Set<String> keys = new TreeSet<String>(map.keySet());
-            for (String key : keys) {
-                T val = map.get(key);
-                listener.onRemoval(new SimpleImmutableEntry<String, T>(key, val));
-                map.remove(key);
+            List<Entry<String, T>> removedEntries = new ArrayList<Entry<String, T>>();
+            synchronized (map) {
+                Iterator<Entry<String, T>> it = map.entrySet().iterator();
+                while(it.hasNext()) {
+                    removedEntries.add(it.next());
+                    it.remove();
+                }
+            }
+            for (Entry<String, T> entry : removedEntries) {
+                listener.onRemoval(entry);
             }
         } else {
             map.clear();
@@ -126,7 +132,7 @@ public final class LRUCache<T> {
         }
 
         @Override
-        protected boolean removeEldestEntry(final Map.Entry<String, T> eldest) {
+        protected boolean removeEldestEntry(final Entry<String, T> eldest) {
             if (size() > maxSize) {
                 if (listener != null) {
                     listener.onRemoval(eldest);
@@ -138,6 +144,6 @@ public final class LRUCache<T> {
     }
 
     public static interface RemovalListener<T> {
-        public void onRemoval(Map.Entry<String, T> entry);
+        public void onRemoval(Entry<String, T> entry);
     }
 }

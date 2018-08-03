@@ -3,7 +3,7 @@
   
   <groupId>com.amazonaws</groupId>
   <artifactId>aws-dynamodb-encryption-java</artifactId>
-  <version>1.11.1</version>
+  <version>1.11.2</version>
   <packaging>jar</packaging>
   
   <name>aws-dynamodb-encryption-java</name>

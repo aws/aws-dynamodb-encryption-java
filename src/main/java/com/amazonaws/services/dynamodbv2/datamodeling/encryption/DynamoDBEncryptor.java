@@ -380,7 +380,7 @@ public class DynamoDBEncryptor {
         }
     }
 
-    protected int getBlockSize(final String encryptionMode) {
+    protected static int getBlockSize(final String encryptionMode) {
         return BLOCK_SIZE_CACHE.computeIfAbsent(encryptionMode, BLOCK_SIZE_CALCULATOR);
     }
 

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mapping;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mappings;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
@@ -32,13 +33,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.TableAadOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
+ * <em>This must be used with @{link SaveBehavior#CLOBBER}. Use of
+ * any other @{code SaveBehavior} can result in data-corruption.</em>
  * 
  * @author Greg Rubin 
  */
 public class AttributeEncryptor implements AttributeTransformer {
+    private static final Log LOG = LogFactory.getLog(AttributeEncryptor.class);
     private final DynamoDBEncryptor encryptor;
     private final Map<Class<?>, ModelClassMetadata> metadataCache = new ConcurrentHashMap<>();
 
@@ -58,9 +64,26 @@ public class AttributeEncryptor implements AttributeTransformer {
     public Map<String, AttributeValue> transform(final Parameters<?> parameters) {
         // one map of attributeFlags per model class
         final ModelClassMetadata metadata = getModelClassMetadata(parameters);
+
+        final Map<String, AttributeValue> attributeValues = parameters.getAttributeValues();
+        // If this class is marked as "DoNotTouch" then we know our encryptor will not change it at all
+        // so we may as well fast-return and do nothing. This also avoids emitting errors when they would not apply.
+        if (metadata.doNotTouch) {
+            return attributeValues;
+        }
+
+        // When AttributeEncryptor is used without SaveBehavior.CLOBBER, it is trying to transform only a subset
+        // of the actual fields stored in DynamoDB. This means that the generated signature will not cover any
+        // unmodified fields. Thus, upon untransform, the signature verification will fail as it won't cover all
+        // expected fields.
+        if (parameters.isPartialUpdate()) {
+            LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and can result in data-corruption. " +
+                    "This occured while trying to save " + parameters.getModelClass());
+        }
+
         try {
             return encryptor.encryptRecord(
-                    parameters.getAttributeValues(),
+                    attributeValues,
                     metadata.getEncryptionFlags(),
                     paramsToContext(parameters));
         } catch (Exception ex) {

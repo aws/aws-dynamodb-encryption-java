@@ -26,13 +26,19 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 public class FakeParameters<T> {
     public static <T> AttributeTransformer.Parameters<T> getInstance(Class<T> clazz,
+                                                                     Map<String, AttributeValue> attribs, DynamoDBMapperConfig config, String tableName,
+                                                                     String hashKeyName, String rangeKeyName) {
+        return getInstance(clazz, attribs, config, tableName, hashKeyName, rangeKeyName, false);
+    }
+
+    public static <T> AttributeTransformer.Parameters<T> getInstance(Class<T> clazz,
             Map<String, AttributeValue> attribs, DynamoDBMapperConfig config, String tableName,
-            String hashKeyName, String rangeKeyName) {
+            String hashKeyName, String rangeKeyName, boolean isPartialUpdate) {
 
         // We use this relatively insane proxy setup so that modifications to the Parameters
         // interface doesn't break our tests (unless it actually impacts our code).
         FakeParameters<T> fakeParams = new FakeParameters<T>(clazz, attribs, config, tableName,
-                hashKeyName, rangeKeyName);
+                hashKeyName, rangeKeyName, isPartialUpdate);
         @SuppressWarnings("unchecked")
         AttributeTransformer.Parameters<T> proxyObject = (AttributeTransformer.Parameters<T>) Proxy
                 .newProxyInstance(AttributeTransformer.class.getClassLoader(),
@@ -65,9 +71,11 @@ public class FakeParameters<T> {
     private final String tableName;
     private final String hashKeyName;
     private final String rangeKeyName;
+    private final boolean isPartialUpdate;
 
     private FakeParameters(Class<T> clazz, Map<String, AttributeValue> attribs,
-            DynamoDBMapperConfig config, String tableName, String hashKeyName, String rangeKeyName) {
+            DynamoDBMapperConfig config, String tableName, String hashKeyName, String rangeKeyName,
+            boolean isPartialUpdate) {
         super();
         this.clazz = clazz;
         this.attrs = Collections.unmodifiableMap(attribs);
@@ -75,6 +83,7 @@ public class FakeParameters<T> {
         this.tableName = tableName;
         this.hashKeyName = hashKeyName;
         this.rangeKeyName = rangeKeyName;
+        this.isPartialUpdate = isPartialUpdate;
     }
 
     public Map<String, AttributeValue> getAttributeValues() {
@@ -99,5 +108,9 @@ public class FakeParameters<T> {
 
     public String getRangeKeyName() {
         return rangeKeyName;
+    }
+
+    public boolean isPartialUpdate() {
+        return isPartialUpdate;
     }
 }

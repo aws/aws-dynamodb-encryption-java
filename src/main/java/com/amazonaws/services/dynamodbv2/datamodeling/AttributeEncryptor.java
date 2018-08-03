@@ -38,8 +38,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
- * <em>It is critically important that this is only used with @{link SaveBehavior#CLOBBER}. Use of
- * any other @{code SaveBehavior} may result in data-corruption.</em>
+ * <em>This must be used with @{link SaveBehavior#CLOBBER}. Use of
+ * any other @{code SaveBehavior} can result in data-corruption.</em>
  * 
  * @author Greg Rubin 
  */
@@ -66,12 +66,14 @@ public class AttributeEncryptor implements AttributeTransformer {
         final ModelClassMetadata metadata = getModelClassMetadata(parameters);
 
         final Map<String, AttributeValue> attributeValues = parameters.getAttributeValues();
+        // If this class is marked as "DoNotTouch" then we know our encryptor will not change it at all
+        // so we may as well fast-return and do nothing. This also avoids emitting errors when they would not apply.
         if (metadata.doNotTouch) {
             return attributeValues;
         }
 
         if (parameters.isPartialUpdate()) {
-            LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and may result in data-corruption. " +
+            LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and can result in data-corruption. " +
                     "This occured while trying to save " + parameters.getModelClass());
         }
 

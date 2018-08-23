@@ -2,18 +2,24 @@
 Versioning Policy
 *****************
 
-We will use a three-part X.Y.Z (Major.Minor.Patch) versioning definition with the following meanings.
+We use a three-part X.Y.Z (Major.Minor.Patch) versioning definition as follows:
 
-* X (Major) version changes cover changes to the code-base that are expected to break backwards compatibility.
-* Y (Minor) version changes cover moderate changes. These include significant (non-breaking) feature additions and might contain changes which break backwards compatability. If there are breaking changes, they will be explicitly stated in the release notes.
-* Z (Patch) version changes cover small changes. They will not break backwards compatibility.
+* **X (Major)** version changes are significant and expected to break backwards compatibility.
+* **Y (Minor)** version changes are moderate changes. These include:
+  * Significant non-breaking feature additions.
+  * Potentially breaking changes. Any such changes will be explicitly stated in the release notes.
+  * Changes to our package's declared dependency versions.
+* **Z (Patch)** version changes are small changes. They will not break backwards compatibility.
+  * Where possible, we will advise of upcoming breaking changes with warnings in a Z release.
 
 What this means for you
 =======================
 
-We definitely recommend always running on the most recent version of our code. This is how we recommend doing so. 
+We recommend running the most recent version. Here are our suggestions for managing updates:
 
-* X changes will likely require dedicated time and work to incorporate into your code-base.
-* Y changes are unlikely to require significant (or any) work to incorporate. If you have good unit and integration tests, they can likely be picked up in an automated manner.
-* Z changes should not require any changes to your code and can be picked up in an automated manner. (Good unit and integration tests are always recommended.)
+* Expect X changes to require effort to incorporate.
+* Expect Y changes not to require significant effort to incorporate.
+  * If you have good unit and integration tests, these changes are generally safe to pick up automatically.
+* Expect Z changes not to require changes to your code. Z changes are intended to be picked up automatically.
+  * Good unit and integration tests are always recommended.
 

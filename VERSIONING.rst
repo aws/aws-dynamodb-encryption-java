@@ -8,10 +8,10 @@ We use a three-part X.Y.Z (Major.Minor.Patch) versioning definition as follows:
 * **Y (Minor)** version changes are moderate changes. These include:
 
   * Significant non-breaking feature additions.
-  * Potentially breaking changes. Any such changes will be explicitly stated in the release notes.
+  * Potentially backwards incompatible changes. Any such changes will be explicitly stated in the release notes.
   * Changes to our package's declared dependency versions.
 
-* **Z (Patch)** version changes are small changes. They will not break backwards compatibility.
+* **Z (Patch)** version changes are small changes. These changes will not break backwards compatibility.
 
   * Where possible, we will advise of upcoming breaking changes with warnings in a Z release.
 

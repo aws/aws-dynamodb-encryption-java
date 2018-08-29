@@ -130,6 +130,13 @@ public class AttributeEncryptorTest {
     }
 
     @Test(expected = DynamoDBMappingException.class)
+    public void rejectsPartialUpdate() {
+        Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY, true);
+        encryptor.transform(params);
+    }
+
+    @Test(expected = DynamoDBMappingException.class)
     public void fullEncryptionBadSignature() {
         Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);

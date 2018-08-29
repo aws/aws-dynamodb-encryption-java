@@ -31,6 +31,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -58,7 +60,16 @@ public class DynamoDBEncryptor {
     private static final String DEFAULT_DESCRIPTION_BASE = "amzn-ddb-map-"; // Same as the Mapper
     private static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String SYMMETRIC_ENCRYPTION_MODE = "/CBC/PKCS5Padding";
-    
+    private static final ConcurrentHashMap<String, Integer> BLOCK_SIZE_CACHE = new ConcurrentHashMap<>();
+    private static final Function<String, Integer> BLOCK_SIZE_CALCULATOR = (transformation) -> {
+        try {
+            final Cipher c = Cipher.getInstance(transformation);
+            return c.getBlockSize();
+        } catch (final GeneralSecurityException ex) {
+            throw new IllegalArgumentException("Algorithm does not exist", ex);
+        }
+    };
+
     private static final int CURRENT_VERSION = 0;
 
     private String signatureFieldName = DEFAULT_SIGNATURE_FIELD;
@@ -339,7 +350,7 @@ public class DynamoDBEncryptor {
         final String encryptionMode = encryptionKey != null ?  encryptionKey.getAlgorithm() +
                     materialDescription.get(symmetricEncryptionModeHeader) : null;
         Cipher cipher = null;
-        int ivSize = -1;
+        int blockSize = -1;
 
         for (Map.Entry<String, AttributeValue> entry: itemAttributes.entrySet()) {
             Set<EncryptionFlags> flags = attributeFlags.get(entry.getKey());
@@ -354,21 +365,23 @@ public class DynamoDBEncryptor {
                     plainText = ByteBuffer.wrap(((DelegatedKey)encryptionKey).decrypt(toByteArray(cipherText), null, encryptionMode));
                 } else {
                     if (cipher == null) {
-                        cipher = Cipher.getInstance(
-                                encryptionMode);
-                        ivSize = cipher.getBlockSize();
+                        blockSize = getBlockSize(encryptionMode);
+                        cipher = Cipher.getInstance(encryptionMode);
                     }
-                    byte[] iv = new byte[ivSize];
+                    byte[] iv = new byte[blockSize];
                     cipherText.get(iv);
                     cipher.init(Cipher.DECRYPT_MODE, encryptionKey, new IvParameterSpec(iv), Utils.getRng());
-                    plainText = ByteBuffer.allocate(
-                            cipher.getOutputSize(cipherText.remaining()));
+                    plainText = ByteBuffer.allocate(cipher.getOutputSize(cipherText.remaining()));
                     cipher.doFinal(cipherText, plainText);
                     plainText.rewind();
                 }
                 entry.setValue(AttributeValueMarshaller.unmarshall(plainText));
             }
         }
+    }
+
+    protected static int getBlockSize(final String encryptionMode) {
+        return BLOCK_SIZE_CACHE.computeIfAbsent(encryptionMode, BLOCK_SIZE_CALCULATOR);
     }
 
     /**
@@ -388,7 +401,7 @@ public class DynamoDBEncryptor {
             encryptionMode = encryptionKey.getAlgorithm() + SYMMETRIC_ENCRYPTION_MODE;
         }
         Cipher cipher = null;
-        int ivSize = -1;
+        int blockSize = -1;
 
         for (Map.Entry<String, AttributeValue> entry: itemAttributes.entrySet()) {
             Set<EncryptionFlags> flags = attributeFlags.get(entry.getKey());
@@ -405,16 +418,22 @@ public class DynamoDBEncryptor {
                             dk.encrypt(toByteArray(plainText), null, encryptionMode));
                 } else {
                     if (cipher == null) {
+                        blockSize = getBlockSize(encryptionMode);
                         cipher = Cipher.getInstance(encryptionMode);
-                        ivSize = cipher.getBlockSize();
                     }
                     // Encryption format: <iv><ciphertext>
                     // Note a unique iv is generated per attribute
-                    byte[] iv = Utils.getRandom(ivSize);
-                    cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, new IvParameterSpec(iv), Utils.getRng());
-                    cipherText = ByteBuffer.allocate(ivSize + cipher.getOutputSize(plainText.remaining()));
-                    cipherText.put(iv);
+                    cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, Utils.getRng());
+                    cipherText = ByteBuffer.allocate(blockSize + cipher.getOutputSize(plainText.remaining()));
+                    cipherText.position(blockSize);
                     cipher.doFinal(plainText, cipherText);
+                    cipherText.flip();
+                    final byte[] iv = cipher.getIV();
+                    if (iv.length != blockSize) {
+                        throw new IllegalStateException(String.format("Generated IV length (%d) not equal to block size (%d)",
+                                iv.length, blockSize));
+                    }
+                    cipherText.put(iv);
                     cipherText.rewind();
                 }
                 // Replace the plaintext attribute value with the encrypted content
@@ -539,17 +558,22 @@ public class DynamoDBEncryptor {
             attributeValue.getB().reset();
         }
     }
-    
+
     private static byte[] toByteArray(ByteBuffer buffer) {
-        if (buffer.hasArray()) {
+        buffer = buffer.duplicate();
+        // We can only return the array directly if:
+        // 1. The ByteBuffer exposes an array
+        // 2. The ByteBuffer starts at the beginning of the array
+        // 3. The ByteBuffer uses the entire array
+        if (buffer.hasArray() && buffer.arrayOffset() == 0) {
             byte[] result = buffer.array();
-            buffer.rewind();
-            return result;
-        } else {
-            byte[] result = new byte[buffer.remaining()];
-            buffer.get(result);
-            buffer.rewind();
-            return result;
+            if (buffer.remaining() == result.length) {
+                return result;
+            }
         }
+
+        byte[] result = new byte[buffer.remaining()];
+        buffer.get(result);
+        return result;
     }
 }

@@ -14,12 +14,14 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
@@ -27,7 +29,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.util.Collection;
@@ -118,7 +119,7 @@ public class DynamoDBEncryptorTest {
     
     @Test
     public void fullEncryption() throws GeneralSecurityException {
-        Map<String, AttributeValue> encryptedAttributes = 
+        Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
 
@@ -296,6 +297,40 @@ public class DynamoDBEncryptorTest {
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         encryptedAttributes.get("hashKey").setN("666");
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+    }
+
+    @Test
+    public void toByteArray() throws ReflectiveOperationException {
+        final byte[] expected = new byte[] {0, 1, 2, 3, 4, 5};
+        assertToByteArray("Wrap", expected, ByteBuffer.wrap(expected));
+        assertToByteArray("Wrap-RO", expected, ByteBuffer.wrap(expected).asReadOnlyBuffer());
+
+        assertToByteArray("Wrap-Truncated-Sliced", expected, ByteBuffer.wrap(new byte[] {0, 1, 2, 3, 4, 5, 6}, 0, 6).slice());
+        assertToByteArray("Wrap-Offset-Sliced", expected, ByteBuffer.wrap(new byte[] {6, 0, 1, 2, 3, 4, 5, 6}, 1, 6).slice());
+        assertToByteArray("Wrap-Truncated", expected, ByteBuffer.wrap(new byte[] {0, 1, 2, 3, 4, 5, 6}, 0, 6));
+        assertToByteArray("Wrap-Offset", expected, ByteBuffer.wrap(new byte[] {6, 0, 1, 2, 3, 4, 5, 6}, 1, 6));
+
+        ByteBuffer buff = ByteBuffer.allocate(expected.length + 10);
+        buff.put(expected);
+        buff.flip();
+        assertToByteArray("Normal", expected, buff);
+
+        buff = ByteBuffer.allocateDirect(expected.length + 10);
+        buff.put(expected);
+        buff.flip();
+        assertToByteArray("Direct", expected, buff);
+    }
+
+    private void assertToByteArray(final String msg, final byte[] expected, final ByteBuffer testValue) throws ReflectiveOperationException {
+        Method m = DynamoDBEncryptor.class.getDeclaredMethod("toByteArray", ByteBuffer.class);
+        m.setAccessible(true);
+
+        int oldPosition = testValue.position();
+        int oldLimit = testValue.limit();
+
+        assertArrayEquals(msg + ":Array", expected, (byte[]) m.invoke(null, testValue));
+        assertEquals(msg + ":Position", oldPosition, testValue.position());
+        assertEquals(msg + ":Limit", oldLimit, testValue.limit());
     }
 
     private void assertAttrEquals(AttributeValue o1, AttributeValue o2) {

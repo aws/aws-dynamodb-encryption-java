@@ -142,6 +142,32 @@ public class MetaStore extends ProviderStore {
             throw new IllegalArgumentException("No meta id found");
         }
     }
+
+    /**
+     * This API retrieves the intermediate keys from the source region and replicates it in the target region.
+     * @param materialName
+     * @param version
+     * @param targetMetaStore
+     */
+    public void replicate(final String materialName, final long version, final MetaStore targetMetaStore) {
+        try {
+            final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
+            ddbKey.put(DEFAULT_HASH_KEY, new AttributeValue().withS(materialName));
+            ddbKey.put(DEFAULT_RANGE_KEY, new AttributeValue().withN(Long.toString(version)));
+            final Map<String, AttributeValue> item = ddbGet(ddbKey);
+            if (item == null || item.isEmpty()) {
+                throw new IndexOutOfBoundsException("No material found: " + materialName + "#" + version);
+            }
+
+            final Map<String, AttributeValue> plainText = getPlainText(item);
+            final Map<String, AttributeValue> encryptedText = targetMetaStore.getEncryptedText(plainText);
+            final PutItemRequest put = new PutItemRequest().withTableName(targetMetaStore.tableName).withItem(encryptedText)
+                    .withExpected(doesNotExist);
+            targetMetaStore.ddb.putItem(put);
+        } catch (ConditionalCheckFailedException e) {
+            //Item already present.
+        }
+    }
     /**
      * Creates a DynamoDB Table with the correct properties to be used with a ProviderStore.
      */
@@ -187,36 +213,43 @@ public class MetaStore extends ProviderStore {
         plaintext
         .put(INTEGRITY_KEY_FIELD, new AttributeValue().withB(ByteBuffer.wrap(integrityKey.getEncoded())));
         plaintext.put(INTEGRITY_ALGORITHM_FIELD, new AttributeValue().withS(integrityKey.getAlgorithm()));
+        return getEncryptedText(plaintext);
+    }
 
+    private EncryptionMaterialsProvider decryptProvider(final Map<String, AttributeValue> item) {
+        final Map<String, AttributeValue> plaintext = getPlainText(item);
+
+        final String type = plaintext.get(MATERIAL_TYPE_VERSION).getS();
+        final SecretKey encryptionKey;
+        final SecretKey integrityKey;
+        // This switch statement is to make future extensibility easier and more obvious
+        switch (type) {
+            case "0": // Only currently supported type
+                encryptionKey = new SecretKeySpec(plaintext.get(ENCRYPTION_KEY_FIELD).getB().array(),
+                        plaintext.get(ENCRYPTION_ALGORITHM_FIELD).getS());
+                integrityKey = new SecretKeySpec(plaintext.get(INTEGRITY_KEY_FIELD).getB().array(), plaintext
+                        .get(INTEGRITY_ALGORITHM_FIELD).getS());
+                break;
+            default:
+                throw new IllegalStateException("Unsupported material type: " + type);
+        }
+        return new WrappedMaterialsProvider(encryptionKey, encryptionKey, integrityKey,
+                buildDescription(plaintext));
+    }
+
+    private Map<String, AttributeValue> getPlainText(Map<String, AttributeValue> item) {
         try {
-            return encryptor.encryptAllFieldsExcept(plaintext, ddbCtx, DEFAULT_HASH_KEY,
-                    DEFAULT_RANGE_KEY);
+            return encryptor.decryptAllFieldsExcept(item,
+                    ddbCtx, DEFAULT_HASH_KEY, DEFAULT_RANGE_KEY);
         } catch (final GeneralSecurityException e) {
             throw new AmazonClientException(e);
         }
     }
 
-    private EncryptionMaterialsProvider decryptProvider(final Map<String, AttributeValue> item) {
+    private Map<String, AttributeValue> getEncryptedText(Map<String, AttributeValue> plaintext) {
         try {
-            final Map<String, AttributeValue> plaintext = encryptor.decryptAllFieldsExcept(item,
-                    ddbCtx, DEFAULT_HASH_KEY, DEFAULT_RANGE_KEY);
-
-            final String type = plaintext.get(MATERIAL_TYPE_VERSION).getS();
-            final SecretKey encryptionKey;
-            final SecretKey integrityKey;
-            // This switch statement is to make future extensibility easier and more obvious
-            switch (type) {
-                case "0": // Only currently supported type
-                    encryptionKey = new SecretKeySpec(plaintext.get(ENCRYPTION_KEY_FIELD).getB().array(),
-                            plaintext.get(ENCRYPTION_ALGORITHM_FIELD).getS());
-                    integrityKey = new SecretKeySpec(plaintext.get(INTEGRITY_KEY_FIELD).getB().array(), plaintext
-                            .get(INTEGRITY_ALGORITHM_FIELD).getS());
-                    break;
-                default:
-                    throw new IllegalStateException("Unsupported material type: " + type);
-            }
-            return new WrappedMaterialsProvider(encryptionKey, encryptionKey, integrityKey,
-                    buildDescription(plaintext));
+            return encryptor.encryptAllFieldsExcept(plaintext, ddbCtx, DEFAULT_HASH_KEY,
+                    DEFAULT_RANGE_KEY);
         } catch (final GeneralSecurityException e) {
             throw new AmazonClientException(e);
         }

@@ -36,29 +36,40 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 
 public class MetaStoreTests {
-    private static final String TABLE_NAME = "keystoreTable";
+    private static final String SOURCE_TABLE_NAME = "keystoreTable";
+    private static final String DESTINATION_TABLE_NAME = "keystoreDestinationTable";
     private static final String MATERIAL_NAME = "material";
     private static final SecretKey AES_KEY = new SecretKeySpec(new byte[] { 0,
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, "AES");
+    private static final SecretKey TARGET_AES_KEY = new SecretKeySpec(new byte[] { 0,
+            2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 }, "AES");
     private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[] { 0,
             1, 2, 3, 4, 5, 6, 7 }, "HmacSHA256");
+    private static final SecretKey TARGET_HMAC_KEY = new SecretKeySpec(new byte[] { 0,
+            2, 4, 6, 8, 10, 12, 14 }, "HmacSHA256");
     private static final EncryptionMaterialsProvider BASE_PROVIDER = new SymmetricStaticProvider(AES_KEY, HMAC_KEY);
+    private static final EncryptionMaterialsProvider TARGET_BASE_PROVIDER = new SymmetricStaticProvider(TARGET_AES_KEY, TARGET_HMAC_KEY);
     private static final DynamoDBEncryptor ENCRYPTOR = DynamoDBEncryptor.getInstance(BASE_PROVIDER);
+    private static final DynamoDBEncryptor TARGET_ENCRYPTOR = DynamoDBEncryptor.getInstance(TARGET_BASE_PROVIDER);
 
     private AmazonDynamoDB client;
-    private ProviderStore store;
+    private AmazonDynamoDB targetClient;
+    private MetaStore store;
+    private MetaStore targetStore;
     private EncryptionContext ctx;
 
     @Before
     public void setup() {
         client = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
-        MetaStore.createTable(client, TABLE_NAME, new ProvisionedThroughput(1L, 1L));
-        store = new MetaStore(client, TABLE_NAME, ENCRYPTOR);
+        targetClient = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
+        MetaStore.createTable(client, SOURCE_TABLE_NAME, new ProvisionedThroughput(1L, 1L));
+        //Creating Targeted DynamoDB Object
+        MetaStore.createTable(targetClient, DESTINATION_TABLE_NAME, new ProvisionedThroughput(1L, 1L));
+        store = new MetaStore(client, SOURCE_TABLE_NAME, ENCRYPTOR);
+        targetStore = new MetaStore(targetClient, DESTINATION_TABLE_NAME, TARGET_ENCRYPTOR);
         ctx = new EncryptionContext.Builder().build();
     }
 
@@ -173,6 +184,28 @@ public class MetaStoreTests {
     }
 
     @Test
+    public void replicateIntermediateKeysTest() {
+        assertEquals(-1, store.getMaxVersion(MATERIAL_NAME));
+
+        final EncryptionMaterialsProvider prov1 = store.getOrCreate(MATERIAL_NAME, 0);
+        assertEquals(0, store.getMaxVersion(MATERIAL_NAME));
+
+        store.replicate(MATERIAL_NAME, 0, targetStore);
+        assertEquals(0, targetStore.getMaxVersion(MATERIAL_NAME));
+
+        final EncryptionMaterials eMat = prov1.getEncryptionMaterials(ctx);
+        final DecryptionMaterials dMat = targetStore.getProvider(MATERIAL_NAME, 0).getDecryptionMaterials(ctx(eMat));
+
+        assertEquals(eMat.getEncryptionKey(), dMat.getDecryptionKey());
+        assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void replicateIntermediateKeysWhenMaterialNotFoundTest() {
+        store.replicate(MATERIAL_NAME, 0, targetStore);
+    }
+
+    @Test
     public void newProviderCollision() throws InterruptedException {
         final SlowNewProvider slowProv = new SlowNewProvider();
         assertEquals(-1, store.getMaxVersion(MATERIAL_NAME));
@@ -207,7 +240,7 @@ public class MetaStoreTests {
 
     private class SlowNewProvider extends Thread {
         public volatile EncryptionMaterialsProvider result;
-        public ProviderStore slowStore = new MetaStore(client, TABLE_NAME, ENCRYPTOR) {
+        public ProviderStore slowStore = new MetaStore(client, SOURCE_TABLE_NAME, ENCRYPTOR) {
             @Override
             public EncryptionMaterialsProvider newProvider(final String materialName) {
                 final long nextId = getMaxVersion(materialName) + 1;

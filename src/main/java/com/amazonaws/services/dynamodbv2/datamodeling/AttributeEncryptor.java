@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
- * <em>This must be used with @{link SaveBehavior#CLOBBER}. Use of
+ * <em>This must be used with @{link SaveBehavior#PUT} or @{link SaveBehavior#CLOBBER}. Use of
  * any other @{code SaveBehavior} can result in data-corruption.</em>
  * 
  * @author Greg Rubin 
@@ -72,13 +72,14 @@ public class AttributeEncryptor implements AttributeTransformer {
             return attributeValues;
         }
 
-        // When AttributeEncryptor is used without SaveBehavior.CLOBBER, it is trying to transform only a subset
+        // When AttributeEncryptor is used without SaveBehavior.PUT or CLOBBER, it is trying to transform only a subset
         // of the actual fields stored in DynamoDB. This means that the generated signature will not cover any
         // unmodified fields. Thus, upon untransform, the signature verification will fail as it won't cover all
         // expected fields.
         if (parameters.isPartialUpdate()) {
-            LOG.error("Use of AttributeEncryptor without SaveBehavior.CLOBBER is an error and can result in data-corruption. " +
-                    "This occured while trying to save " + parameters.getModelClass());
+            LOG.error("Use of AttributeEncryptor without SaveBehavior.PUT or SaveBehavior.CLOBBER is an error " +
+	        "and can result in data-corruption. This occured while trying to save " +
+	        parameters.getModelClass());
         }
 
         try {

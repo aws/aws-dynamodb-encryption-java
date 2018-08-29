@@ -4,8 +4,8 @@ The **[Amazon DynamoDB][ddb] Client-side Encryption in Java** supports encryptio
 
 A typical use of this library is when you are using [DynamoDBMapper][ddbmapper], where transparent protection of all objects serialized through the mapper can be enabled via configuring an [AttributeEncryptor][attrencryptor].
 
-**Important: Use `SaveBehavior.CLOBBER` with `AttributeEncryptor`. If you do not do so you risk corrupting your signatures and encrypted data.**
-When CLOBBER is not specified, fields that are present in the record may not be passed down to the encryptor, which results in fields being left out of the record signature. This in turn can result in records failing to decrypt.
+**Important: Use `SaveBehavior.PUT` or `SaveBehavior.CLOBBER` with `AttributeEncryptor`. If you do not do so you risk corrupting your signatures and encrypted data.**
+When PUT or CLOBBER is not specified, fields that are present in the record may not be passed down to the encryptor, which results in fields being left out of the record signature. This in turn can result in records failing to decrypt.
 
 For more advanced use cases where tighter control over the encryption and signing process is necessary, the low-level [DynamoDBEncryptor][ddbencryptor] can be used directly.
 
@@ -77,7 +77,7 @@ To enable transparent encryption and signing, simply specify the necessary encry
     SecretKey cek = ...;        // Content encrypting key
     SecretKey macKey =  ...;    // Signing key
     EncryptionMaterialsProvider provider = new SymmetricStaticProvider(cek, macKey);
-    mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.CLOBBER).build(),
+    mapper = new DynamoDBMapper(client, DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.PUT).build(),
                 new AttributeEncryptor(provider));
     Book book = new Book();
     book.setId(123);

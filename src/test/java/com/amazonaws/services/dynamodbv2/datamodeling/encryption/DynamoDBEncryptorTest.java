@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,6 +96,34 @@ public class DynamoDBEncryptorTest {
         attribs.put("hashKey", new AttributeValue().withN("5"));
         attribs.put("rangeKey", new AttributeValue().withN("7"));
         attribs.put("version", new AttributeValue().withN("0"));
+
+        // New(er) data types
+        attribs.put("booleanTrue", new AttributeValue().withBOOL(true));
+        attribs.put("booleanFalse", new AttributeValue().withBOOL(false));
+        attribs.put("nullValue", new AttributeValue().withNULL(true));
+        Map<String, AttributeValue> tmpMap = new HashMap<>(attribs);
+        attribs.put("listValue", new AttributeValue().withL(
+                new AttributeValue().withS("I'm a string"),
+                new AttributeValue().withN("42"),
+                new AttributeValue().withS("Another string"),
+                new AttributeValue().withNS("1", "4", "7"),
+                new AttributeValue().withM(tmpMap),
+                new AttributeValue().withL(
+                        new AttributeValue().withN("123"),
+                        new AttributeValue().withNS("1", "200", "10", "15", "0"),
+                        new AttributeValue().withSS("Goodbye", "Cruel", "World", "!")
+                )));
+        tmpMap = new HashMap<>();
+        tmpMap.put("another string", new AttributeValue().withS("All around the cobbler's bench"));
+        tmpMap.put("next line", new AttributeValue().withSS("the monkey", "chased", "the weasel"));
+        tmpMap.put("more lyrics", new AttributeValue().withL(
+                new AttributeValue().withS("the monkey"),
+                new AttributeValue().withS("thought twas"),
+                new AttributeValue().withS("all in fun")
+        ));
+        tmpMap.put("weasel", new AttributeValue().withM(Collections.singletonMap("pop", new AttributeValue().withBOOL(true))));
+        attribs.put("song", new AttributeValue().withM(tmpMap));
+
 
         context = new EncryptionContext.Builder()
             .withTableName("TableName")

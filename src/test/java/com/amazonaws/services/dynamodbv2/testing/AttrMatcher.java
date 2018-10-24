@@ -60,12 +60,39 @@ public class AttrMatcher extends BaseMatcher<Map<String, AttributeValue>> {
 
     public static boolean attrEquals(AttributeValue e, AttributeValue a) {
         if (!isEqual(e.getB(), a.getB()) ||
+                !isEqual(e.getBOOL(), a.getBOOL()) ||
+                !isSetEqual(e.getBS(), a.getBS()) ||
                 !isEqual(e.getN(), a.getN()) ||
+                !isSetEqual(e.getNS(), a.getNS()) ||
+                !isEqual(e.getNULL(), a.getNULL()) ||
                 !isEqual(e.getS(), a.getS()) ||
-                !isEqual(e.getBS(), a.getBS()) ||
-                !isEqual(e.getNS(), a.getNS()) ||
-                !isEqual(e.getSS(), a.getSS())) {
+                !isSetEqual(e.getSS(), a.getSS())) {
             return false;
+        }
+        // Recursive types need special handling
+        if (e.getM() == null ^ a.getM() == null) {
+            return false;
+        } else if (e.getM() != null) {
+            if (!e.getM().keySet().equals(a.getM().keySet())) {
+                return false;
+            }
+            for (final String key : e.getM().keySet()) {
+                if (!attrEquals(e.getM().get(key), a.getM().get(key))) {
+                    return false;
+                }
+            }
+        }
+        if (e.getL() == null ^ a.getL() == null) {
+            return false;
+        } else if (e.getL() != null) {
+            if (e.getL().size() != a.getL().size()) {
+                return false;
+            }
+            for (int x = 0; x < e.getL().size(); x++) {
+                if (!attrEquals(e.getL().get(x), a.getL().get(x))) {
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -82,7 +109,7 @@ public class AttrMatcher extends BaseMatcher<Map<String, AttributeValue>> {
         return o1.equals(o2);
     }
     
-    private static <T> boolean isEqual(Collection<T> c1, Collection<T> c2) {
+    private static <T> boolean isSetEqual(Collection<T> c1, Collection<T> c2) {
         if(c1 == null ^ c2 == null) {
             return false;
         }

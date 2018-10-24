@@ -15,7 +15,10 @@
 package com.amazonaws.services.dynamodbv2.datamodeling;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -34,6 +37,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -321,6 +326,75 @@ public class TransformerHolisticTests {
         
         mapper.delete(result);
         assertNull(mapper.load(Mixed.class, 0, 15));
+    }
+
+    /**
+     * This test ensures that optimistic locking can be successfully done through the {@link DynamoDBMapper} when
+     * combined with the @{link AttributeEncryptor}. Specifically it checks that {@link SaveBehavior#PUT} properly
+     * enforces versioning and will result in a {@link ConditionalCheckFailedException} when optimistic locking should
+     * prevent a write. Finally, it checks that {@link SaveBehavior#CLOBBER} properly ignores optimistic locking and
+     * overwrites the old value.
+     */
+    @Test
+    public void optimisticLockingTest() {
+        DynamoDBMapper mapper = new DynamoDBMapper(client,
+                                                   DynamoDBMapperConfig.builder()
+                                                                       .withSaveBehavior(SaveBehavior.PUT).build(),
+                                                   new AttributeEncryptor(symProv));
+        DynamoDBMapper clobberMapper = new DynamoDBMapper(client, CLOBBER_CONFIG, new AttributeEncryptor(symProv));
+
+        /*
+         * Lineage of objects
+         * expected -> v1 -> v2 -> v3
+         *                |
+         *                -> v2_2 -> clobbered
+         * Splitting the lineage after v1 is what should
+         * cause the ConditionalCheckFailedException.
+         */
+        final int hashKey = 0;
+        final int rangeKey = 15;
+        final Mixed expected = new Mixed();
+        expected.setHashKey(hashKey);
+        expected.setRangeKey(rangeKey);
+        expected.setIntSet(new HashSet<Integer>());
+        expected.getIntSet().add(3);
+        expected.getIntSet().add(5);
+        expected.getIntSet().add(7);
+        expected.setDoubleValue(15);
+        expected.setStringValue("Blargh!");
+        expected.setDoubleSet(
+                new HashSet<Double>(Arrays.asList(15.0D, 7.6D, -3D, -34.2D, 0.0D)));
+
+        mapper.save(expected);
+        Mixed v1 = mapper.load(Mixed.class, hashKey, rangeKey);
+        assertEquals(expected, v1);
+        v1.setStringValue("New value");
+        mapper.save(v1);
+        Mixed v2 = mapper.load(Mixed.class, hashKey, rangeKey);
+        assertEquals(v1, v2);
+        Mixed v2_2 = mapper.load(Mixed.class, hashKey, rangeKey);
+
+        v2.getIntSet().add(-37);
+        mapper.save(v2);
+        Mixed v3 = mapper.load(Mixed.class, hashKey, rangeKey);
+        assertEquals(v2, v3);
+        assertTrue(v3.getIntSet().contains(-37));
+
+        // This should fail due to optimistic locking
+        v2_2.getIntSet().add(38);
+        try {
+            mapper.save(v2_2);
+            fail("Expected ConditionalCheckFailedException");
+        } catch (ConditionalCheckFailedException ex) {
+            // Expected exception
+        }
+
+        // Force the update with clobber
+        clobberMapper.save(v2_2);
+        Mixed clobbered = mapper.load(Mixed.class, hashKey, rangeKey);
+        assertEquals(v2_2, clobbered);
+        assertTrue(clobbered.getIntSet().contains(38));
+        assertFalse(clobbered.getIntSet().contains(-37));
     }
 
     @Test

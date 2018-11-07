@@ -151,7 +151,7 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 ## Known Limitations
 
-1. During retrieval of an item, all the attributes of the item that have been involved for encryption or signing must also be included for signature verification.  Otherwise, the signature would fail to verify.
+1. During retrieval of an item, all the attributes of the item that have been involved for encryption or signing must also be included for signature verification.  Otherwise, the signature will fail to verify.
 
 [attrencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
 [createtable]: https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonDynamoDBDocumentAPI/quick-start/com/amazonaws/services/dynamodbv2/document/quickstart/A_CreateTableTest.java

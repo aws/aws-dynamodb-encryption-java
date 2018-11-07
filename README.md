@@ -11,6 +11,17 @@ For more advanced use cases where tighter control over the encryption and signin
 
 ## Getting Started
 
+### Required Prerequisites
+To use this SDK you must have:
+
+* **A Java 8 development environment**
+
+  If you do not have one, go to [Java SE Downloads](https://www.oracle.com/technetwork/java/javase/downloads/index.html) on the Oracle website, then download and install the Java SE Development Kit (JDK). Java 8 or higher is recommended.
+
+  **Note:** If you use the Oracle JDK, you must also download and install the [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html).
+
+### Get Started
+
 Suppose you have created ([sample code][createtable]) a DynamoDB table "MyStore", and want to store some Book objects.  The security requirement involves classifying the attributes Title and Authors as sensitive information.  This is how the Book class may look like:
 
 ```java

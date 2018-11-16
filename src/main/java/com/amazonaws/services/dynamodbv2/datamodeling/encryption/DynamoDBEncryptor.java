@@ -81,7 +81,8 @@ public class DynamoDBEncryptor {
     private final String signingAlgorithmHeader;
     
     public static final String DEFAULT_SIGNING_ALGORITHM_HEADER = DEFAULT_DESCRIPTION_BASE + "signingAlg";
-    
+    private Function<EncryptionContext, EncryptionContext> encryptionContextOverrideOperator;
+
     protected DynamoDBEncryptor(EncryptionMaterialsProvider provider, String descriptionBase) {
         this.encryptionMaterialsProvider = provider;
         this.descriptionBase = descriptionBase;
@@ -254,6 +255,11 @@ public class DynamoDBEncryptor {
             .withAttributeValues(itemAttributes)
             .build();
 
+        Function<EncryptionContext, EncryptionContext> encryptionContextOverrideOperator = getEncryptionContextOverrideOperator();
+        if (encryptionContextOverrideOperator != null) {
+            context = encryptionContextOverrideOperator.apply(context);
+        }
+
         materials = encryptionMaterialsProvider.getDecryptionMaterials(context);
         decryptionKey = materials.getDecryptionKey();
         if (materialDescription.containsKey(signingAlgorithmHeader)) {
@@ -307,7 +313,13 @@ public class DynamoDBEncryptor {
         context = new EncryptionContext.Builder(context)
             .withAttributeValues(itemAttributes)
             .build();
-        
+
+        Function<EncryptionContext, EncryptionContext> encryptionContextOverrideOperator =
+                getEncryptionContextOverrideOperator();
+        if (encryptionContextOverrideOperator != null) {
+            context = encryptionContextOverrideOperator.apply(context);
+        }
+
         EncryptionMaterials materials = encryptionMaterialsProvider.getEncryptionMaterials(context);
         // We need to copy this because we modify it to record other encryption details
         Map<String, String> materialDescription = new HashMap<String, String>(
@@ -557,6 +569,24 @@ public class DynamoDBEncryptor {
         } finally {
             attributeValue.getB().reset();
         }
+    }
+
+    /**
+     * @param encryptionContextOverrideOperator  the nullable operator which will be used to override
+     *                                           the EncryptionContext.
+     * @see com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators
+     */
+    public final void setEncryptionContextOverrideOperator(
+            Function<EncryptionContext, EncryptionContext> encryptionContextOverrideOperator) {
+        this.encryptionContextOverrideOperator = encryptionContextOverrideOperator;
+    }
+
+    /**
+     * @return the operator used to override the EncryptionContext
+     * @see #setEncryptionContextOverrideOperator(Function)
+     */
+    public final Function<EncryptionContext, EncryptionContext> getEncryptionContextOverrideOperator() {
+        return encryptionContextOverrideOperator;
     }
 
     private static byte[] toByteArray(ByteBuffer buffer) {

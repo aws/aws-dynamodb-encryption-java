@@ -10,14 +10,18 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.DirectKmsMaterialProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
 
 import java.security.GeneralSecurityException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableNameUsingMap;
 
@@ -27,12 +31,26 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
         final String region = args[1];
         final String encryptionContextTableName = args[2];
 
-        encryptRecord(cmkArn, region, encryptionContextTableName);
+        AmazonDynamoDB ddb = null;
+        AWSKMS kms = null;
+        try {
+            ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
+            kms = AWSKMSClientBuilder.standard().withRegion(region).build();
+            encryptRecord(cmkArn, encryptionContextTableName, ddb, kms);
+        } finally {
+            if (ddb != null) {
+                ddb.shutdown();
+            }
+            if (kms != null) {
+                kms.shutdown();
+            }
+        }
     }
 
     public static void encryptRecord(final String cmkArn,
-                                     final String region,
-                                     final String newEncryptionContextTableName) {
+                                     final String newEncryptionContextTableName,
+                                     AmazonDynamoDB ddb,
+                                     AWSKMS kms) throws GeneralSecurityException {
         // Sample object to be encrypted
         ExampleItem record = new ExampleItem();
         record.setPartitionAttribute("is this");
@@ -40,17 +58,14 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
         record.setExample("my data");
 
         // Set up our configuration and clients
-        final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
-        final AWSKMS kms = AWSKMSClientBuilder.standard().withRegion(region).build();
         final DirectKmsMaterialProvider cmp = new DirectKmsMaterialProvider(kms, cmkArn);
-        // Encryptor creation
         final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
 
         Map<String, String> tableNameEncryptionContextOverrides = new HashMap<>();
         tableNameEncryptionContextOverrides.put("ExampleTableForEncryptionContextOverrides", newEncryptionContextTableName);
         tableNameEncryptionContextOverrides.put("AnotherExampleTableForEncryptionContextOverrides", "this table doesn't exist");
 
-        // Here we supply an operator to override the table name used in the encryption context
+        // Supply an operator to override the table name used in the encryption context
         encryptor.setEncryptionContextOverrideOperator(
                 overrideEncryptionContextTableNameUsingMap(tableNameEncryptionContextOverrides)
         );
@@ -62,20 +77,40 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
                 .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.CLOBBER).build();
         DynamoDBMapper mapper = new DynamoDBMapper(ddb, mapperConfig, new AttributeEncryptor(encryptor));
 
-        System.out.println("Plaintext Record: " + record);
+        System.out.println("Plaintext Record: " + record.toString());
         // Save the record to the DynamoDB table
         mapper.save(record);
 
-        // Retrieve the encrypted record (directly without decrypting) from Dynamo so we can see it in our example
+        // Retrieve (and decrypt) it from DynamoDB
+        ExampleItem decrypted_record = mapper.load(ExampleItem.class, "is this", 55);
+        System.out.println("Decrypted Record: " + decrypted_record.toString());
+
+        // Setup new configuration to decrypt without using an overridden EncryptionContext
         final Map<String, AttributeValue> itemKey = new HashMap<>();
         itemKey.put("partition_attribute", new AttributeValue().withS("is this"));
         itemKey.put("sort_attribute", new AttributeValue().withN("55"));
-        System.out.println("Encrypted Record: " + ddb.getItem("ExampleTableForEncryptionContextOverrides",
-                itemKey).getItem());
 
-        // Retrieve (and decrypt) it from DynamoDB
-        ExampleItem decrypted_record = mapper.load(ExampleItem.class, "is this", 55);
-        System.out.println("Decrypted Record: " + decrypted_record);
+        final EnumSet<EncryptionFlags> signOnly = EnumSet.of(EncryptionFlags.SIGN);
+        final EnumSet<EncryptionFlags> encryptAndSign = EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
+        final Map<String, AttributeValue> encryptedItem = ddb.getItem("ExampleTableForEncryptionContextOverrides", itemKey)
+                .getItem();
+        System.out.println("Encrypted Record: " + encryptedItem);
+
+        Map<String, Set<EncryptionFlags>> encryptionFlags = new HashMap<>();
+        encryptionFlags.put("partition_attribute", signOnly);
+        encryptionFlags.put("sort_attribute", signOnly);
+        encryptionFlags.put("example", encryptAndSign);
+
+        final DynamoDBEncryptor encryptorWithoutOverrides = DynamoDBEncryptor.getInstance(cmp);
+
+        // Decrypt the record without using an overridden EncryptionContext
+        encryptorWithoutOverrides.decryptRecord(encryptedItem,
+                encryptionFlags,
+                new EncryptionContext.Builder().withHashKeyName("partition_attribute")
+                        .withRangeKeyName("sort_attribute")
+                        .withTableName(newEncryptionContextTableName)
+                        .build());
+        System.out.printf("The example item was encrypted using the table name '%s' in the EncryptionContext%n", newEncryptionContextTableName);
     }
 
     @DynamoDBTable(tableName = "ExampleTableForEncryptionContextOverrides")
@@ -109,6 +144,11 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
 
         public void setExample(String example) {
             this.example = example;
+        }
+
+        public String toString() {
+            return String.format("{partition_attribute: %s, sort_attribute: %s, example: %s}",
+                    partitionAttribute, sortAttribute, example);
         }
     }
 

@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.UnaryOperator;
+import java.util.function.Function;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableNameUsingMap;
@@ -15,7 +15,7 @@ public class EncryptionContextOperatorsTest {
 
     @Test
     public void testCreateEncryptionContextTableNameOverride_expectedOverride() {
-        UnaryOperator<EncryptionContext> myNewTableName = overrideEncryptionContextTableName("OriginalTableName", "MyNewTableName");
+        Function<EncryptionContext, EncryptionContext> myNewTableName = overrideEncryptionContextTableName("OriginalTableName", "MyNewTableName");
 
         EncryptionContext context = new EncryptionContext.Builder().withTableName("OriginalTableName").build();
 
@@ -56,7 +56,7 @@ public class EncryptionContextOperatorsTest {
         tableNameOverrides.put("OriginalTableName", "MyNewTableName");
 
 
-        UnaryOperator<EncryptionContext> nameOverrideMap =
+        Function<EncryptionContext, EncryptionContext> nameOverrideMap =
                 overrideEncryptionContextTableNameUsingMap(tableNameOverrides);
 
         EncryptionContext context = new EncryptionContext.Builder().withTableName("OriginalTableName").build();
@@ -74,7 +74,7 @@ public class EncryptionContextOperatorsTest {
         tableNameOverrides.put("OriginalTableName2", "MyNewTableName2");
 
 
-        UnaryOperator<EncryptionContext> overrideOperator =
+        Function<EncryptionContext, EncryptionContext> overrideOperator =
                 overrideEncryptionContextTableNameUsingMap(tableNameOverrides);
 
         EncryptionContext context = new EncryptionContext.Builder().withTableName("OriginalTableName1").build();
@@ -136,17 +136,15 @@ public class EncryptionContextOperatorsTest {
 
 
     private void assertEncryptionContextUnchanged(EncryptionContext encryptionContext, String originalTableName, String newTableName) {
-        UnaryOperator<EncryptionContext> encryptionContextTableNameOverride = overrideEncryptionContextTableName(originalTableName, newTableName);
+        Function<EncryptionContext, EncryptionContext> encryptionContextTableNameOverride = overrideEncryptionContextTableName(originalTableName, newTableName);
         EncryptionContext newEncryptionContext = encryptionContextTableNameOverride.apply(encryptionContext);
         assertEquals(encryptionContext, newEncryptionContext);
     }
 
 
     private void assertEncryptionContextUnchangedFromMap(EncryptionContext encryptionContext, Map<String, String> overrideMap) {
-        UnaryOperator<EncryptionContext> encryptionContextTableNameOverrideFromMap = overrideEncryptionContextTableNameUsingMap(overrideMap);
+        Function<EncryptionContext, EncryptionContext> encryptionContextTableNameOverrideFromMap = overrideEncryptionContextTableNameUsingMap(overrideMap);
         EncryptionContext newEncryptionContext = encryptionContextTableNameOverrideFromMap.apply(encryptionContext);
         assertEquals(encryptionContext, newEncryptionContext);
     }
-
-
 }

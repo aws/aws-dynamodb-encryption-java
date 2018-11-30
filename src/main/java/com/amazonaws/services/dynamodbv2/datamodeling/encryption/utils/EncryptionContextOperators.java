@@ -9,6 +9,11 @@ import java.util.function.UnaryOperator;
  * Implementations of common operators for overriding the EncryptionContext
  */
 public class EncryptionContextOperators {
+
+    // Prevent instantiation
+    private EncryptionContextOperators() {
+    }
+
     /**
      * An operator for overriding EncryptionContext's table name for a specific DynamoDBEncryptor. If any table names or
      * the encryption context itself is null, then it returns the original EncryptionContext.
@@ -35,7 +40,6 @@ public class EncryptionContextOperators {
         };
     }
 
-
     /**
      * An operator for mapping multiple table names in the Encryption Context to a new table name. If the table name for
      * a given EncryptionContext is missing, then it returns the original EncryptionContext. Similarly, it returns the
@@ -60,6 +64,4 @@ public class EncryptionContextOperators {
             }
         };
     }
-
-
 }

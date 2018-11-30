@@ -52,9 +52,9 @@ public class AwsKmsEncryptedObject {
     // Encryptor creation
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
     // Mapper Creation
-    // Please note the use of SaveBehavior.CLOBBER (SaveBehavior.PUT works as well).
+    // Please note the use of SaveBehavior.PUT (SaveBehavior.CLOBBER works as well).
     // Omitting this can result in data-corruption.
-    DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.CLOBBER).build();
+    DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.PUT).build();
     DynamoDBMapper mapper = new DynamoDBMapper(ddb, mapperConfig, new AttributeEncryptor(encryptor));
 
     System.out.println("Plaintext Record: " + record);

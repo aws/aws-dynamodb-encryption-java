@@ -14,8 +14,10 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption;
 
+import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -31,7 +33,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -296,7 +297,71 @@ public class DynamoDBEncryptorTest {
         encryptedAttributes.get("hashKey").setN("666");
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
     }
-    
+
+    /**
+     * Tests that no exception is thrown when the encryption context override operator is null
+     * @throws GeneralSecurityException
+     */
+    @Test
+    public void testNullEncryptionContextOperator() throws GeneralSecurityException {
+        DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(prov);
+        encryptor.setEncryptionContextOverrideOperator(null);
+        encryptor.encryptAllFieldsExcept(attribs, context, Collections.emptyList());
+    }
+
+    /**
+     * Tests decrypt and encrypt with an encryption context override operator
+     * @throws GeneralSecurityException
+     */
+    @Test
+    public void testTableNameOverriddenEncryptionContextOperator() throws GeneralSecurityException {
+        // Ensure that the table name is different from what we override the table to.
+        assertNotEquals(context.getTableName(), "TheBestTableName");
+        DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(prov);
+        encryptor.setEncryptionContextOverrideOperator(overrideEncryptionContextTableName(context.getTableName(), "TheBestTableName"));
+        Map<String, AttributeValue> encryptedItems = encryptor.encryptAllFieldsExcept(attribs, context, Collections.emptyList());
+        Map<String, AttributeValue> decryptedItems = encryptor.decryptAllFieldsExcept(encryptedItems, context, Collections.emptyList());
+        assertThat(decryptedItems, AttrMatcher.match(attribs));
+    }
+
+
+    /**
+     * Tests encrypt with an encryption context override operator, and a second encryptor without an override
+     * @throws GeneralSecurityException
+     */
+    @Test
+    public void testTableNameOverriddenEncryptionContextOperatorWithSecondEncryptor() throws GeneralSecurityException {
+        // Ensure that the table name is different from what we override the table to.
+        assertNotEquals(context.getTableName(), "TheBestTableName");
+        DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(prov);
+        DynamoDBEncryptor encryptorWithoutOverride = DynamoDBEncryptor.getInstance(prov);
+        encryptor.setEncryptionContextOverrideOperator(overrideEncryptionContextTableName(context.getTableName(), "TheBestTableName"));
+        Map<String, AttributeValue> encryptedItems = encryptor.encryptAllFieldsExcept(attribs, context, Collections.emptyList());
+
+        EncryptionContext expectedOverriddenContext = new EncryptionContext.Builder(context).withTableName("TheBestTableName").build();
+        Map<String, AttributeValue> decryptedItems = encryptorWithoutOverride.decryptAllFieldsExcept(encryptedItems,
+                expectedOverriddenContext, Collections.emptyList());
+        assertThat(decryptedItems, AttrMatcher.match(attribs));
+    }
+
+    /**
+     * Tests encrypt with an encryption context override operator, and a second encryptor without an override
+     * @throws GeneralSecurityException
+     */
+    @Test(expected = SignatureException.class)
+    public void testTableNameOverriddenEncryptionContextOperatorWithSecondEncryptorButTheOriginalEncryptionContext() throws GeneralSecurityException {
+        // Ensure that the table name is different from what we override the table to.
+        assertNotEquals(context.getTableName(), "TheBestTableName");
+        DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(prov);
+        DynamoDBEncryptor encryptorWithoutOverride = DynamoDBEncryptor.getInstance(prov);
+        encryptor.setEncryptionContextOverrideOperator(overrideEncryptionContextTableName(context.getTableName(), "TheBestTableName"));
+        Map<String, AttributeValue> encryptedItems = encryptor.encryptAllFieldsExcept(attribs, context, Collections.emptyList());
+
+        // Use the original encryption context, and expect a signature failure
+        Map<String, AttributeValue> decryptedItems = encryptorWithoutOverride.decryptAllFieldsExcept(encryptedItems,
+                context, Collections.emptyList());
+    }
+
     @Test
     public void EcdsaSignedOnly() throws GeneralSecurityException {
 

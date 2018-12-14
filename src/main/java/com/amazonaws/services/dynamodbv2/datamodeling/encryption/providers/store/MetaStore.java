@@ -148,7 +148,7 @@ public class MetaStore extends ProviderStore {
         this.ddbCtx = new EncryptionContext.Builder().withTableName(this.tableName)
                 .withHashKeyName(DEFAULT_HASH_KEY).withRangeKeyName(DEFAULT_RANGE_KEY).build();
 
-        final Map<String, ExpectedAttributeValue> tmpExpected = new HashMap<String, ExpectedAttributeValue>();
+        final Map<String, ExpectedAttributeValue> tmpExpected = new HashMap<>();
         tmpExpected.put(DEFAULT_HASH_KEY, new ExpectedAttributeValue().withExists(false));
         tmpExpected.put(DEFAULT_RANGE_KEY, new ExpectedAttributeValue().withExists(false));
         doesNotExist = Collections.unmodifiableMap(tmpExpected);
@@ -221,7 +221,7 @@ public class MetaStore extends ProviderStore {
     }
 
     private Map<String, AttributeValue> getMaterialItem(final String materialName, final long version) {
-        final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
+        final Map<String, AttributeValue> ddbKey = new HashMap<>();
         ddbKey.put(DEFAULT_HASH_KEY, new AttributeValue().withS(materialName));
         ddbKey.put(DEFAULT_RANGE_KEY, new AttributeValue().withN(Long.toString(version)));
         final Map<String, AttributeValue> item = ddbGet(ddbKey);
@@ -294,7 +294,7 @@ public class MetaStore extends ProviderStore {
             ddb.putItem(put);
             return item;
         } catch (final ConditionalCheckFailedException ex) {
-            final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
+            final Map<String, AttributeValue> ddbKey = new HashMap<>();
             ddbKey.put(DEFAULT_HASH_KEY, item.get(DEFAULT_HASH_KEY));
             ddbKey.put(DEFAULT_RANGE_KEY, item.get(DEFAULT_RANGE_KEY));
             return ddbGet(ddbKey);

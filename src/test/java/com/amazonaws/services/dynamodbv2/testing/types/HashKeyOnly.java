@@ -17,18 +17,18 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="HashKeyOnly")
+@DynamoDBTable(tableName = "HashKeyOnly")
 public class HashKeyOnly {
     private String hashKey;
-    
+
     public HashKeyOnly() {
-    
+
     }
-    
+
     public HashKeyOnly(String hashKey) {
         this.hashKey = hashKey;
     }
-    
+
     @DynamoDBHashKey
     public String getHashKey() {
         return hashKey;
@@ -56,10 +56,7 @@ public class HashKeyOnly {
             return false;
         HashKeyOnly other = (HashKeyOnly) obj;
         if (hashKey == null) {
-            if (other.hashKey != null)
-                return false;
-        } else if (!hashKey.equals(other.hashKey))
-            return false;
-        return true;
+            return other.hashKey == null;
+        } else return hashKey.equals(other.hashKey);
     }
 }

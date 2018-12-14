@@ -1,21 +1,33 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
+import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,36 +37,22 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.fail;
 
 public class MetaStoreTests {
     private static final String SOURCE_TABLE_NAME = "keystoreTable";
     private static final String DESTINATION_TABLE_NAME = "keystoreDestinationTable";
     private static final String MATERIAL_NAME = "material";
-    private static final SecretKey AES_KEY = new SecretKeySpec(new byte[] { 0,
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, "AES");
-    private static final SecretKey TARGET_AES_KEY = new SecretKeySpec(new byte[] { 0,
-            2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 }, "AES");
-    private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[] { 0,
-            1, 2, 3, 4, 5, 6, 7 }, "HmacSHA256");
-    private static final SecretKey TARGET_HMAC_KEY = new SecretKeySpec(new byte[] { 0,
-            2, 4, 6, 8, 10, 12, 14 }, "HmacSHA256");
+    private static final SecretKey AES_KEY = new SecretKeySpec(new byte[]{0,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, "AES");
+    private static final SecretKey TARGET_AES_KEY = new SecretKeySpec(new byte[]{0,
+            2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30}, "AES");
+    private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[]{0,
+            1, 2, 3, 4, 5, 6, 7}, "HmacSHA256");
+    private static final SecretKey TARGET_HMAC_KEY = new SecretKeySpec(new byte[]{0,
+            2, 4, 6, 8, 10, 12, 14}, "HmacSHA256");
     private static final EncryptionMaterialsProvider BASE_PROVIDER = new SymmetricStaticProvider(AES_KEY, HMAC_KEY);
     private static final EncryptionMaterialsProvider TARGET_BASE_PROVIDER = new SymmetricStaticProvider(TARGET_AES_KEY, TARGET_HMAC_KEY);
     private static final DynamoDBEncryptor ENCRYPTOR = DynamoDBEncryptor.getInstance(BASE_PROVIDER);
@@ -72,7 +70,7 @@ public class MetaStoreTests {
         private final Set<String> signedOnlyFieldNames;
 
         public TestExtraDataSupplier(final Map<String, AttributeValue> attributeValueMap,
-                final Set<String> signedOnlyFieldNames) {
+                                     final Set<String> signedOnlyFieldNames) {
             this.attributeValueMap = attributeValueMap;
             this.signedOnlyFieldNames = signedOnlyFieldNames;
         }
@@ -88,7 +86,7 @@ public class MetaStoreTests {
         }
     }
 
-    @Before
+    @BeforeMethod
     public void setup() {
         client = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
         targetClient = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
@@ -255,7 +253,7 @@ public class MetaStoreTests {
         assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void replicateIntermediateKeysWhenMaterialNotFoundTest() {
         store.replicate(MATERIAL_NAME, 0, targetStore);
     }
@@ -283,12 +281,12 @@ public class MetaStoreTests {
         assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
     }
 
-    @Test(expected=IndexOutOfBoundsException.class)
+    @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void invalidVersion() {
         store.getProvider(MATERIAL_NAME, 1000);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void invalidSignedOnlyField() {
         final Map<String, AttributeValue> attributeValueMap = new HashMap<>();
         attributeValueMap.put("enc", new AttributeValue().withS("testEncryptionKey"));
@@ -304,7 +302,7 @@ public class MetaStoreTests {
 
     private static EncryptionContext ctx(final EncryptionMaterials mat) {
         return new EncryptionContext.Builder()
-        .withMaterialDescription(mat.getMaterialDescription()).build();
+                .withMaterialDescription(mat.getMaterialDescription()).build();
     }
 
     private class SlowNewProvider extends Thread {
@@ -330,21 +328,21 @@ public class MetaStoreTests {
 
     @SuppressWarnings("unchecked")
     private static <T> T synchronize(final T obj, final Class<T> clazz) {
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz },
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
                 new InvocationHandler() {
-            private final Object lock = new Object();
+                    private final Object lock = new Object();
 
-            @Override
-            public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-                synchronized (lock) {
-                    try {
-                        return method.invoke(obj, args);
-                    } catch (final InvocationTargetException ex) {
-                        throw ex.getCause();
+                    @Override
+                    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+                        synchronized (lock) {
+                            try {
+                                return method.invoke(obj, args);
+                            } catch (final InvocationTargetException ex) {
+                                throw ex.getCause();
+                            }
+                        }
                     }
                 }
-            }
-        }
-                );
+        );
     }
 }

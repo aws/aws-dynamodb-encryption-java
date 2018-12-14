@@ -1,26 +1,26 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.mapper.encryption;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 /**
  * Simple domain class with numeric attributes
@@ -159,69 +159,66 @@ public class NumberSetAttributeTestClass {
 
     @Override
     public boolean equals(Object obj) {
-        if ( this == obj )
+        if (this == obj)
             return true;
-        if ( obj == null )
+        if (obj == null)
             return false;
-        if ( getClass() != obj.getClass() )
+        if (getClass() != obj.getClass())
             return false;
         NumberSetAttributeTestClass other = (NumberSetAttributeTestClass) obj;
-        if ( bigDecimalAttribute == null ) {
-            if ( other.bigDecimalAttribute != null )
+        if (bigDecimalAttribute == null) {
+            if (other.bigDecimalAttribute != null)
                 return false;
-        } else if ( !bigDecimalAttribute.equals(other.bigDecimalAttribute) )
+        } else if (!bigDecimalAttribute.equals(other.bigDecimalAttribute))
             return false;
-        if ( bigIntegerAttribute == null ) {
-            if ( other.bigIntegerAttribute != null )
+        if (bigIntegerAttribute == null) {
+            if (other.bigIntegerAttribute != null)
                 return false;
-        } else if ( !bigIntegerAttribute.equals(other.bigIntegerAttribute) )
+        } else if (!bigIntegerAttribute.equals(other.bigIntegerAttribute))
             return false;
-        if ( booleanAttribute == null ) {
-            if ( other.booleanAttribute != null )
+        if (booleanAttribute == null) {
+            if (other.booleanAttribute != null)
                 return false;
-        } else if ( !booleanAttribute.equals(other.booleanAttribute) )
+        } else if (!booleanAttribute.equals(other.booleanAttribute))
             return false;
-        if ( byteObjectAttribute == null ) {
-            if ( other.byteObjectAttribute != null )
+        if (byteObjectAttribute == null) {
+            if (other.byteObjectAttribute != null)
                 return false;
-        } else if ( !byteObjectAttribute.equals(other.byteObjectAttribute) )
+        } else if (!byteObjectAttribute.equals(other.byteObjectAttribute))
             return false;
-        if ( calendarAttribute == null ) {
-            if ( other.calendarAttribute != null )
+        if (calendarAttribute == null) {
+            if (other.calendarAttribute != null)
                 return false;
-        } else if ( !calendarAttribute.equals(other.calendarAttribute) )
+        } else if (!calendarAttribute.equals(other.calendarAttribute))
             return false;
-        if ( dateAttribute == null ) {
-            if ( other.dateAttribute != null )
+        if (dateAttribute == null) {
+            if (other.dateAttribute != null)
                 return false;
-        } else if ( !dateAttribute.equals(other.dateAttribute) )
+        } else if (!dateAttribute.equals(other.dateAttribute))
             return false;
-        if ( doubleObjectAttribute == null ) {
-            if ( other.doubleObjectAttribute != null )
+        if (doubleObjectAttribute == null) {
+            if (other.doubleObjectAttribute != null)
                 return false;
-        } else if ( !doubleObjectAttribute.equals(other.doubleObjectAttribute) )
+        } else if (!doubleObjectAttribute.equals(other.doubleObjectAttribute))
             return false;
-        if ( floatObjectAttribute == null ) {
-            if ( other.floatObjectAttribute != null )
+        if (floatObjectAttribute == null) {
+            if (other.floatObjectAttribute != null)
                 return false;
-        } else if ( !floatObjectAttribute.equals(other.floatObjectAttribute) )
+        } else if (!floatObjectAttribute.equals(other.floatObjectAttribute))
             return false;
-        if ( integerAttribute == null ) {
-            if ( other.integerAttribute != null )
+        if (integerAttribute == null) {
+            if (other.integerAttribute != null)
                 return false;
-        } else if ( !integerAttribute.equals(other.integerAttribute) )
+        } else if (!integerAttribute.equals(other.integerAttribute))
             return false;
-        if ( key == null ) {
-            if ( other.key != null )
+        if (key == null) {
+            if (other.key != null)
                 return false;
-        } else if ( !key.equals(other.key) )
+        } else if (!key.equals(other.key))
             return false;
-        if ( longObjectAttribute == null ) {
-            if ( other.longObjectAttribute != null )
-                return false;
-        } else if ( !longObjectAttribute.equals(other.longObjectAttribute) )
-            return false;
-        return true;
+        if (longObjectAttribute == null) {
+            return other.longObjectAttribute == null;
+        } else return longObjectAttribute.equals(other.longObjectAttribute);
     }
 
     /* (non-Javadoc)

@@ -14,9 +14,12 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -24,12 +27,8 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class SymmetricRawMaterialsTest {
     private static SecretKey encryptionKey;
@@ -37,29 +36,29 @@ public class SymmetricRawMaterialsTest {
     private static KeyPair sigPair;
     private static SecureRandom rnd;
     private Map<String, String> description;
-    
+
     @BeforeClass
     public static void setUpClass() throws NoSuchAlgorithmException {
         rnd = new SecureRandom();
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, rnd);
         sigPair = rsaGen.generateKeyPair();
-        
+
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
         aesGen.init(128, rnd);
         encryptionKey = aesGen.generateKey();
-        
+
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
         macGen.init(256, rnd);
         macKey = macGen.generateKey();
     }
-    
-    @Before
+
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");
     }
-    
+
     @Test
     public void macNoDescription() throws NoSuchAlgorithmException {
         SymmetricRawMaterials mat = new SymmetricRawMaterials(encryptionKey, macKey);
@@ -69,7 +68,7 @@ public class SymmetricRawMaterialsTest {
         assertEquals(macKey, mat.getVerificationKey());
         assertTrue(mat.getMaterialDescription().isEmpty());
     }
-    
+
     @Test
     public void macWithDescription() throws NoSuchAlgorithmException {
         SymmetricRawMaterials mat = new SymmetricRawMaterials(encryptionKey, macKey, description);
@@ -90,7 +89,7 @@ public class SymmetricRawMaterialsTest {
         assertEquals(sigPair.getPublic(), mat.getVerificationKey());
         assertTrue(mat.getMaterialDescription().isEmpty());
     }
-    
+
     @Test
     public void sigWithDescription() throws NoSuchAlgorithmException {
         SymmetricRawMaterials mat = new SymmetricRawMaterials(encryptionKey, sigPair, description);

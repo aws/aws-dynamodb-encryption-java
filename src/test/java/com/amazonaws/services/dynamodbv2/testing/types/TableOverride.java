@@ -17,4 +17,5 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.TableAadOverride;
 
 @TableAadOverride(tableName = "Override")
-public class TableOverride extends BaseClass {}
+public class TableOverride extends BaseClass {
+}

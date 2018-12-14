@@ -14,10 +14,10 @@
  */
 package com.amazonaws.services.dynamodbv2.testing.types;
 
-import java.util.Set;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
+
+import java.util.Set;
 
 public class Mixed extends BaseClass {
     @Override
@@ -25,19 +25,19 @@ public class Mixed extends BaseClass {
     public String getStringValue() {
         return super.getStringValue();
     }
-    
+
     @Override
     @DoNotEncrypt
     public double getDoubleValue() {
         return super.getDoubleValue();
     }
-    
+
     @Override
     @DoNotEncrypt
     public Set<Double> getDoubleSet() {
         return super.getDoubleSet();
     }
-    
+
     @Override
     @DoNotTouch
     public int getIntValue() {

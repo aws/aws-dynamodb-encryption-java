@@ -14,16 +14,23 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption;
 
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -43,29 +50,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
-import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECParameterSpec;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
+import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.testng.AssertJUnit.assertArrayEquals;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class DynamoDBEncryptorTest {
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
-    
+
     private InstrumentedEncryptionMaterialsProvider prov;
     private DynamoDBEncryptor encryptor;
     private Map<String, AttributeValue> attribs;
@@ -77,23 +75,23 @@ public class DynamoDBEncryptorTest {
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
         aesGen.init(128, Utils.getRng());
         encryptionKey = aesGen.generateKey();
-        
+
         KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
         macGen.init(256, Utils.getRng());
         macKey = macGen.generateKey();
     }
-    
-    @Before
+
+    @BeforeMethod
     public void setUp() throws Exception {
         prov = new InstrumentedEncryptionMaterialsProvider(
-                    new SymmetricStaticProvider(encryptionKey, macKey,
-                        Collections.<String, String> emptyMap()));
+                new SymmetricStaticProvider(encryptionKey, macKey,
+                        Collections.emptyMap()));
         encryptor = DynamoDBEncryptor.getInstance(prov, "encryptor-");
-        
+
         attribs = new HashMap<String, AttributeValue>();
         attribs.put("intValue", new AttributeValue().withN("123"));
         attribs.put("stringValue", new AttributeValue().withS("Hello world!"));
-        attribs.put("byteArrayValue", new AttributeValue().withB(ByteBuffer.wrap(new byte[] {0, 1, 2, 3, 4, 5})));
+        attribs.put("byteArrayValue", new AttributeValue().withB(ByteBuffer.wrap(new byte[]{0, 1, 2, 3, 4, 5})));
         attribs.put("stringSet", new AttributeValue().withSS("Goodbye", "Cruel", "World", "?"));
         attribs.put("intSet", new AttributeValue().withNS("1", "200", "10", "15", "0"));
         attribs.put("hashKey", new AttributeValue().withN("5"));
@@ -129,10 +127,10 @@ public class DynamoDBEncryptorTest {
 
 
         context = new EncryptionContext.Builder()
-            .withTableName("TableName")
-            .withHashKeyName("hashKey")
-            .withRangeKeyName("rangeKey")
-            .build();
+                .withTableName("TableName")
+                .withHashKeyName("hashKey")
+                .withRangeKeyName("rangeKey")
+                .build();
     }
 
     @Test
@@ -148,7 +146,7 @@ public class DynamoDBEncryptorTest {
         encryptor.setMaterialDescriptionFieldName("A different value");
         assertEquals("A different value", encryptor.getMaterialDescriptionFieldName());
     }
-    
+
     @Test
     public void fullEncryption() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
@@ -170,7 +168,7 @@ public class DynamoDBEncryptorTest {
         assertNotNull(encryptedAttributes.get("stringValue").getB());
 
         // Make sure we're calling the proper getEncryptionMaterials method
-        assertEquals("Wrong getEncryptionMaterials() called", 
+        assertEquals("Wrong getEncryptionMaterials() called",
                 1, prov.getCallCount("getEncryptionMaterials(EncryptionContext context)"));
     }
 
@@ -184,7 +182,7 @@ public class DynamoDBEncryptorTest {
         assertEquals(encryptedString, encryptedAttributes.toString());
     }
 
-    @Test(expected=SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void fullEncryptionBadSignature() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
@@ -192,8 +190,8 @@ public class DynamoDBEncryptorTest {
         encryptedAttributes.get("hashKey").setN("666");
         encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void badVersionNumber() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
@@ -204,96 +202,96 @@ public class DynamoDBEncryptorTest {
         encryptedAttributes.put(encryptor.getMaterialDescriptionFieldName(), new AttributeValue().withB(ByteBuffer.wrap(rawArray)));
         encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
     }
-    
+
     @Test
     public void signedOnly() throws GeneralSecurityException {
-        Map<String, AttributeValue> encryptedAttributes = 
+        Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         Map<String, AttributeValue> decryptedAttributes =
                 encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-        
+
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
         assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
-        
+
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
-    
+
     @Test
     public void signedOnlyNullCryptoKey() throws GeneralSecurityException {
         prov = new InstrumentedEncryptionMaterialsProvider(
-                new SymmetricStaticProvider(null, macKey, Collections.<String, String>emptyMap()));
+                new SymmetricStaticProvider(null, macKey, Collections.emptyMap()));
         encryptor = DynamoDBEncryptor.getInstance(prov, "encryptor-");
-        Map<String, AttributeValue> encryptedAttributes = 
+        Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         Map<String, AttributeValue> decryptedAttributes = encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-        
+
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
         assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
-        
+
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
-    
-    @Test(expected=SignatureException.class)
+
+    @Test(expectedExceptions = SignatureException.class)
     public void signedOnlyBadSignature() throws GeneralSecurityException {
-        Map<String, AttributeValue> encryptedAttributes = 
+        Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         encryptedAttributes.get("hashKey").setN("666");
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
     }
-    
-    @Test(expected=SignatureException.class)
+
+    @Test(expectedExceptions = SignatureException.class)
     public void signedOnlyNoSignature() throws GeneralSecurityException {
-        Map<String, AttributeValue> encryptedAttributes = 
+        Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         encryptedAttributes.remove(encryptor.getSignatureFieldName());
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
     }
-    
+
     @Test
     public void RsaSignedOnly() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
-                new SymmetricStaticProvider(encryptionKey, sigPair, 
-                    Collections.<String, String> emptyMap()), "encryptor-");
-        
+                new SymmetricStaticProvider(encryptionKey, sigPair,
+                        Collections.emptyMap()), "encryptor-");
+
         Map<String, AttributeValue> encryptedAttributes = encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
-        Map<String, AttributeValue> decryptedAttributes = 
+        Map<String, AttributeValue> decryptedAttributes =
                 encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-        
+
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
         assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
-        
+
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
-    
-    @Test(expected=SignatureException.class)
+
+    @Test(expectedExceptions = SignatureException.class)
     public void RsaSignedOnlyBadSignature() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, Utils.getRng());
         KeyPair sigPair = rsaGen.generateKeyPair();
         encryptor = DynamoDBEncryptor.getInstance(
-                new SymmetricStaticProvider(encryptionKey, sigPair, 
-                    Collections.<String, String> emptyMap()), "encryptor-");
-        
+                new SymmetricStaticProvider(encryptionKey, sigPair,
+                        Collections.emptyMap()), "encryptor-");
+
         Map<String, AttributeValue> encryptedAttributes = encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
         encryptedAttributes.get("hashKey").setN("666");
@@ -302,6 +300,7 @@ public class DynamoDBEncryptorTest {
 
     /**
      * Tests that no exception is thrown when the encryption context override operator is null
+     *
      * @throws GeneralSecurityException
      */
     @Test
@@ -313,6 +312,7 @@ public class DynamoDBEncryptorTest {
 
     /**
      * Tests decrypt and encrypt with an encryption context override operator
+     *
      * @throws GeneralSecurityException
      */
     @Test
@@ -329,6 +329,7 @@ public class DynamoDBEncryptorTest {
 
     /**
      * Tests encrypt with an encryption context override operator, and a second encryptor without an override
+     *
      * @throws GeneralSecurityException
      */
     @Test
@@ -348,9 +349,10 @@ public class DynamoDBEncryptorTest {
 
     /**
      * Tests encrypt with an encryption context override operator, and a second encryptor without an override
+     *
      * @throws GeneralSecurityException
      */
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void testTableNameOverriddenEncryptionContextOperatorWithSecondEncryptorButTheOriginalEncryptionContext() throws GeneralSecurityException {
         // Ensure that the table name is different from what we override the table to.
         assertThat(context.getTableName(), not(equalTo(OVERRIDDEN_TABLE_NAME)));
@@ -368,23 +370,23 @@ public class DynamoDBEncryptorTest {
     public void EcdsaSignedOnly() throws GeneralSecurityException {
 
         encryptor = DynamoDBEncryptor.getInstance(getMaterialProviderwithECDSA());
-        
+
         Map<String, AttributeValue> encryptedAttributes = encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
         assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
-        Map<String, AttributeValue> decryptedAttributes = 
+        Map<String, AttributeValue> decryptedAttributes =
                 encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-        
+
         // Make sure keys and version are not encrypted
         assertAttrEquals(attribs.get("hashKey"), encryptedAttributes.get("hashKey"));
         assertAttrEquals(attribs.get("rangeKey"), encryptedAttributes.get("rangeKey"));
         assertAttrEquals(attribs.get("version"), encryptedAttributes.get("version"));
-        
+
         // Make sure String has not been encrypted (we'll assume the others are correct as well)
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
-    
-    @Test(expected=SignatureException.class)
+
+    @Test(expectedExceptions = SignatureException.class)
     public void EcdsaSignedOnlyBadSignature() throws GeneralSecurityException {
 
         encryptor = DynamoDBEncryptor.getInstance(getMaterialProviderwithECDSA());
@@ -397,14 +399,14 @@ public class DynamoDBEncryptorTest {
 
     @Test
     public void toByteArray() throws ReflectiveOperationException {
-        final byte[] expected = new byte[] {0, 1, 2, 3, 4, 5};
+        final byte[] expected = new byte[]{0, 1, 2, 3, 4, 5};
         assertToByteArray("Wrap", expected, ByteBuffer.wrap(expected));
         assertToByteArray("Wrap-RO", expected, ByteBuffer.wrap(expected).asReadOnlyBuffer());
 
-        assertToByteArray("Wrap-Truncated-Sliced", expected, ByteBuffer.wrap(new byte[] {0, 1, 2, 3, 4, 5, 6}, 0, 6).slice());
-        assertToByteArray("Wrap-Offset-Sliced", expected, ByteBuffer.wrap(new byte[] {6, 0, 1, 2, 3, 4, 5, 6}, 1, 6).slice());
-        assertToByteArray("Wrap-Truncated", expected, ByteBuffer.wrap(new byte[] {0, 1, 2, 3, 4, 5, 6}, 0, 6));
-        assertToByteArray("Wrap-Offset", expected, ByteBuffer.wrap(new byte[] {6, 0, 1, 2, 3, 4, 5, 6}, 1, 6));
+        assertToByteArray("Wrap-Truncated-Sliced", expected, ByteBuffer.wrap(new byte[]{0, 1, 2, 3, 4, 5, 6}, 0, 6).slice());
+        assertToByteArray("Wrap-Offset-Sliced", expected, ByteBuffer.wrap(new byte[]{6, 0, 1, 2, 3, 4, 5, 6}, 1, 6).slice());
+        assertToByteArray("Wrap-Truncated", expected, ByteBuffer.wrap(new byte[]{0, 1, 2, 3, 4, 5, 6}, 0, 6));
+        assertToByteArray("Wrap-Offset", expected, ByteBuffer.wrap(new byte[]{6, 0, 1, 2, 3, 4, 5, 6}, 1, 6));
 
         ByteBuffer buff = ByteBuffer.allocate(expected.length + 10);
         buff.put(expected);
@@ -437,7 +439,7 @@ public class DynamoDBEncryptorTest {
         Assert.assertEquals(o1.getS(), o2.getS());
         assertSetsEqual(o1.getSS(), o2.getSS());
     }
-    
+
     private <T> void assertSetsEqual(Collection<T> c1, Collection<T> c2) {
         Assert.assertFalse(c1 == null ^ c2 == null);
         if (c1 != null) {
@@ -447,26 +449,26 @@ public class DynamoDBEncryptorTest {
         }
     }
 
-    private EncryptionMaterialsProvider getMaterialProviderwithECDSA() 
-           throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException {
-            Security.addProvider(new BouncyCastleProvider());
-            ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
-            KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
-            g.initialize(ecSpec, Utils.getRng());
-            KeyPair keypair = g.generateKeyPair();
-            Map<String, String> description = new HashMap<String, String>();
-            description.put(DynamoDBEncryptor.DEFAULT_SIGNING_ALGORITHM_HEADER, "SHA384withECDSA");
-            return new SymmetricStaticProvider(null, keypair, description);
+    private EncryptionMaterialsProvider getMaterialProviderwithECDSA()
+            throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, NoSuchProviderException {
+        Security.addProvider(new BouncyCastleProvider());
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("secp384r1");
+        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
+        g.initialize(ecSpec, Utils.getRng());
+        KeyPair keypair = g.generateKeyPair();
+        Map<String, String> description = new HashMap<String, String>();
+        description.put(DynamoDBEncryptor.DEFAULT_SIGNING_ALGORITHM_HEADER, "SHA384withECDSA");
+        return new SymmetricStaticProvider(null, keypair, description);
     }
 
     private static final class InstrumentedEncryptionMaterialsProvider implements EncryptionMaterialsProvider {
         private final EncryptionMaterialsProvider delegate;
         private final ConcurrentHashMap<String, AtomicInteger> calls = new ConcurrentHashMap<>();
-        
+
         public InstrumentedEncryptionMaterialsProvider(EncryptionMaterialsProvider delegate) {
             this.delegate = delegate;
         }
-        
+
         @Override
         public DecryptionMaterials getDecryptionMaterials(EncryptionContext context) {
             incrementMethodCount("getDecryptionMaterials()");
@@ -484,7 +486,7 @@ public class DynamoDBEncryptorTest {
             incrementMethodCount("refresh()");
             delegate.refresh();
         }
-        
+
         public int getCallCount(String method) {
             AtomicInteger count = calls.get(method);
             if (count != null) {
@@ -493,12 +495,12 @@ public class DynamoDBEncryptorTest {
                 return 0;
             }
         }
-        
+
         @SuppressWarnings("unused")
         public void resetCallCounts() {
             calls.clear();
         }
-        
+
         private void incrementMethodCount(String method) {
             AtomicInteger oldValue = calls.putIfAbsent(method, new AtomicInteger(1));
             if (oldValue != null) {

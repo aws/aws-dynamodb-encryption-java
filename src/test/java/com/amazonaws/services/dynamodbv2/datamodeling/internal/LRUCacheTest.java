@@ -12,15 +12,15 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Test;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class LRUCacheTest {
     @Test
@@ -104,12 +104,12 @@ public class LRUCacheTest {
         assertEquals("v3", removed.get("k3"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testZeroSize() {
         new LRUCache<Object>(0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testIllegalArgument() {
         new LRUCache<Object>(-1);
     }

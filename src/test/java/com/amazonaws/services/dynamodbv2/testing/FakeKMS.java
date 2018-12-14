@@ -44,12 +44,12 @@ public class FakeKMS extends AbstractAWSKMS {
     private final Map<DecryptMapKey, DecryptResult> results_ = new HashMap<>();
 
     @Override
-    public CreateKeyResult createKey() throws AmazonServiceException, AmazonClientException {
+    public CreateKeyResult createKey() throws AmazonClientException {
         return createKey(new CreateKeyRequest());
     }
 
     @Override
-    public CreateKeyResult createKey(CreateKeyRequest req) throws AmazonServiceException,
+    public CreateKeyResult createKey(CreateKeyRequest req) throws
             AmazonClientException {
         String keyId = UUID.randomUUID().toString();
         String arn = "arn:aws:testing:kms:" + ACCOUNT_ID + ":key/" + keyId;
@@ -62,7 +62,7 @@ public class FakeKMS extends AbstractAWSKMS {
     }
 
     @Override
-    public DecryptResult decrypt(DecryptRequest req) throws AmazonServiceException,
+    public DecryptResult decrypt(DecryptRequest req) throws
             AmazonClientException {
         DecryptResult result = results_.get(new DecryptMapKey(req));
         if (result != null) {
@@ -73,7 +73,7 @@ public class FakeKMS extends AbstractAWSKMS {
     }
 
     @Override
-    public EncryptResult encrypt(EncryptRequest req) throws AmazonServiceException,
+    public EncryptResult encrypt(EncryptRequest req) throws
             AmazonClientException {
         final byte[] cipherText = new byte[512];
         rnd.nextBytes(cipherText);
@@ -88,7 +88,7 @@ public class FakeKMS extends AbstractAWSKMS {
 
     @Override
     public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest req)
-            throws AmazonServiceException, AmazonClientException {
+            throws AmazonClientException {
         byte[] pt;
         if (req.getKeySpec() != null) {
             if (req.getKeySpec().contains("256")) {
@@ -112,7 +112,7 @@ public class FakeKMS extends AbstractAWSKMS {
 
     @Override
     public GenerateDataKeyWithoutPlaintextResult generateDataKeyWithoutPlaintext(
-            GenerateDataKeyWithoutPlaintextRequest req) throws AmazonServiceException,
+            GenerateDataKeyWithoutPlaintextRequest req) throws
             AmazonClientException {
         GenerateDataKeyResult generateDataKey = generateDataKey(new GenerateDataKeyRequest()
                 .withEncryptionContext(req.getEncryptionContext()).withNumberOfBytes(
@@ -197,11 +197,8 @@ public class FakeKMS extends AbstractAWSKMS {
             } else if (!cipherText.equals(other.cipherText))
                 return false;
             if (ec == null) {
-                if (other.ec != null)
-                    return false;
-            } else if (!ec.equals(other.ec))
-                return false;
-            return true;
+                return other.ec == null;
+            } else return ec.equals(other.ec);
         }
 
         @Override

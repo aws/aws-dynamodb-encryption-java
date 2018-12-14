@@ -1,22 +1,32 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
+import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,34 +35,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.MostRecentProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.MetaStore;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class MostRecentProviderTests {
     private static final String TABLE_NAME = "keystoreTable";
     private static final String MATERIAL_NAME = "material";
     private static final String MATERIAL_PARAM = "materialName";
-    private static final SecretKey AES_KEY = new SecretKeySpec(new byte[] { 0,
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, "AES");
-    private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[] { 0,
-            1, 2, 3, 4, 5, 6, 7 }, "HmacSHA256");
+    private static final SecretKey AES_KEY = new SecretKeySpec(new byte[]{0,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}, "AES");
+    private static final SecretKey HMAC_KEY = new SecretKeySpec(new byte[]{0,
+            1, 2, 3, 4, 5, 6, 7}, "HmacSHA256");
     private static final EncryptionMaterialsProvider BASE_PROVIDER = new SymmetricStaticProvider(AES_KEY, HMAC_KEY);
     private static final DynamoDBEncryptor ENCRYPTOR = DynamoDBEncryptor.getInstance(BASE_PROVIDER);
 
@@ -61,7 +56,7 @@ public class MostRecentProviderTests {
     private ProviderStore store;
     private EncryptionContext ctx;
 
-    @Before
+    @BeforeMethod
     public void setup() {
         methodCalls = new HashMap<String, Integer>();
         client = instrument(DynamoDBEmbedded.create(), AmazonDynamoDB.class, methodCalls);
@@ -500,18 +495,18 @@ public class MostRecentProviderTests {
 
     private static EncryptionContext ctx(final Map<String, AttributeValue> attr) {
         return new EncryptionContext.Builder()
-            .withAttributeValues(attr).build();
+                .withAttributeValues(attr).build();
     }
 
     private static EncryptionContext ctx(final EncryptionMaterials mat, Map<String, AttributeValue> attr) {
         return new EncryptionContext.Builder()
-            .withAttributeValues(attr)
-            .withMaterialDescription(mat.getMaterialDescription()).build();
+                .withAttributeValues(attr)
+                .withMaterialDescription(mat.getMaterialDescription()).build();
     }
 
     private static EncryptionContext ctx(final EncryptionMaterials mat) {
         return new EncryptionContext.Builder()
-            .withMaterialDescription(mat.getMaterialDescription()).build();
+                .withMaterialDescription(mat.getMaterialDescription()).build();
     }
 
     private static class ExtendedProvider extends MostRecentProvider {
@@ -532,27 +527,27 @@ public class MostRecentProviderTests {
 
     @SuppressWarnings("unchecked")
     private static <T> T instrument(final T obj, final Class<T> clazz, final Map<String, Integer> map) {
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz },
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
                 new InvocationHandler() {
-            private final Object lock = new Object();
+                    private final Object lock = new Object();
 
-            @Override
-            public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-                synchronized (lock) {
-                    try {
-                        final Integer oldCount = map.get(method.getName());
-                        if (oldCount != null) {
-                            map.put(method.getName(), oldCount + 1);
-                        } else {
-                            map.put(method.getName(), 1);
+                    @Override
+                    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+                        synchronized (lock) {
+                            try {
+                                final Integer oldCount = map.get(method.getName());
+                                if (oldCount != null) {
+                                    map.put(method.getName(), oldCount + 1);
+                                } else {
+                                    map.put(method.getName(), 1);
+                                }
+                                return method.invoke(obj, args);
+                            } catch (final InvocationTargetException ex) {
+                                throw ex.getCause();
+                            }
                         }
-                        return method.invoke(obj, args);
-                    } catch (final InvocationTargetException ex) {
-                        throw ex.getCause();
                     }
                 }
-            }
-        }
-                );
+        );
     }
 }

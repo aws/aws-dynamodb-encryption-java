@@ -158,13 +158,7 @@ public class MetaStore extends ProviderStore {
 
     @Override
     public EncryptionMaterialsProvider getProvider(final String materialName, final long version) {
-        final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
-        ddbKey.put(DEFAULT_HASH_KEY, new AttributeValue().withS(materialName));
-        ddbKey.put(DEFAULT_RANGE_KEY, new AttributeValue().withN(Long.toString(version)));
-        final Map<String, AttributeValue> item = ddbGet(ddbKey);
-        if (item == null || item.isEmpty()) {
-            throw new IndexOutOfBoundsException("No material found: " + materialName + "#" + version);
-        }
+        Map<String, AttributeValue> item = getMaterialItem(materialName, version);
         return decryptProvider(item);
     }
 
@@ -215,14 +209,7 @@ public class MetaStore extends ProviderStore {
      */
     public void replicate(final String materialName, final long version, final MetaStore targetMetaStore) {
         try {
-            final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
-            ddbKey.put(DEFAULT_HASH_KEY, new AttributeValue().withS(materialName));
-            ddbKey.put(DEFAULT_RANGE_KEY, new AttributeValue().withN(Long.toString(version)));
-            final Map<String, AttributeValue> item = ddbGet(ddbKey);
-            if (item == null || item.isEmpty()) {
-                throw new IndexOutOfBoundsException("No material found: " + materialName + "#" + version);
-            }
-
+            Map<String, AttributeValue> item = getMaterialItem(materialName, version);
             final Map<String, AttributeValue> plainText = getPlainText(item);
             final Map<String, AttributeValue> encryptedText = targetMetaStore.getEncryptedText(plainText);
             final PutItemRequest put = new PutItemRequest().withTableName(targetMetaStore.tableName).withItem(encryptedText)
@@ -231,6 +218,17 @@ public class MetaStore extends ProviderStore {
         } catch (ConditionalCheckFailedException e) {
             //Item already present.
         }
+    }
+
+    private Map<String, AttributeValue> getMaterialItem(final String materialName, final long version) {
+        final Map<String, AttributeValue> ddbKey = new HashMap<String, AttributeValue>();
+        ddbKey.put(DEFAULT_HASH_KEY, new AttributeValue().withS(materialName));
+        ddbKey.put(DEFAULT_RANGE_KEY, new AttributeValue().withN(Long.toString(version)));
+        final Map<String, AttributeValue> item = ddbGet(ddbKey);
+        if (item == null || item.isEmpty()) {
+            throw new IndexOutOfBoundsException("No material found: " + materialName + "#" + version);
+        }
+        return item;
     }
 
     /**

@@ -342,7 +342,7 @@ public class DirectKmsMaterialProviderTest {
     }
 
     private static class ExtendedKmsMaterialProvider extends DirectKmsMaterialProvider {
-        protected final String encryptionKeyIdAttributeName;
+        private final String encryptionKeyIdAttributeName;
 
         public ExtendedKmsMaterialProvider(AWSKMS kms, String encryptionKeyId, String encryptionKeyIdAttributeName) {
             super(kms, encryptionKeyId);
@@ -370,6 +370,16 @@ public class DirectKmsMaterialProviderTest {
             if (!customEncryptionKeyId.equals(encryptionKeyId)) {
                 throw new DynamoDBMappingException("encryption key ids do not match.");
             }
+        }
+
+        @Override
+        protected DecryptResult decrypt(DecryptRequest request, EncryptionContext context) {
+            return super.decrypt(request, context);
+        }
+
+        @Override
+        protected GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest request, EncryptionContext context) {
+            return super.generateDataKey(request, context);
         }
     }
 

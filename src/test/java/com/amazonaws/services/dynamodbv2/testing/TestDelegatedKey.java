@@ -14,12 +14,7 @@
  */
 package com.amazonaws.services.dynamodbv2.testing;
 
-import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -28,14 +23,18 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class TestDelegatedKey implements DelegatedKey {
     private static final long serialVersionUID = 1L;
 
     private final Key realKey;
-    
+
     public TestDelegatedKey(Key key) {
         this.realKey = key;
     }
@@ -94,7 +93,7 @@ public class TestDelegatedKey implements DelegatedKey {
 
     @Override
     public Key unwrap(byte[] wrappedKey, String wrappedKeyAlgorithm, int wrappedKeyType,
-            byte[] additionalAssociatedData, String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException,
+                      byte[] additionalAssociatedData, String algorithm) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException {
         Cipher cipher = Cipher.getInstance(extractAlgorithm(algorithm));
         cipher.init(Cipher.UNWRAP_MODE, realKey);
@@ -117,7 +116,7 @@ public class TestDelegatedKey implements DelegatedKey {
             return false;
         }
     }
-    
+
     private String extractAlgorithm(String alg) {
         if (alg.startsWith(getAlgorithm())) {
             return alg.substring(10);

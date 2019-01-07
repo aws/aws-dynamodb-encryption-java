@@ -1,23 +1,23 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
+
 public class HkdfTests {
-    private static final testCase[] testCases = new testCase[] {
+    private static final testCase[] testCases = new testCase[]{
             new testCase(
                     "HmacSHA256",
                     fromCHex("\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b\\x0b"
@@ -105,7 +105,7 @@ public class HkdfTests {
                     null, new byte[0],
                     fromHex("2C91117204D745F3500D636A62F64F0A"
                             + "B3BAE548AA53D423B0D1F27EBBA6F5E5"
-                            + "673A081D70CCE7ACFC48")) };
+                            + "673A081D70CCE7ACFC48"))};
 
     @Test
     public void rfc5869Tests() throws Exception {
@@ -125,14 +125,14 @@ public class HkdfTests {
         Hkdf kdf = Hkdf.getInstance(trial.algo);
         kdf.init(trial.ikm, trial.salt);
         // Just ensuring no exceptions are thrown
-        kdf.deriveKey((String)null, 16);
-        kdf.deriveKey((byte[]) null, 16); 
+        kdf.deriveKey((String) null, 16);
+        kdf.deriveKey((byte[]) null, 16);
     }
-    
+
     @Test
     public void defaultSalt() throws Exception {
         // Tests all the different ways to get the default salt
-        
+
         testCase trial = testCases[0];
         Hkdf kdf1 = Hkdf.getInstance(trial.algo);
         kdf1.init(trial.ikm, null);
@@ -142,12 +142,12 @@ public class HkdfTests {
         kdf3.init(trial.ikm);
         Hkdf kdf4 = Hkdf.getInstance(trial.algo);
         kdf4.init(trial.ikm, new byte[32]);
-        
+
         byte[] key1 = kdf1.deriveKey("Test", 16);
         byte[] key2 = kdf2.deriveKey("Test", 16);
         byte[] key3 = kdf3.deriveKey("Test", 16);
         byte[] key4 = kdf4.deriveKey("Test", 16);
-        
+
         assertArrayEquals(key1, key2);
         assertArrayEquals(key1, key3);
         assertArrayEquals(key1, key4);
@@ -179,7 +179,7 @@ public class HkdfTests {
         public final byte[] expected;
 
         public testCase(String algo, byte[] ikm, byte[] salt, byte[] info,
-                byte[] expected) {
+                        byte[] expected) {
             super();
             this.algo = algo;
             this.ikm = ikm;

@@ -17,4 +17,5 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
 
 @DoNotEncrypt
-public class SignOnly extends BaseClass {}
+public class SignOnly extends BaseClass {
+}

@@ -18,35 +18,37 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="TableName")
+@DynamoDBTable(tableName = "TableName")
 public class KeysOnly {
     private int hashKey;
     private int rangeKey;
-    
+
     public KeysOnly() {
     }
-    
+
     public KeysOnly(int hashKey, int rangeKey) {
         this.hashKey = hashKey;
         this.rangeKey = rangeKey;
     }
-    
+
     @DynamoDBRangeKey
     public int getRangeKey() {
         return rangeKey;
     }
+
     public void setRangeKey(int rangeKey) {
         this.rangeKey = rangeKey;
     }
-    
+
     @DynamoDBHashKey
     public int getHashKey() {
         return hashKey;
     }
+
     public void setHashKey(int hashKey) {
         this.hashKey = hashKey;
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -55,6 +57,7 @@ public class KeysOnly {
         result = prime * result + rangeKey;
         return result;
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

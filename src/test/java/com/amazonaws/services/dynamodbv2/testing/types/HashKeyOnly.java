@@ -17,18 +17,18 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="HashKeyOnly")
+@DynamoDBTable(tableName = "HashKeyOnly")
 public class HashKeyOnly {
     private String hashKey;
-    
+
     public HashKeyOnly() {
-    
+
     }
-    
+
     public HashKeyOnly(String hashKey) {
         this.hashKey = hashKey;
     }
-    
+
     @DynamoDBHashKey
     public String getHashKey() {
         return hashKey;

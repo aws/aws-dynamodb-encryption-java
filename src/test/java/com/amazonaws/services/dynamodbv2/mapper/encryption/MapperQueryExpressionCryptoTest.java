@@ -1,27 +1,16 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.mapper.encryption;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
@@ -38,6 +27,16 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.util.ImmutableMapParameter;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Unit test for the private method DynamoDBMapper#createQueryRequestFromExpression
@@ -64,17 +63,17 @@ public class MapperQueryExpressionCryptoTest {
     public final class HashOnlyClass {
 
         @DynamoDBHashKey
-        @DynamoDBIndexHashKey (
+        @DynamoDBIndexHashKey(
                 globalSecondaryIndexNames = "GSI-primary-hash"
         )
         private String primaryHashKey;
 
-        @DynamoDBIndexHashKey (
+        @DynamoDBIndexHashKey(
                 globalSecondaryIndexNames = {"GSI-index-hash-1", "GSI-index-hash-2"}
         )
         private String indexHashKey;
 
-        @DynamoDBIndexHashKey (
+        @DynamoDBIndexHashKey(
                 globalSecondaryIndexNames = {"GSI-another-index-hash"}
         )
         private String anotherIndexHashKey;
@@ -110,7 +109,9 @@ public class MapperQueryExpressionCryptoTest {
         }
     }
 
-    /** Tests different scenarios of hash-only query **/
+    /**
+     * Tests different scenarios of hash-only query
+     **/
     @Test
     public void testHashConditionOnly() {
         // Primary hash only
@@ -122,7 +123,7 @@ public class MapperQueryExpressionCryptoTest {
         assertEquals("primaryHashKey", queryRequest.getKeyConditions().keySet().iterator().next());
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertNull(queryRequest.getIndexName());
 
@@ -136,20 +137,20 @@ public class MapperQueryExpressionCryptoTest {
         assertEquals("primaryHashKey", queryRequest.getKeyConditions().keySet().iterator().next());
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertEquals("GSI-primary-hash", queryRequest.getIndexName());
 
         // Primary hash query takes higher priority then index hash query
         queryRequest = testCreateQueryRequestFromExpression(
-                    HashOnlyClass.class,
-                    new DynamoDBQueryExpression<HashOnlyClass>()
-                            .withHashKeyValues(new HashOnlyClass("foo", "bar", null)));
+                HashOnlyClass.class,
+                new DynamoDBQueryExpression<HashOnlyClass>()
+                        .withHashKeyValues(new HashOnlyClass("foo", "bar", null)));
         assertTrue(queryRequest.getKeyConditions().size() == 1);
         assertEquals("primaryHashKey", queryRequest.getKeyConditions().keySet().iterator().next());
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertNull(queryRequest.getIndexName());
 
@@ -177,7 +178,7 @@ public class MapperQueryExpressionCryptoTest {
         assertEquals("indexHashKey", queryRequest.getKeyConditions().keySet().iterator().next());
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("bar"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("indexHashKey"));
         assertEquals("GSI-index-hash-1", queryRequest.getIndexName());
 
@@ -187,7 +188,7 @@ public class MapperQueryExpressionCryptoTest {
                 new DynamoDBQueryExpression<HashOnlyClass>()
                         .withHashKeyValues(new HashOnlyClass("foo", "bar", null))
                         .withIndexName("some fake gsi"),
-                        "No hash key condition is applicable to the specified index");
+                "No hash key condition is applicable to the specified index");
 
         // No hash key condition specified
         queryRequest = testCreateQueryRequestFromExpression(
@@ -211,7 +212,7 @@ public class MapperQueryExpressionCryptoTest {
         }
 
         @DynamoDBHashKey
-        @DynamoDBIndexHashKey (
+        @DynamoDBIndexHashKey(
                 globalSecondaryIndexNames = {
                         "GSI-primary-hash-index-range-1",
                         "GSI-primary-hash-index-range-2"}
@@ -224,7 +225,7 @@ public class MapperQueryExpressionCryptoTest {
             this.primaryHashKey = primaryHashKey;
         }
 
-        @DynamoDBIndexHashKey (
+        @DynamoDBIndexHashKey(
                 globalSecondaryIndexNames = {
                         "GSI-index-hash-primary-range",
                         "GSI-index-hash-index-range-1",
@@ -239,7 +240,7 @@ public class MapperQueryExpressionCryptoTest {
         }
 
         @DynamoDBRangeKey
-        @DynamoDBIndexRangeKey (
+        @DynamoDBIndexRangeKey(
                 globalSecondaryIndexNames = {"GSI-index-hash-primary-range"},
                 localSecondaryIndexName = "LSI-primary-range"
         )
@@ -251,7 +252,7 @@ public class MapperQueryExpressionCryptoTest {
             this.primaryRangeKey = primaryRangeKey;
         }
 
-        @DynamoDBIndexRangeKey (
+        @DynamoDBIndexRangeKey(
                 globalSecondaryIndexNames = {
                         "GSI-primary-hash-index-range-1",
                         "GSI-index-hash-index-range-1",
@@ -266,7 +267,7 @@ public class MapperQueryExpressionCryptoTest {
             this.indexRangeKey = indexRangeKey;
         }
 
-        @DynamoDBIndexRangeKey (
+        @DynamoDBIndexRangeKey(
                 localSecondaryIndexName = "LSI-index-range-3",
                 globalSecondaryIndexName = "GSI-primary-hash-index-range-2"
         )
@@ -279,7 +280,9 @@ public class MapperQueryExpressionCryptoTest {
         }
     }
 
-    /** Tests hash + range query **/
+    /**
+     * Tests hash + range query
+     **/
     @Test
     public void testHashAndRangeCondition() {
         // Primary hash + primary range
@@ -292,7 +295,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("primaryRangeKey"));
@@ -309,7 +312,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("primaryRangeKey"));
@@ -325,7 +328,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("indexRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("indexRangeKey"));
@@ -342,7 +345,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("primaryHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("indexRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("indexRangeKey"));
@@ -376,7 +379,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("indexHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("indexHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("primaryRangeKey"));
@@ -401,7 +404,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("indexHashKey"));
         assertEquals(
                 new Condition().withAttributeValueList(new AttributeValue("foo"))
-                    .withComparisonOperator(ComparisonOperator.EQ),
+                        .withComparisonOperator(ComparisonOperator.EQ),
                 queryRequest.getKeyConditions().get("indexHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("indexRangeKey"));
         assertEquals(RANGE_KEY_CONDITION, queryRequest.getKeyConditions().get("indexRangeKey"));
@@ -440,37 +443,40 @@ public class MapperQueryExpressionCryptoTest {
         private String primaryHashKey;
         private String primaryRangeKey;
         private String lsiRangeKey;
-        
+
         public LSIRangeKeyTestClass(String primaryHashKey, String primaryRangeKey) {
             this.primaryHashKey = primaryHashKey;
             this.primaryRangeKey = primaryRangeKey;
         }
-        
+
         @DynamoDBHashKey
         public String getPrimaryHashKey() {
             return primaryHashKey;
         }
+
         public void setPrimaryHashKey(String primaryHashKey) {
             this.primaryHashKey = primaryHashKey;
         }
-        
+
         @DynamoDBRangeKey
         public String getPrimaryRangeKey() {
             return primaryRangeKey;
         }
+
         public void setPrimaryRangeKey(String primaryRangeKey) {
             this.primaryRangeKey = primaryRangeKey;
         }
-        
+
         @DynamoDBIndexRangeKey(localSecondaryIndexName = "LSI")
         public String getLsiRangeKey() {
             return lsiRangeKey;
         }
+
         public void setLsiRangeKey(String lsiRangeKey) {
             this.lsiRangeKey = lsiRangeKey;
         }
     }
-    
+
     @Test
     public void testHashOnlyQueryOnHashRangeTable() {
         // Primary hash only query on a Hash+Range table
@@ -481,7 +487,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().size() == 1);
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertNull(queryRequest.getIndexName());
-        
+
         // Hash+Range query on a LSI
         queryRequest = testCreateQueryRequestFromExpression(
                 LSIRangeKeyTestClass.class,
@@ -493,7 +499,7 @@ public class MapperQueryExpressionCryptoTest {
         assertTrue(queryRequest.getKeyConditions().containsKey("primaryHashKey"));
         assertTrue(queryRequest.getKeyConditions().containsKey("lsiRangeKey"));
         assertEquals("LSI", queryRequest.getIndexName());
-        
+
         // Hash-only query on a LSI
         queryRequest = testCreateQueryRequestFromExpression(
                 LSIRangeKeyTestClass.class,
@@ -523,7 +529,7 @@ public class MapperQueryExpressionCryptoTest {
         } catch (InvocationTargetException ite) {
             if (expectedErrorMessage != null) {
                 assertTrue("Exception message [" + ite.getCause().getMessage() + "] does not contain " +
-                        "the expected message [" + expectedErrorMessage + "].",
+                                "the expected message [" + expectedErrorMessage + "].",
                         ite.getCause().getMessage().contains(expectedErrorMessage));
             } else {
                 ite.getCause().printStackTrace();

@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableNameUsingMap;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class EncryptionContextOperatorsTest {
 

@@ -14,13 +14,13 @@
  */
 package com.amazonaws.services.dynamodbv2.testing.types;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
+
+import java.util.Arrays;
+import java.util.Set;
 
 @DynamoDBTable(tableName = "TableName")
 public class BaseClass {
@@ -42,6 +42,7 @@ public class BaseClass {
                 + ((doubleSet == null) ? 0 : doubleSet.hashCode());
         return result;
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -81,6 +82,7 @@ public class BaseClass {
             return false;
         return true;
     }
+
     private int hashKey;
     private int rangeKey;
     private String stringValue;
@@ -96,66 +98,85 @@ public class BaseClass {
     public int getHashKey() {
         return hashKey;
     }
+
     public void setHashKey(int hashKey) {
         this.hashKey = hashKey;
     }
-    
+
     @DynamoDBRangeKey
     public int getRangeKey() {
         return rangeKey;
     }
+
     public void setRangeKey(int rangeKey) {
         this.rangeKey = rangeKey;
     }
+
     public String getStringValue() {
         return stringValue;
     }
+
     public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
+
     public int getIntValue() {
         return intValue;
     }
+
     public void setIntValue(int intValue) {
         this.intValue = intValue;
     }
+
     public byte[] getByteArrayValue() {
         return byteArrayValue;
     }
+
     public void setByteArrayValue(byte[] byteArrayValue) {
         this.byteArrayValue = byteArrayValue;
     }
+
     public Set<String> getStringSet() {
         return stringSet;
     }
+
     public void setStringSet(Set<String> stringSet) {
         this.stringSet = stringSet;
     }
+
     public Set<Integer> getIntSet() {
         return intSet;
     }
+
     public void setIntSet(Set<Integer> intSet) {
         this.intSet = intSet;
     }
+
     public Set<Double> getDoubleSet() {
         return doubleSet;
     }
+
     public void setDoubleSet(Set<Double> doubleSet) {
         this.doubleSet = doubleSet;
     }
+
     public double getDoubleValue() {
         return doubleValue;
     }
+
     public void setDoubleValue(double doubleValue) {
         this.doubleValue = doubleValue;
     }
+
     @DynamoDBVersionAttribute
     public Integer getVersion() {
         return version;
     }
+
     public void setVersion(Integer version) {
         this.version = version;
     }
+
     @Override
     public String toString() {
         return "BaseClass [hashKey=" + hashKey + ", rangeKey=" + rangeKey

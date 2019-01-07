@@ -1,25 +1,32 @@
 /*
  * Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.testing.FakeKMS;
+import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
+import com.amazonaws.services.kms.model.GenerateDataKeyResult;
+import com.amazonaws.util.Base64;
+import org.junit.Before;
+import org.junit.Test;
 
+import javax.crypto.SecretKey;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -29,25 +36,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.crypto.SecretKey;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
-import com.amazonaws.services.kms.AWSKMS;
-import com.amazonaws.services.kms.AbstractAWSKMS;
-import com.amazonaws.services.kms.model.DecryptRequest;
-import com.amazonaws.services.kms.model.DecryptResult;
-import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
-import com.amazonaws.services.kms.model.GenerateDataKeyResult;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.testing.FakeKMS;
-import com.amazonaws.util.Base64;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DirectKmsMaterialProviderTest {
     private FakeKMS kms;
@@ -329,7 +322,8 @@ public class DirectKmsMaterialProviderTest {
     public void generateDataKeyIsCalledWith256NumberOfBits() {
         final AtomicBoolean gdkCalled = new AtomicBoolean(false);
         AWSKMS kmsSpy = new FakeKMS() {
-            @Override public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
+            @Override
+            public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
                 gdkCalled.set(true);
                 assertEquals((Integer) 32, r.getNumberOfBytes());
                 assertNull(r.getKeySpec());

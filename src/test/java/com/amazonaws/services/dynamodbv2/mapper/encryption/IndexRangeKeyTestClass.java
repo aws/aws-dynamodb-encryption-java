@@ -1,11 +1,11 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -55,9 +55,9 @@ public class IndexRangeKeyTestClass {
     }
 
     @DoNotEncrypt
-    @DynamoDBIndexRangeKey (
-    		localSecondaryIndexName = "index_foo",
-    		attributeName = "indexFooRangeKey"
+    @DynamoDBIndexRangeKey(
+            localSecondaryIndexName = "index_foo",
+            attributeName = "indexFooRangeKey"
     )
     public Double getIndexFooRangeKeyWithFakeName() {
         return indexFooRangeKey;
@@ -66,10 +66,10 @@ public class IndexRangeKeyTestClass {
     public void setIndexFooRangeKeyWithFakeName(Double indexFooRangeKey) {
         this.indexFooRangeKey = indexFooRangeKey;
     }
-    
+
     @DoNotEncrypt
-    @DynamoDBIndexRangeKey (
-    		localSecondaryIndexName = "index_bar"
+    @DynamoDBIndexRangeKey(
+            localSecondaryIndexName = "index_bar"
     )
     public Double getIndexBarRangeKey() {
         return indexBarRangeKey;
@@ -78,10 +78,10 @@ public class IndexRangeKeyTestClass {
     public void setIndexBarRangeKey(Double indexBarRangeKey) {
         this.indexBarRangeKey = indexBarRangeKey;
     }
-    
+
     @DoNotEncrypt
-    @DynamoDBIndexRangeKey (
-    		localSecondaryIndexNames = {"index_foo_copy", "index_bar_copy"}
+    @DynamoDBIndexRangeKey(
+            localSecondaryIndexNames = {"index_foo_copy", "index_bar_copy"}
     )
     public Double getMultipleIndexRangeKey() {
         return multipleIndexRangeKey;
@@ -139,35 +139,35 @@ public class IndexRangeKeyTestClass {
 
     @Override
     public boolean equals(Object obj) {
-        if ( this == obj )
+        if (this == obj)
             return true;
-        if ( obj == null )
+        if (obj == null)
             return false;
-        if ( getClass() != obj.getClass() )
+        if (getClass() != obj.getClass())
             return false;
         IndexRangeKeyTestClass other = (IndexRangeKeyTestClass) obj;
-        if ( fooAttribute == null ) {
-            if ( other.fooAttribute != null )
+        if (fooAttribute == null) {
+            if (other.fooAttribute != null)
                 return false;
-        } else if ( !fooAttribute.equals(other.fooAttribute) )
+        } else if (!fooAttribute.equals(other.fooAttribute))
             return false;
-        if ( barAttribute == null ) {
-            if ( other.barAttribute != null )
+        if (barAttribute == null) {
+            if (other.barAttribute != null)
                 return false;
-        } else if ( !barAttribute.equals(other.barAttribute) )
+        } else if (!barAttribute.equals(other.barAttribute))
             return false;
-        if ( key != other.key )
+        if (key != other.key)
             return false;
-        if ( Double.doubleToLongBits(rangeKey) != Double.doubleToLongBits(other.rangeKey) )
+        if (Double.doubleToLongBits(rangeKey) != Double.doubleToLongBits(other.rangeKey))
             return false;
-        if ( Double.doubleToLongBits(indexFooRangeKey) != Double.doubleToLongBits(other.indexFooRangeKey) )
+        if (Double.doubleToLongBits(indexFooRangeKey) != Double.doubleToLongBits(other.indexFooRangeKey))
             return false;
-        if ( Double.doubleToLongBits(indexBarRangeKey) != Double.doubleToLongBits(other.indexBarRangeKey) )
+        if (Double.doubleToLongBits(indexBarRangeKey) != Double.doubleToLongBits(other.indexBarRangeKey))
             return false;
-        if ( version == null ) {
-            if ( other.version != null )
+        if (version == null) {
+            if (other.version != null)
                 return false;
-        } else if ( !version.equals(other.version) )
+        } else if (!version.equals(other.version))
             return false;
         return true;
     }

@@ -1,22 +1,22 @@
 /*
  * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
  * in compliance with the License. A copy of the License is located at
- * 
+ *
  * http://aws.amazon.com/apache2.0
- * 
+ *
  * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.mapper.encryption;
 
-import java.util.Set;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+
+import java.util.Set;
 
 /**
  * Test domain class with byte[] attribute, byte[] set and a string key
@@ -67,27 +67,27 @@ public class BinaryAttributeByteArrayTestClass {
 
     @Override
     public boolean equals(Object obj) {
-        if ( this == obj )
+        if (this == obj)
             return true;
-        if ( obj == null )
+        if (obj == null)
             return false;
-        if ( getClass() != obj.getClass() )
+        if (getClass() != obj.getClass())
             return false;
         BinaryAttributeByteArrayTestClass other = (BinaryAttributeByteArrayTestClass) obj;
-        if ( key == null ) {
-            if ( other.key != null )
+        if (key == null) {
+            if (other.key != null)
                 return false;
-        } else if ( !key.equals(other.key) )
+        } else if (!key.equals(other.key))
             return false;
-        if ( binaryAttribute == null ) {
-            if ( other.binaryAttribute != null )
+        if (binaryAttribute == null) {
+            if (other.binaryAttribute != null)
                 return false;
-        } else if ( !binaryAttribute.equals(other.binaryAttribute) )
+        } else if (!binaryAttribute.equals(other.binaryAttribute))
             return false;
-        if ( binarySetAttribute == null ) {
-            if ( other.binarySetAttribute != null )
+        if (binarySetAttribute == null) {
+            if (other.binarySetAttribute != null)
                 return false;
-        } else if ( !binarySetAttribute.equals(other.binarySetAttribute) )
+        } else if (!binarySetAttribute.equals(other.binarySetAttribute))
             return false;
         return true;
     }

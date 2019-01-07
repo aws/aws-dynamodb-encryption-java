@@ -19,9 +19,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.util.Base64;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -39,10 +39,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.fail;
 
 public class KeyStoreMaterialsProviderTest {
     private static final String certPem =
@@ -133,7 +133,7 @@ public class KeyStoreMaterialsProviderTest {
         keyStore.setCertificateEntry("trustedCert", certificate);
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");

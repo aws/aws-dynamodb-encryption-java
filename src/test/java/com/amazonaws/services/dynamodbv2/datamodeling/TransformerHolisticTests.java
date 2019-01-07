@@ -46,8 +46,8 @@ import com.amazonaws.services.dynamodbv2.testing.types.Mixed;
 import com.amazonaws.services.dynamodbv2.testing.types.SignOnly;
 import com.amazonaws.services.dynamodbv2.testing.types.Untouched;
 import com.amazonaws.util.Base64;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -65,11 +65,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 public class TransformerHolisticTests {
     private static final SecretKey aesKey = new SecretKeySpec(new byte[]{0,
@@ -250,7 +250,7 @@ public class TransformerHolisticTests {
 
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         client = DynamoDBEmbedded.create();
 

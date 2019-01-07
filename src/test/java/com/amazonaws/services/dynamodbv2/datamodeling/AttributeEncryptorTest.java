@@ -33,10 +33,11 @@ import com.amazonaws.services.dynamodbv2.testing.types.Untouched;
 import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithNewAttribute;
 import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithUnknownAttributeAnnotation;
 import com.amazonaws.services.dynamodbv2.testing.types.UntouchedWithUnknownAttributeAnnotationWithNewAttribute;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.AssertJUnit;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -51,11 +52,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class AttributeEncryptorTest {
     private static final String RANGE_KEY = "rangeKey";
@@ -79,7 +80,7 @@ public class AttributeEncryptorTest {
         macKey = macGen.generateKey();
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception {
         prov = new SymmetricStaticProvider(encryptionKey, macKey,
                 Collections.<String, String>emptyMap());
@@ -127,14 +128,14 @@ public class AttributeEncryptorTest {
         assertNotNull(encryptedAttributes.get("stringValue").getB());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void rejectsPartialUpdate() {
         Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY, true);
         encryptor.transform(params);
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void fullEncryptionBadSignature() {
         Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
@@ -146,7 +147,7 @@ public class AttributeEncryptorTest {
         encryptor.untransform(params);
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void badVersionNumber() {
         Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
@@ -205,7 +206,7 @@ public class AttributeEncryptorTest {
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void signedOnlyBadSignature() {
         Parameters<SignOnly> params = FakeParameters.getInstance(SignOnly.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
@@ -217,7 +218,7 @@ public class AttributeEncryptorTest {
         encryptor.untransform(params);
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void signedOnlyNoSignature() {
         Parameters<SignOnly> params = FakeParameters.getInstance(SignOnly.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
@@ -253,7 +254,7 @@ public class AttributeEncryptorTest {
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void RsaSignedOnlyBadSignature() throws NoSuchAlgorithmException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, Utils.getRng());
@@ -304,7 +305,7 @@ public class AttributeEncryptorTest {
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void mixedBadSignature() {
         Parameters<Mixed> params = FakeParameters.getInstance(Mixed.class, attribs, null,
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
@@ -316,7 +317,7 @@ public class AttributeEncryptorTest {
         encryptor.untransform(params);
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void tableNameRespected() {
         Parameters<BaseClass> params = FakeParameters.getInstance(BaseClass.class, attribs, null, "firstTable",
                 HASH_KEY, RANGE_KEY);
@@ -340,7 +341,7 @@ public class AttributeEncryptorTest {
         assertThat(decryptedAttributes, AttrMatcher.match(attribs));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUnknownAttributeFails() {
         Map<String, AttributeValue> attributes = new HashMap<>(attribs);
         attributes.put("newAttribute", new AttributeValue().withS("foobar"));
@@ -402,7 +403,7 @@ public class AttributeEncryptorTest {
         assertThat(decryptedAttributes, AttrMatcher.match(attributes));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testSignOnlyWithUnknownAttributeAnnotationBadSignature() {
         Map<String, AttributeValue> attributes = new HashMap<>(attribs);
         attributes.put("newAttribute", new AttributeValue().withS("foo"));
@@ -435,7 +436,7 @@ public class AttributeEncryptorTest {
         assertThat(decryptedAttributes, AttrMatcher.match(attributes));
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testEncryptWithUnknownAttributeAnnotationBadSignature() {
         Map<String, AttributeValue> attributes = new HashMap<>(attribs);
         attributes.put("newAttribute", new AttributeValue().withS("foo"));

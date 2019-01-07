@@ -14,9 +14,9 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -28,8 +28,8 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
 
 public class AsymmetricRawMaterialsTest {
     private static SecureRandom rnd;
@@ -51,7 +51,7 @@ public class AsymmetricRawMaterialsTest {
         macKey = macGen.generateKey();
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");

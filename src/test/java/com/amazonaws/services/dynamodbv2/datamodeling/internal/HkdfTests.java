@@ -12,9 +12,9 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.testng.AssertJUnit.assertArrayEquals;
 
 public class HkdfTests {
     private static final testCase[] testCases = new testCase[]{

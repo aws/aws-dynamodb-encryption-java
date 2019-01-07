@@ -17,9 +17,9 @@ package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -29,9 +29,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class SymmetricStaticProviderTest {
     private static SecretKey encryptionKey;
@@ -55,7 +55,7 @@ public class SymmetricStaticProviderTest {
         encryptionKey = aesGen.generateKey();
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");

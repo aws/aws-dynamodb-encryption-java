@@ -19,9 +19,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -32,9 +32,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
 
 public class AsymmetricStaticProviderTest {
     private static KeyPair encryptionPair;
@@ -55,7 +55,7 @@ public class AsymmetricStaticProviderTest {
         macKey = macGen.generateKey();
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");

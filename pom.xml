@@ -193,6 +193,32 @@
           </systemProperties>
         </configuration>
       </plugin>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.0.0-M2</version>
+          <configuration>
+              <useSystemClassLoader>false</useSystemClassLoader>
+              <systemProperties>
+                  <property>
+                      <name>sqlite4java.library.path</name>
+                      <value>${project.build.directory}/test-lib</value>
+                  </property>
+              </systemProperties>
+              <includes>
+                  <include>**/*ITCase.java</include>
+              </includes>
+          </configuration>
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>integration-test</goal>
+                      <goal>verify</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
     </plugins>
   </build>
 

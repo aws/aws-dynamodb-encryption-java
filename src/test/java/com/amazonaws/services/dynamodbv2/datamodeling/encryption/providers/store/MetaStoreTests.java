@@ -22,8 +22,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.Encry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,9 +32,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.fail;
 
 public class MetaStoreTests {
     private static final String SOURCE_TABLE_NAME = "keystoreTable";
@@ -59,7 +59,7 @@ public class MetaStoreTests {
     private MetaStore targetStore;
     private EncryptionContext ctx;
 
-    @Before
+    @BeforeMethod
     public void setup() {
         client = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
         targetClient = synchronize(DynamoDBEmbedded.create(), AmazonDynamoDB.class);
@@ -198,7 +198,7 @@ public class MetaStoreTests {
         assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void replicateIntermediateKeysWhenMaterialNotFoundTest() {
         store.replicate(MATERIAL_NAME, 0, targetStore);
     }
@@ -226,7 +226,7 @@ public class MetaStoreTests {
         assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void invalidVersion() {
         store.getProvider(MATERIAL_NAME, 1000);
     }

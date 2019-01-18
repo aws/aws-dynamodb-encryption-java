@@ -23,8 +23,8 @@ import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.Base64;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.crypto.SecretKey;
 import java.nio.ByteBuffer;
@@ -36,11 +36,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class DirectKmsMaterialProviderTest {
     private FakeKMS kms;
@@ -48,7 +48,7 @@ public class DirectKmsMaterialProviderTest {
     private Map<String, String> description;
     private EncryptionContext ctx;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         description = new HashMap<String, String>();
         description.put("TestKey", "test value");
@@ -282,7 +282,7 @@ public class DirectKmsMaterialProviderTest {
         assertEquals(signingKey, dMat.getVerificationKey());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void encryptionKeyIdMismatch() throws GeneralSecurityException {
         DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, keyId);
         String customKeyId = kms.createKey().getKeyMetadata().getKeyId();
@@ -305,7 +305,7 @@ public class DirectKmsMaterialProviderTest {
         extendedProvider.getDecryptionMaterials(dCtx);
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void missingEncryptionKeyId() throws GeneralSecurityException {
         ExtendedKmsMaterialProvider prov = new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
 

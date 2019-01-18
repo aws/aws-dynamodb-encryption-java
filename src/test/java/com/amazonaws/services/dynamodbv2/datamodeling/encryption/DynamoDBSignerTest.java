@@ -19,9 +19,9 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.KeyGenerator;
 import java.nio.ByteBuffer;
@@ -71,7 +71,7 @@ public class DynamoDBSignerTest {
 
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         signerRsa = DynamoDBSigner.getInstance("SHA256withRSA", Utils.getRng());
         signerEcdsa = DynamoDBSigner.getInstance("SHA384withECDSA", Utils.getRng());
@@ -168,7 +168,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void macChangedValue() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -185,7 +185,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void macChangedFlag() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -202,7 +202,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], macKey, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void macChangedAssociatedData() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -284,7 +284,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void sigChangedValue() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -301,7 +301,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void sigChangedFlag() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -318,7 +318,7 @@ public class DynamoDBSignerTest {
         signerRsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyRsa, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void sigChangedAssociatedData() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -400,7 +400,7 @@ public class DynamoDBSignerTest {
         signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void sigEcdsaChangedValue() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();
@@ -417,7 +417,7 @@ public class DynamoDBSignerTest {
         signerEcdsa.verifySignature(itemAttributes, attributeFlags, new byte[0], pubKeyEcdsa, ByteBuffer.wrap(signature));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void sigEcdsaChangedAssociatedData() throws GeneralSecurityException {
         Map<String, AttributeValue> itemAttributes = new HashMap<String, AttributeValue>();
         Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<String, Set<EncryptionFlags>>();

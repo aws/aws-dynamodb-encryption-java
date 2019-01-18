@@ -20,10 +20,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.AttrMatcher;
 import com.amazonaws.services.dynamodbv2.testing.TestDelegatedKey;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.AssertJUnit;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
@@ -38,11 +39,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class DelegatedEncryptionTest {
     private static SecretKeySpec rawEncryptionKey;
@@ -64,7 +65,7 @@ public class DelegatedEncryptionTest {
         macKey = new TestDelegatedKey(rawMacKey);
     }
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception {
         prov = new SymmetricStaticProvider(encryptionKey, macKey,
                 Collections.<String, String>emptyMap());
@@ -121,7 +122,7 @@ public class DelegatedEncryptionTest {
         assertNotNull(encryptedAttributes.get("stringValue").getB());
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void fullEncryptionBadSignature() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
@@ -130,7 +131,7 @@ public class DelegatedEncryptionTest {
         encryptor.decryptAllFieldsExcept(Collections.unmodifiableMap(encryptedAttributes), context, "hashKey", "rangeKey", "version");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void badVersionNumber() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
@@ -179,7 +180,7 @@ public class DelegatedEncryptionTest {
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void signedOnlyBadSignature() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
@@ -188,7 +189,7 @@ public class DelegatedEncryptionTest {
         encryptor.decryptAllFieldsExcept(encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void signedOnlyNoSignature() throws GeneralSecurityException {
         Map<String, AttributeValue> encryptedAttributes =
                 encryptor.encryptAllFieldsExcept(attribs, context, attribs.keySet().toArray(new String[0]));
@@ -221,7 +222,7 @@ public class DelegatedEncryptionTest {
         assertAttrEquals(attribs.get("stringValue"), encryptedAttributes.get("stringValue"));
     }
 
-    @Test(expected = SignatureException.class)
+    @Test(expectedExceptions = SignatureException.class)
     public void RsaSignedOnlyBadSignature() throws GeneralSecurityException {
         KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
         rsaGen.initialize(2048, Utils.getRng());

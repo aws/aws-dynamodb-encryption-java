@@ -16,8 +16,9 @@ package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.util.Base64;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ import static com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeV
 import static com.amazonaws.services.dynamodbv2.datamodeling.internal.AttributeValueMarshaller.unmarshall;
 
 public class AttributeValueMarshallerTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testEmpty() {
         AttributeValue av = new AttributeValue();
         marshall(av);
@@ -135,7 +136,7 @@ public class AttributeValueMarshallerTest {
         assertEquals(av, unmarshall(marshall(av)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expectedExceptions = NullPointerException.class)
     public void testActualNULL() {
         unmarshall(marshall(null));
     }
@@ -280,7 +281,7 @@ public class AttributeValueMarshallerTest {
         AttributeValue newObject = buildComplexAttributeValue();
         byte[] oldBytes = Base64.decode(COMPLEX_ATTRIBUTE_MARSHALLED);
         byte[] newBytes = marshall(newObject).array();
-        Assert.assertArrayEquals(oldBytes, newBytes);
+        AssertJUnit.assertArrayEquals(oldBytes, newBytes);
 
         AttributeValue oldObject = unmarshall(ByteBuffer.wrap(oldBytes));
         assertEquals(oldObject, newObject);

@@ -22,8 +22,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -35,10 +35,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class MostRecentProviderTests {
     private static final String TABLE_NAME = "keystoreTable";
@@ -56,7 +56,7 @@ public class MostRecentProviderTests {
     private ProviderStore store;
     private EncryptionContext ctx;
 
-    @Before
+    @BeforeMethod
     public void setup() {
         methodCalls = new HashMap<String, Integer>();
         client = instrument(DynamoDBEmbedded.create(), AmazonDynamoDB.class, methodCalls);

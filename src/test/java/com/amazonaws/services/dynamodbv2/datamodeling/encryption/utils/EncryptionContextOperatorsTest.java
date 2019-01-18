@@ -1,7 +1,7 @@
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableNameUsingMap;
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 public class EncryptionContextOperatorsTest {
 

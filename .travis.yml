@@ -4,6 +4,6 @@ jdk:
   - openjdk11
   - oraclejdk8
 install: /bin/true
-script: mvn install --quiet -Dgpg.skip=true -DskipTests=true
+script: mvn install
 after_success:
   - bash <(curl -s https://codecov.io/bash)

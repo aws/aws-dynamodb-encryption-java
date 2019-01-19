@@ -286,7 +286,7 @@ public class MetaStoreTests {
         store.getProvider(MATERIAL_NAME, 1000);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void invalidSignedOnlyField() {
         final Map<String, AttributeValue> attributeValueMap = new HashMap<>();
         attributeValueMap.put("enc", new AttributeValue().withS("testEncryptionKey"));

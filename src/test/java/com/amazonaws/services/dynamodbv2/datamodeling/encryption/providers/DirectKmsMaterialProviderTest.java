@@ -20,6 +20,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Wrapp
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.testing.FakeKMS;
 import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.model.DecryptRequest;
+import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.Base64;
@@ -50,7 +52,7 @@ public class DirectKmsMaterialProviderTest {
 
     @BeforeMethod
     public void setUp() {
-        description = new HashMap<String, String>();
+        description = new HashMap<>();
         description.put("TestKey", "test value");
         description = Collections.unmodifiableMap(description);
         ctx = new EncryptionContext.Builder().build();
@@ -87,7 +89,7 @@ public class DirectKmsMaterialProviderTest {
     public void simpleWithKmsEc() throws GeneralSecurityException {
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<String, AttributeValue>();
+        Map<String, AttributeValue> attrVals = new HashMap<>();
         attrVals.put("hk", new AttributeValue("HashKeyValue"));
         attrVals.put("rk", new AttributeValue("RangeKeyValue"));
 
@@ -116,7 +118,7 @@ public class DirectKmsMaterialProviderTest {
     public void simpleWithKmsEc2() throws GeneralSecurityException {
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<String, AttributeValue>();
+        Map<String, AttributeValue> attrVals = new HashMap<>();
         attrVals.put("hk", new AttributeValue().withN("10"));
         attrVals.put("rk", new AttributeValue().withN("20"));
 
@@ -145,7 +147,7 @@ public class DirectKmsMaterialProviderTest {
     public void simpleWithKmsEc3() throws GeneralSecurityException {
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<String, AttributeValue>();
+        Map<String, AttributeValue> attrVals = new HashMap<>();
         attrVals.put("hk",
                 new AttributeValue().withB(ByteBuffer.wrap("Foo".getBytes(StandardCharsets.UTF_8))));
         attrVals.put("rk",
@@ -198,7 +200,7 @@ public class DirectKmsMaterialProviderTest {
 
     @Test
     public void explicitContentKeyAlgorithm() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
+        Map<String, String> desc = new HashMap<>();
         desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES");
 
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
@@ -215,7 +217,7 @@ public class DirectKmsMaterialProviderTest {
 
     @Test
     public void explicitContentKeyLength128() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
+        Map<String, String> desc = new HashMap<>();
         desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/128");
 
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
@@ -234,7 +236,7 @@ public class DirectKmsMaterialProviderTest {
 
     @Test
     public void explicitContentKeyLength256() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
+        Map<String, String> desc = new HashMap<>();
         desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/256");
 
         DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
@@ -336,7 +338,7 @@ public class DirectKmsMaterialProviderTest {
     }
 
     private static class ExtendedKmsMaterialProvider extends DirectKmsMaterialProvider {
-        protected final String encryptionKeyIdAttributeName;
+        private final String encryptionKeyIdAttributeName;
 
         public ExtendedKmsMaterialProvider(AWSKMS kms, String encryptionKeyId, String encryptionKeyIdAttributeName) {
             super(kms, encryptionKeyId);
@@ -364,6 +366,16 @@ public class DirectKmsMaterialProviderTest {
             if (!customEncryptionKeyId.equals(encryptionKeyId)) {
                 throw new DynamoDBMappingException("encryption key ids do not match.");
             }
+        }
+
+        @Override
+        protected DecryptResult decrypt(DecryptRequest request, EncryptionContext context) {
+            return super.decrypt(request, context);
+        }
+
+        @Override
+        protected GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest request, EncryptionContext context) {
+            return super.generateDataKey(request, context);
         }
     }
 

@@ -4,6 +4,7 @@ jdk:
   - openjdk11
   - oraclejdk8
 install: /bin/true
-script: mvn install
+script: mvn install --quiet
 after_success:
+  # https://docs.codecov.io/docs/about-the-codecov-bash-uploader
   - bash <(curl -s https://codecov.io/bash)

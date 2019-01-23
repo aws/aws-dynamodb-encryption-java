@@ -21,6 +21,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Encry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.SymmetricStaticProvider;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,6 +32,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
@@ -58,6 +63,28 @@ public class MetaStoreTests {
     private MetaStore store;
     private MetaStore targetStore;
     private EncryptionContext ctx;
+
+    private static class TestExtraDataSupplier implements MetaStore.ExtraDataSupplier {
+
+        private final Map<String, AttributeValue> attributeValueMap;
+        private final Set<String> signedOnlyFieldNames;
+
+        public TestExtraDataSupplier(final Map<String, AttributeValue> attributeValueMap,
+                                     final Set<String> signedOnlyFieldNames) {
+            this.attributeValueMap = attributeValueMap;
+            this.signedOnlyFieldNames = signedOnlyFieldNames;
+        }
+
+        @Override
+        public Map<String, AttributeValue> getAttributes(String materialName, long version) {
+            return this.attributeValueMap;
+        }
+
+        @Override
+        public Set<String> getSignedOnlyFieldNames() {
+            return this.signedOnlyFieldNames;
+        }
+    }
 
     @BeforeMethod
     public void setup() {
@@ -182,6 +209,34 @@ public class MetaStoreTests {
     }
 
     @Test
+    public void getOrCreateWithContextSupplier() {
+        final Map<String, AttributeValue> attributeValueMap = new HashMap<>();
+        attributeValueMap.put("CustomKeyId", new AttributeValue().withS("testCustomKeyId"));
+        attributeValueMap.put("KeyToken", new AttributeValue().withS("testKeyToken"));
+
+        final Set<String> signedOnlyAttributes = new HashSet<>();
+        signedOnlyAttributes.add("CustomKeyId");
+
+        final TestExtraDataSupplier extraDataSupplier = new TestExtraDataSupplier(
+                attributeValueMap, signedOnlyAttributes);
+
+        final MetaStore metaStore = new MetaStore(client, SOURCE_TABLE_NAME, ENCRYPTOR, extraDataSupplier);
+
+        assertEquals(-1, metaStore.getMaxVersion(MATERIAL_NAME));
+        final EncryptionMaterialsProvider prov1 = metaStore.getOrCreate(MATERIAL_NAME, 0);
+        assertEquals(0, metaStore.getMaxVersion(MATERIAL_NAME));
+        final EncryptionMaterialsProvider prov2 = metaStore.getOrCreate(MATERIAL_NAME, 0);
+
+        final EncryptionMaterials eMat = prov1.getEncryptionMaterials(ctx);
+        final SecretKey encryptionKey = eMat.getEncryptionKey();
+        assertNotNull(encryptionKey);
+
+        final DecryptionMaterials dMat = prov2.getDecryptionMaterials(ctx(eMat));
+        assertEquals(encryptionKey, dMat.getDecryptionKey());
+        assertEquals(eMat.getSigningKey(), dMat.getVerificationKey());
+    }
+
+    @Test
     public void replicateIntermediateKeysTest() {
         assertEquals(-1, store.getMaxVersion(MATERIAL_NAME));
 
@@ -229,6 +284,20 @@ public class MetaStoreTests {
     @Test(expectedExceptions = IndexOutOfBoundsException.class)
     public void invalidVersion() {
         store.getProvider(MATERIAL_NAME, 1000);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void invalidSignedOnlyField() {
+        final Map<String, AttributeValue> attributeValueMap = new HashMap<>();
+        attributeValueMap.put("enc", new AttributeValue().withS("testEncryptionKey"));
+
+        final Set<String> signedOnlyAttributes = new HashSet<>();
+        signedOnlyAttributes.add("enc");
+
+        final TestExtraDataSupplier extraDataSupplier = new TestExtraDataSupplier(
+                attributeValueMap, signedOnlyAttributes);
+
+        new MetaStore(client, SOURCE_TABLE_NAME, ENCRYPTOR, extraDataSupplier);
     }
 
     private static EncryptionContext ctx(final EncryptionMaterials mat) {

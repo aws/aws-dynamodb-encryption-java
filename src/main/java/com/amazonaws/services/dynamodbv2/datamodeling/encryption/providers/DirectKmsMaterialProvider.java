@@ -126,7 +126,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         DecryptRequest request = appendUserAgent(new DecryptRequest());
         request.setCiphertextBlob(ByteBuffer.wrap(Base64.decode(materialDescription.get(ENVELOPE_KEY))));
         request.setEncryptionContext(ec);
-        final DecryptResult decryptResult = kms.decrypt(request);
+        final DecryptResult decryptResult = decrypt(request, context);
         validateEncryptionKeyId(decryptResult.getKeyId(), context);
 
         final Hkdf kdf;
@@ -167,7 +167,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         req.setNumberOfBytes(256 / 8);
         req.setEncryptionContext(ec);
 
-        final GenerateDataKeyResult dataKeyResult = kms.generateDataKey(req);
+        final GenerateDataKeyResult dataKeyResult = generateDataKey(req, context);
 
         final Map<String, String> materialDescription = new HashMap<>();
         materialDescription.putAll(description);
@@ -192,7 +192,8 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     }
 
     /**
-     * Get encryption key id.
+     * Get encryption key id that is used to create the {@link EncryptionMaterials}.
+     *
      * @return encryption key id.
      */
     protected String getEncryptionKeyId() {
@@ -202,6 +203,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     /**
      * Select encryption key id to be used to generate data key. The default implementation of this method returns
      * {@link DirectKmsMaterialProvider#encryptionKeyId}.
+     *
      * @param context encryption context.
      * @return the encryptionKeyId.
      * @throws DynamoDBMappingException when we fails to select a valid encryption key id.
@@ -211,7 +213,9 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     }
 
     /**
-     * Validate the encryption key id. The default implementation of this method does nothing.
+     * Validate the encryption key id. The default implementation of this method does not validate
+     * encryption key id.
+     *
      * @param encryptionKeyId encryption key id from {@link DecryptResult}.
      * @param context encryption context.
      * @throws DynamoDBMappingException when encryptionKeyId is invalid.
@@ -219,6 +223,34 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     protected void validateEncryptionKeyId(String encryptionKeyId, EncryptionContext context)
             throws DynamoDBMappingException {
         // No action taken.
+    }
+
+    /**
+     * Decrypts ciphertext. The default implementation calls KMS to decrypt the ciphertext using the parameters
+     * provided in the {@link DecryptRequest}. Subclass can override the default implementation to provide
+     * additional request parameters using attributes within the {@link EncryptionContext}.
+     *
+     * @param request request parameters to decrypt the given ciphertext.
+     * @param context additional useful data to decrypt the ciphertext.
+     * @return the decrypted plaintext for the given ciphertext.
+     */
+    protected DecryptResult decrypt(final DecryptRequest request, final EncryptionContext context) {
+        return kms.decrypt(request);
+    }
+
+    /**
+     * Returns a data encryption key that you can use in your application to encrypt data locally. The default
+     * implementation calls KMS to generate the data key using the parameters provided in the
+     * {@link GenerateDataKeyRequest}. Subclass can override the default implementation to provide additional
+     * request parameters using attributes within the {@link EncryptionContext}.
+     *
+     * @param request request parameters to generate the data key.
+     * @param context additional useful data to generate the data key.
+     * @return the newly generated data key which includes both the plaintext and ciphertext.
+     */
+    protected GenerateDataKeyResult generateDataKey(final GenerateDataKeyRequest request,
+            final EncryptionContext context) {
+        return kms.generateDataKey(request);
     }
 
     /**

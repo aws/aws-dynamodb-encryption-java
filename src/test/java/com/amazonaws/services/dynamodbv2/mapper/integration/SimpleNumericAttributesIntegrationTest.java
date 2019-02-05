@@ -141,7 +141,7 @@ public class SimpleNumericAttributesIntegrationTest extends DynamoDBMapperCrypto
             assertEquals(new BigDecimal(x.getShortAttribute()), new BigDecimal(attr.get(SHORT_ATTRIBUTE).getN()));
             assertEquals(new BigDecimal(x.getShortObjectAttribute()), new BigDecimal(attr.get(SHORT_OBJECT_ATTRIBUTE).getN()));
             assertEquals(x.isBooleanAttribute(), attr.get(BOOLEAN_ATTRIBUTE).getN().equals("1"));
-            assertEquals(x.getBooleanObjectAttribute(), attr.get(BOOLEAN_OBJECT_ATTRIBUTE).getN().equals("1"));
+            assertEquals((Object) x.getBooleanObjectAttribute(), (Object) attr.get(BOOLEAN_OBJECT_ATTRIBUTE).getN().equals("1"));
         }
         
         // Test loading an object that doesn't exist
@@ -238,9 +238,10 @@ public class SimpleNumericAttributesIntegrationTest extends DynamoDBMapperCrypto
         NumberAttributeTestClass obj = getUniqueObject();
         DynamoDBMapper mapper = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         mapper.save(obj);
-        
-        GetItemResult item = dynamo.getItem(new GetItemRequest().withTableName("aws-java-sdk-util-crypto").withKey(
-                getMapKey(KEY_NAME, new AttributeValue().withS(obj.getKey()))));
+        HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
+        key.put(KEY_NAME, new AttributeValue().withS(obj.getKey()));
+        GetItemResult item = dynamo.getItem(new GetItemRequest()
+                .withTableName("aws-java-sdk-util-crypto").withKey(key));
         
         long start = System.currentTimeMillis();
         for (int i = 0; i < 10000; i++) {

@@ -12,12 +12,12 @@
  */
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
-import org.testng.annotations.BeforeClass;
-
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
+import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
@@ -26,7 +26,11 @@ import com.amazonaws.services.dynamodbv2.model.Projection;
 import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
+import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
+import org.testng.annotations.BeforeClass;
+
+import java.util.logging.Logger;
 
 public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
     protected static final boolean DEBUG = true;
@@ -37,6 +41,8 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
 
     protected static final String TABLE_WITH_RANGE_ATTRIBUTE = "aws-java-sdk-range-test-crypto";
     protected static final String TABLE_WITH_INDEX_RANGE_ATTRIBUTE = "aws-java-sdk-index-range-test-crypto";
+
+    protected static Logger log = Logger.getLogger("DynamoDBCryptoIntegrationTestBase");
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -152,6 +158,39 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
         if (TableUtils.createTableIfNotExists(dynamo, createTableRequest)) {
             TableUtils.waitUntilActive(dynamo, TABLE_WITH_INDEX_RANGE_ATTRIBUTE);
         }
+    }
+
+    protected static void waitForTableToBecomeDeleted(String tableName) {
+        waitForTableToBecomeDeleted(dynamo, tableName);
+    }
+
+    public static void waitForTableToBecomeDeleted(AmazonDynamoDB dynamo, String tableName) {
+        log.info(() -> "Waiting for " + tableName + " to become Deleted...");
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + (60_000);
+        while (System.currentTimeMillis() < endTime) {
+            try {
+                Thread.sleep(5_000);
+            } catch (Exception e) {
+                // Ignored or expected.
+            }
+            try {
+                DescribeTableRequest request = new DescribeTableRequest(tableName);
+                TableDescription table = dynamo.describeTable(request).getTable();
+
+                log.info(() -> "  - current state: " + table.getTableStatus());
+                if (table.getTableStatus() == "DELETING") {
+                    continue;
+                }
+            } catch (AmazonDynamoDBException exception) {
+                if (exception.getErrorCode().equalsIgnoreCase("ResourceNotFoundException")) {
+                    log.info(() -> "successfully deleted");
+                    return;
+                }
+            }
+        }
+
+        throw new RuntimeException("Table " + tableName + " never went deleted");
     }
 
     public static void main(String[] args) throws Exception {

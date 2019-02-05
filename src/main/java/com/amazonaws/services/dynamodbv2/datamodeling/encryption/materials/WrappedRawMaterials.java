@@ -14,6 +14,15 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Base64;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
+
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -21,16 +30,6 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Map;
-
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
-import com.amazonaws.util.Base64;
 
 /**
  * Represents cryptographic materials used to manage unique record-level keys.
@@ -136,7 +135,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
                     description.get(KEY_WRAPPING_ALGORITHM) :
                     getTransformation(wrappingKey.getAlgorithm());
             byte[] encryptedKey = wrapKey(key, wrappingAlg);
-            description.put(ENVELOPE_KEY, Base64.encodeAsString(encryptedKey));
+            description.put(ENVELOPE_KEY, Base64.encodeToString(encryptedKey));
             description.put(CONTENT_KEY_ALGORITHM, key.getAlgorithm());
             description.put(KEY_WRAPPING_ALGORITHM, wrappingAlg);
             setMaterialDescription(description);

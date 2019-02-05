@@ -67,6 +67,14 @@
         <version>6.10</version>
         <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.quicktheories</groupId>
+      <artifactId>quicktheories</artifactId>
+      <version>0.25</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-all</artifactId>

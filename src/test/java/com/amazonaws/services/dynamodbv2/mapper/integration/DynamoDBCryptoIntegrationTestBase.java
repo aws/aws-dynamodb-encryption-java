@@ -42,7 +42,7 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
     protected static final String TABLE_WITH_RANGE_ATTRIBUTE = "aws-java-sdk-range-test-crypto";
     protected static final String TABLE_WITH_INDEX_RANGE_ATTRIBUTE = "aws-java-sdk-index-range-test-crypto";
 
-    protected static Logger log = Logger.getLogger("DynamoDBCryptoIntegrationTestBase");
+    protected static Logger log = Logger.getLogger("DynamoDBCryptoITCaseBase");
 
     @BeforeClass
     public static void setUp() throws Exception {

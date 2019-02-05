@@ -39,7 +39,7 @@ import static org.testng.Assert.fail;
 /**
  * Integration tests for the query operation on DynamoDBMapper.
  */
-public class QueryIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class QueryITCase extends DynamoDBMapperCryptoIntegrationTestBase {
     private static final boolean DEBUG = true;
     private static final long HASH_KEY = System.currentTimeMillis();
     private static RangeKeyTestClass hashKeyObject;

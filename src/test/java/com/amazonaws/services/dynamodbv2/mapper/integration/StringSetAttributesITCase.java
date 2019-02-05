@@ -38,7 +38,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Tests string set attributes
  */
-public class StringSetAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class StringSetAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String ORIGINAL_NAME_ATTRIBUTE = "originalName";
     private static final String STRING_SET_ATTRIBUTE = "stringSetAttribute";

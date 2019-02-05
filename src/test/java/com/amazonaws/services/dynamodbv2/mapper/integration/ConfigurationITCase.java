@@ -39,7 +39,7 @@ import static org.testng.Assert.fail;
 /**
  * Tests of the configuration object
  */
-public class ConfigurationIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class ConfigurationITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     // We don't start with the current system millis like other tests because
     // it's out of the range of some data types

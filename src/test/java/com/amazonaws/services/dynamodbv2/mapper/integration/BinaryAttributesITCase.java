@@ -44,7 +44,7 @@ import static org.testng.Assert.assertTrue;
 /**
  * Tests simple string attributes
  */
-public class BinaryAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class BinaryAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String BINARY_ATTRIBUTE = "binaryAttribute";
     private static final String BINARY_SET_ATTRIBUTE = "binarySetAttribute";

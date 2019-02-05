@@ -42,7 +42,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Tests string set attributes
  */
-public class NumericSetAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class NumericSetAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String INTEGER_ATTRIBUTE = "integerAttribute";
     private static final String FLOAT_OBJECT_ATTRIBUTE = "floatObjectAttribute";

@@ -47,7 +47,7 @@ import static org.testng.Assert.fail;
  * when items are loaded, saved/updated by using primary key.
  * Also tests using index range keys for queries.
  */
-public class IndexRangeKeyAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class IndexRangeKeyAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
 	private static DynamoDBMapper mapper;
 	private static final String RANGE_KEY = "rangeKey";

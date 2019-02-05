@@ -34,7 +34,7 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
 
-public class KeyOnlyPutIntegrationTest extends DynamoDBCryptoIntegrationTestBase {
+public class KeyOnlyPutITCase extends DynamoDBCryptoIntegrationTestBase {
     @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
     public static class HashAndAttribute {
 

@@ -40,7 +40,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Tests of the configuration object
  */
-public class ComplexTypeIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class ComplexTypeITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     // We don't start with the current system millis like other tests because
     // it's out of the range of some data types
@@ -81,7 +81,7 @@ public class ComplexTypeIntegrationTest extends DynamoDBMapperCryptoIntegrationT
         obj.setCalendarAttribute(cal);
         obj.setComplexNestedType(new ComplexNestedType("" + start++, start++, new ComplexNestedType("" + start++,
                 start++, null)));
-        List<ComplexNestedType> complexTypes = new ArrayList<ComplexTypeIntegrationTest.ComplexNestedType>();
+        List<ComplexNestedType> complexTypes = new ArrayList<ComplexTypeITCase.ComplexNestedType>();
         complexTypes.add(new ComplexNestedType("" + start++, start++,
                 new ComplexNestedType("" + start++, start++, null)));
         complexTypes.add(new ComplexNestedType("" + start++, start++, new ComplexNestedType("" + start++, start++, null)));

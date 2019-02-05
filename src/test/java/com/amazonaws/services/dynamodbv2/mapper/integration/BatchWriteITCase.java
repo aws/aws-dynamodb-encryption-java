@@ -45,7 +45,7 @@ import static org.testng.Assert.fail;
 /**
  * Tests batch write calls
  */
-public class BatchWriteIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class BatchWriteITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     // We don't start with the current system millis like other tests because
     // it's out of the range of some data types

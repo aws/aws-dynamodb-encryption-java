@@ -47,7 +47,7 @@ import static org.testng.Assert.fail;
 /**
  * Tests updating version fields correctly
  */
-public class VersionAttributeUpdateIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class VersionAttributeUpdateITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
     public static class VersionFieldBaseClass {

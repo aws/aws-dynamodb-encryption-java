@@ -49,7 +49,7 @@ import static org.testng.Assert.assertTrue;
  * Integration test for GSI support with a table that has no primary range key
  * (only a primary hash key).
  */
-public class HashKeyOnlyTableWithGSIIntegrationTest extends
+public class HashKeyOnlyTableWithGSIITCase extends
         DynamoDBMapperCryptoIntegrationTestBase {
 
     public static final String HASH_KEY_ONLY_TABLE_NAME = "no-primary-range-key-gsi-test-crypto";

@@ -40,7 +40,7 @@ import static org.testng.Assert.fail;
  * Tests the behavior of save method of DynamoDBMapper under different
  * SaveBehavior configurations.
  */
-public class MapperSaveConfigIntegrationTest extends MapperSaveConfigCryptoTestBase {
+public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTestBase {
 
     @AfterClass
     public static void teatDown() throws Exception {

@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Tests of exception handling
  */
-public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class ExceptionHandlingITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     public static class NoTableAnnotation {
 

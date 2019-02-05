@@ -29,7 +29,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Tests inheritance behavior in DynamoDB mapper.
  */
-public class InheritanceIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class InheritanceITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
     public static class BaseClass {

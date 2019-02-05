@@ -45,7 +45,7 @@ import static org.testng.Assert.assertNull;
 /**
  * Tests numeric attributes
  */
-public class SimpleNumericAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class SimpleNumericAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String INT_ATTRIBUTE = "intAttribute";
     private static final String INTEGER_ATTRIBUTE = "integerAttribute";

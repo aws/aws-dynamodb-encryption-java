@@ -40,7 +40,7 @@ import static org.testng.Assert.fail;
 /**
  * Integration tests for PaginationLoadingStrategy configuration
  */
-public class MapperLoadingStrategyConfigIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class MapperLoadingStrategyConfigITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static long hashKey = System.currentTimeMillis();
     private static int PAGE_SIZE = 5;

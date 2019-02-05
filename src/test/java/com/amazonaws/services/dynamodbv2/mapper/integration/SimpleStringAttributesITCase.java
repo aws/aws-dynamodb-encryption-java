@@ -41,7 +41,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  * Tests simple string attributes
  */
-public class SimpleStringAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class SimpleStringAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String ORIGINAL_NAME_ATTRIBUTE = "originalName";
     private static final String STRING_ATTRIBUTE = "stringAttribute";

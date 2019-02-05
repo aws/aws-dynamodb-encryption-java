@@ -37,7 +37,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 
-public class MapperSaveConfigCryptoTestBase extends DynamoDBCryptoIntegrationTestBase {
+public class MapperSaveConfigCryptoIntegrationTestBase extends DynamoDBCryptoIntegrationTestBase {
 
     protected static DynamoDBMapper dynamoMapper;
 

@@ -37,7 +37,7 @@ import static org.testng.Assert.fail;
 /**
  * Tests range and hash key combination
  */
-public class RangeKeyAttributesIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class RangeKeyAttributesITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String RANGE_KEY = "rangeKey";
     private static final String INTEGER_ATTRIBUTE = "integerSetAttribute";

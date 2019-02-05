@@ -50,7 +50,7 @@ import static org.testng.Assert.fail;
 /**
  * Integration tests for the scan operation on DynamoDBMapper.
  */
-public class ScanIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
+public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     private static final String TABLE_NAME = "aws-java-sdk-util-scan-crypto";
     /**
@@ -226,7 +226,7 @@ public class ScanIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase
 
         int count = 0;
         Iterator<SimpleClass> iterator = result.getResults().iterator();
-        Set<SimpleClass> seen = new HashSet<ScanIntegrationTest.SimpleClass>();
+        Set<SimpleClass> seen = new HashSet<ScanITCase.SimpleClass>();
         while ( iterator.hasNext() ) {
             count++;
             SimpleClass next = iterator.next();

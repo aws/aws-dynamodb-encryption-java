@@ -14,7 +14,8 @@ package com.amazonaws.services.dynamodbv2.mapper.integration;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper.FailedBatch;
-import com.amazonaws.services.dynamodbv2.mapper.encryption.DynamoDBMapperCryptoIntegrationTestBase;
+import com.amazonaws.services.dynamodbv2.mapper.encryption.BinaryAttributeByteBufferTestClass;
+import com.amazonaws.services.dynamodbv2.mapper.encryption.NoSuchTableTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.NumberSetAttributeTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.RangeKeyTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
@@ -38,7 +39,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 
 /**
  * Tests batch write calls

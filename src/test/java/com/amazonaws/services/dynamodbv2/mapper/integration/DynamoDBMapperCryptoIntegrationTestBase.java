@@ -12,7 +12,6 @@
  */
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
-import com.amazonaws.dynamodbv2.test.util.DynamoDBTestBase;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.BinaryAttributeByteBufferTestClass;
 
 import java.nio.ByteBuffer;

@@ -19,7 +19,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.mapper.encryption.DynamoDBMapperCryptoIntegrationTestBase;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.NumberAttributeTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
 import org.junit.Test;

@@ -11,11 +11,9 @@
  * specific language governing permissions and limitations under the License.
  */
 package com.amazonaws.services.dynamodbv2.mapper.integration;
-package com.amazonaws.services.dynamodbv2.mapper.encryption;
 
 import org.junit.BeforeClass;
 
-import com.amazonaws.dynamodbv2.test.util.DynamoDBTestBase;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;

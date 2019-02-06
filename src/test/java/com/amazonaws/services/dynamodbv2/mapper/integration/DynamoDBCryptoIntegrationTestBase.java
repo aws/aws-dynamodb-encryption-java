@@ -33,7 +33,7 @@ import org.testng.annotations.BeforeClass;
 import java.util.logging.Logger;
 
 public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
-    protected static final boolean DEBUG = true;
+    protected static final boolean DEBUG = false;
     protected static final String KEY_NAME = "key";
     protected static final String TABLE_NAME = "aws-java-sdk-util-crypto";
 
@@ -47,6 +47,7 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
     @BeforeClass
     public static void setUp() throws Exception {
         // Create a table
+        DynamoDBTestBase.setUpTestBase();
         String keyName = KEY_NAME;
         CreateTableRequest createTableRequest = new CreateTableRequest()
                 .withTableName(TABLE_NAME)

@@ -22,7 +22,7 @@ import java.util.Set;
 public class DynamoDBMapperCryptoIntegrationTestBase extends DynamoDBCryptoIntegrationTestBase {
     
     public static void setUpMapperTestBase() {
-        DynamoDBTestBase.setUpTestBase();
+        DynamoDBCryptoIntegrationTestBase.setUpTestBase();
     }
 
     /*

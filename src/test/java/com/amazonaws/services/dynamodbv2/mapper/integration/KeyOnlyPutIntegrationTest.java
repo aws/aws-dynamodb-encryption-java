@@ -21,16 +21,17 @@ import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFac
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.equalTo;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 
 public class KeyOnlyPutIntegrationTest extends DynamoDBCryptoIntegrationTestBase {
@@ -140,7 +141,7 @@ public class KeyOnlyPutIntegrationTest extends DynamoDBCryptoIntegrationTestBase
             obj.setNormalStringAttribute(null);
             util.save(obj);
             Object loaded = util.load(HashAndAttribute.class, obj.getKey());
-            assertEquals("Expected " + obj.toString() + ", but was " + loaded.toString(), obj, loaded);
+            assertEquals(obj, equalTo(loaded));
         }
     }
     

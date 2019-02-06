@@ -23,7 +23,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,13 +51,13 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testNoTableAnnotation() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.save(new NoTableAnnotation());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testNoTableAnnotationLoad() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.load(NoTableAnnotation.class, "abc");
@@ -93,7 +93,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testNoDefaultConstructor() {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         NoDefaultConstructor obj = new NoDefaultConstructor("" + startKey++, "abc");
@@ -108,13 +108,13 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         private String key;
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testNoHashKeyGetter() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.save(new NoKeyGetterDefined());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testNoHashKeyGetterLoad() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.load(NoKeyGetterDefined.class, "abc");
@@ -137,13 +137,13 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testPrivateKeyGetter() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.save(new PrivateKeyGetter());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testPrivateKeyGetterLoad() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.load(PrivateKeyGetter.class, "abc");
@@ -166,7 +166,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testPrivateKeySetter() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         util.save(new PrivateKeySetter());
@@ -176,7 +176,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
      * To trigger this error, we need for a service object to be present, so
      * we'll insert one manually.
      */
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testPrivateKeySetterLoad() throws Exception {
         Map<String, AttributeValue> attr = new HashMap<String, AttributeValue>();
         attr.put(KEY_NAME, new AttributeValue().withS("abc"));
@@ -209,7 +209,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testPrivateSetterLoad() throws Exception {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         PrivateSetter object = new PrivateSetter();
@@ -242,7 +242,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testOverloadedSetter() {
         OverloadedSetter obj = new OverloadedSetter();
         obj.setKey("" + startKey++);
@@ -278,7 +278,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testWrongTypeForSetter() {
         WrongTypeForSetter obj = new WrongTypeForSetter();
         obj.setKey("" + startKey++);
@@ -314,7 +314,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testWrongDataType() {
         Map<String, AttributeValue> attr = new HashMap<String, AttributeValue>();
         attr.put("integerProperty", new AttributeValue().withS("abc"));
@@ -324,7 +324,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         util.load(NumericFields.class, attr.get(KEY_NAME).getS());
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testWrongDataType2() {
         Map<String, AttributeValue> attr = new HashMap<String, AttributeValue>();
         attr.put("integerProperty", new AttributeValue().withNS("1", "2", "3"));
@@ -364,7 +364,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testComplexTypeFailure() {
         ComplexType complexType = new ComplexType("" + startKey++, new ComplexType("" + startKey++, null));
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
@@ -395,7 +395,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUnsupportedHashKeyType() {
         ComplexType complexType = new ComplexType("" + startKey++, new ComplexType("" + startKey++, null));
         ComplexHashKeyType obj = new ComplexHashKeyType();
@@ -429,7 +429,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
         }
     }
 
-    @Test(expected = AmazonServiceException.class)
+    @Test(expectedExceptions = AmazonServiceException.class)
     public void testNonSetCollection() {
         NonSetCollectionType obj = new NonSetCollectionType();
         obj.setKey("" + startKey++);
@@ -465,7 +465,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testFractionalVersionAttribute() {
         FractionalVersionAttribute obj = new FractionalVersionAttribute();
         obj.setKey("" + startKey++);
@@ -500,7 +500,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAutoGeneratedIntegerHashKey() {
         AutoGeneratedIntegerKey obj = new AutoGeneratedIntegerKey();
         obj.setValue("fdgfdsgf");
@@ -544,7 +544,7 @@ public class ExceptionHandlingIntegrationTest extends DynamoDBMapperCryptoIntegr
 
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAutoGeneratedIntegerRangeKey() {
         AutoGeneratedIntegerRangeKey obj = new AutoGeneratedIntegerRangeKey();
         obj.setKey("Bldadsfa");

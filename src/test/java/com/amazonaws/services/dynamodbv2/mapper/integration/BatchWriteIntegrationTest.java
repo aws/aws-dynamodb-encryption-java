@@ -19,8 +19,8 @@ import com.amazonaws.services.dynamodbv2.mapper.encryption.NoSuchTableTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.NumberSetAttributeTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.RangeKeyTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -35,10 +35,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Tests batch write calls
@@ -332,7 +334,7 @@ public class BatchWriteIntegrationTest extends DynamoDBMapperCryptoIntegrationTe
 
         DynamoDBMapper mapper = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         List<FailedBatch> failedBatches = mapper.batchSave(objs);
-        assertTrue(0 == failedBatches.size());
+        assertEquals(failedBatches.size(), 0);
 
         // Get these objects back
         for (BinaryAttributeByteBufferTestClass obj : objs) {

@@ -18,12 +18,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 
 /**
@@ -274,7 +274,7 @@ public class InheritanceIntegrationTest extends DynamoDBMapperCryptoIntegrationT
         }
     }
     
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testImplementation() throws Exception {
         List<Implementation> objs = new ArrayList<Implementation>();
         for ( int i = 0; i < 5; i++ ) {

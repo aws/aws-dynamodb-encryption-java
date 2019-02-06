@@ -28,7 +28,7 @@ import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.ConditionalOperator;
 import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
 import com.amazonaws.util.ImmutableMapParameter;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -37,11 +37,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 
 /**
@@ -144,7 +144,7 @@ public class VersionAttributeUpdateIntegrationTest extends DynamoDBMapperCryptoI
         }
     }
 
-    @Test(expected = DynamoDBMappingException.class)
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testStringVersion() throws Exception {
         List<StringVersionField> objs = new ArrayList<StringVersionField>();
         for ( int i = 0; i < 5; i++ ) {

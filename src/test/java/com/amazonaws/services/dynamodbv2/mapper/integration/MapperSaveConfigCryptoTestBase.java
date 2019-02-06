@@ -12,7 +12,6 @@
  */
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -30,12 +29,12 @@ import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
-import org.junit.BeforeClass;
+import org.testng.annotations.BeforeClass;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 
 public class MapperSaveConfigCryptoTestBase extends DynamoDBCryptoIntegrationTestBase {
@@ -74,8 +73,6 @@ public class MapperSaveConfigCryptoTestBase extends DynamoDBCryptoIntegrationTes
 
     @BeforeClass
     public static void setUp() throws Exception {
-        setUpCredentials();
-        dynamo = new AmazonDynamoDBClient(credentials);
         dynamoMapper = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
 
         CreateTableRequest createTableRequest = new CreateTableRequest()

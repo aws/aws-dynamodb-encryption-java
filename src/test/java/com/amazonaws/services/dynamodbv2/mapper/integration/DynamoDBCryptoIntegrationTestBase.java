@@ -12,7 +12,7 @@
  */
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
-import org.junit.BeforeClass;
+import org.testng.annotations.BeforeClass;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -40,10 +40,6 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        setUpCredentials();
-        dynamo = new AmazonDynamoDBClient(credentials);
-        dynamo.setEndpoint(ENDPOINT);
-
         // Create a table
         String keyName = KEY_NAME;
         CreateTableRequest createTableRequest = new CreateTableRequest()

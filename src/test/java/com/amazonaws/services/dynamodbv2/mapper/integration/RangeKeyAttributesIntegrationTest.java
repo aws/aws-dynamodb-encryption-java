@@ -20,8 +20,8 @@ import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFac
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestEncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 
 /**

@@ -19,8 +19,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestEncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Test;
 
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 
 /**

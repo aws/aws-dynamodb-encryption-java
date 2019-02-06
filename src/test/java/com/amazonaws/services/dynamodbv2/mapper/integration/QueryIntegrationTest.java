@@ -21,8 +21,8 @@ import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFac
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,15 +31,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Integration tests for the query operation on DynamoDBMapper.
  */
-public class QueryIntegrationTest extends com.amazonaws.services.dynamodbv2.mapper.encryption.DynamoDBMapperCryptoIntegrationTestBase {
+public class QueryIntegrationTest extends DynamoDBMapperCryptoIntegrationTestBase {
     private static final boolean DEBUG = true;
     private static final long HASH_KEY = System.currentTimeMillis();
     private static RangeKeyTestClass hashKeyObject;

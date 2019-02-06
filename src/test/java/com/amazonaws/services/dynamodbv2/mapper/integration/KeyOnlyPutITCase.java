@@ -14,24 +14,7 @@ package com.amazonaws.services.dynamodbv2.mapper.integration;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
-import com.amazonaws.services.dynamodbv2.model.ExpectedAttributeValue;
-import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
 
 
 public class KeyOnlyPutITCase extends DynamoDBCryptoIntegrationTestBase {
@@ -90,61 +73,7 @@ public class KeyOnlyPutITCase extends DynamoDBCryptoIntegrationTestBase {
             return true;
         }
     }
-    
-    @Test
-    public void testKeyOnlyPut() throws Exception {
-        /*
-         * Testing this scenario
-         *     (1) An empty table with the schema:
-         *
-         *    "key" (HASH)
-         *
-         *    (2) A POJO class:
-         *    "key" (HASH), "attribute" (NON-KEY)
-         *
-         *    (3) Save operation by some user:
-         *     - item : {"key" : "some value"}
-         *     - user-specified expected values : {"attribute" : {Exist : true}}
-         *     - SaveBehavior : UPDATE (default)
-         *
-         *    (4) Expected behavior
-         *    ConditionalCheckFailedException, and the table should remain empty.
-         */
-        List<HashAndAttribute> objs = new ArrayList<HashAndAttribute>();
-        for ( int i = 0; i < 5; i++ ) {
-            HashAndAttribute obj = getUniqueObject(new HashAndAttribute());
-            objs.add(obj);
-        }
 
-        DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
-        for ( HashAndAttribute obj : objs ) {
-            try {
-                DynamoDBSaveExpression saveExpression = new DynamoDBSaveExpression();
-                Map<String,ExpectedAttributeValue> expected = new HashMap<String,ExpectedAttributeValue>();
-                ExpectedAttributeValue expectedVersion = new ExpectedAttributeValue()
-                    .withValue(new AttributeValue()
-                    .withS("SomeNonExistantValue"))   
-                    .withExists(true);
-                expected.put("normalStringAttribute", expectedVersion);
-                saveExpression.setExpected(expected);
-                
-                util.save(obj,saveExpression);
-                fail("This should fail, expected clause should block an insert.");
-            }catch(ConditionalCheckFailedException e){
-                
-            }
-            assertNull(util.load(HashAndAttribute.class, obj.getKey()));
-            
-            //this should succeed without the expected clause
-            obj.setNormalStringAttribute("to-be-deleted");
-            util.save(obj);
-            obj.setNormalStringAttribute(null);
-            util.save(obj);
-            Object loaded = util.load(HashAndAttribute.class, obj.getKey());
-            assertEquals(obj, equalTo(loaded));
-        }
-    }
-    
     private <T extends HashAndAttribute> T getUniqueObject(T obj) {
         obj.setKey("" + startKey++);
         return obj;

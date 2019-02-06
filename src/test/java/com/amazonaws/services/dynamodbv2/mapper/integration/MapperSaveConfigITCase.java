@@ -13,6 +13,7 @@
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
@@ -58,7 +59,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
      * Tests that a key-only object could be saved with
      * UPDATE configuration, even when the key has already existed in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testDefaultWithOnlyKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -84,7 +85,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
      * present in the table, we should add this object by a key-only put
      * request even if it is using UPDATE configuration.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testDefaultWithOnlyKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();
@@ -104,7 +105,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Update an existing item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testDefaultWithKeyAndNonKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -137,7 +138,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Use UPDATE to put a new item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testDefaultWithKeyAndNonKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();
@@ -164,7 +165,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
      * should not affect the item at all, since all the null-valued non-key
      * attributes are ignored.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUpdateSkipNullWithOnlyKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -188,7 +189,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * The behavior should be the same as UPDATE.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUpdateSkipNullWithOnlyKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();
@@ -208,7 +209,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Use UPDATE_SKIP_NULL_ATTRIBUTES to update an existing item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUpdateSkipNullWithKeyAndNonKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -254,7 +255,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Use UPDATE_SKIP_NULL_ATTRIBUTES to put a new item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testUpdateSkipNullWithKeyAndNonKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();
@@ -279,7 +280,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * The behavior should be the same as UPDATE_SKIP_NULL_ATTRIBUTES.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAppendSetWithOnlyKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -306,7 +307,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * The behavior should be the same as UPDATE and UPDATE_SKIP_NULL_ATTRIBUTES.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAppendSetWithOnlyKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();
@@ -327,7 +328,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Use APPEND_SET to update an existing item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAppendSetWithKeyAndNonKeyAttributesSpecifiedRecordInTable()
             throws Exception {
 
@@ -393,7 +394,7 @@ public class MapperSaveConfigITCase extends MapperSaveConfigCryptoIntegrationTes
     /**
      * Use APPEND_SET to put a new item in the table.
      */
-    @Test
+    @Test(expectedExceptions = DynamoDBMappingException.class)
     public void testAppendSetWithKeyAndNonKeyAttributesSpecifiedRecordNotInTable()
             throws Exception {
         TestItem testItem = new TestItem();

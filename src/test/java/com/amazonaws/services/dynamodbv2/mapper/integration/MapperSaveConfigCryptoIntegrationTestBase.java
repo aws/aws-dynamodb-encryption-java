@@ -73,6 +73,7 @@ public class MapperSaveConfigCryptoIntegrationTestBase extends DynamoDBCryptoInt
 
     @BeforeClass
     public static void setUp() throws Exception {
+        DynamoDBCryptoIntegrationTestBase.setUp();
         dynamoMapper = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
 
         CreateTableRequest createTableRequest = new CreateTableRequest()

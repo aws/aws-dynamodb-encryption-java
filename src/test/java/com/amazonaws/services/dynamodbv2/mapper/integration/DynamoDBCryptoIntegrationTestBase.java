@@ -20,7 +20,6 @@ import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
-import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.amazonaws.services.dynamodbv2.model.LocalSecondaryIndex;
 import com.amazonaws.services.dynamodbv2.model.Projection;
 import com.amazonaws.services.dynamodbv2.model.ProjectionType;
@@ -30,6 +29,8 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import org.testng.annotations.BeforeClass;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
@@ -64,12 +65,14 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
     }
 
     /**
-     * Quick utility method to delete all tables when we have too much capacity
-     * reserved for the region.
+     * Utility method to delete tables used in the integration test
      */
-    public static void deleteAllTables() {
-        ListTablesResult listTables = dynamo.listTables();
-        for (String name : listTables.getTableNames()) {
+    public static void deleteCryptoIntegrationTestTables() {
+        List<String> integrationTestTables = new ArrayList<>();
+        integrationTestTables.add(TABLE_NAME);
+        integrationTestTables.add(TABLE_WITH_INDEX_RANGE_ATTRIBUTE);
+        integrationTestTables.add(TABLE_WITH_RANGE_ATTRIBUTE);
+        for (String name : integrationTestTables) {
             dynamo.deleteTable(new DeleteTableRequest().withTableName(name));
         }
     }
@@ -196,6 +199,6 @@ public class DynamoDBCryptoIntegrationTestBase extends DynamoDBTestBase {
 
     public static void main(String[] args) throws Exception {
         setUp();
-        deleteAllTables();
+        deleteCryptoIntegrationTestTables();
     }
 }

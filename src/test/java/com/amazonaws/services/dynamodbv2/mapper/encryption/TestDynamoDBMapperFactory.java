@@ -20,7 +20,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 public class TestDynamoDBMapperFactory {
     public static DynamoDBMapper createDynamoDBMapper(AmazonDynamoDB dynamo) {
         return new DynamoDBMapper(dynamo,
-                DynamoDBMapperConfig.DEFAULT,
+                DynamoDBMapperConfig.builder().withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.PUT).build(),
                 new AttributeEncryptor(new TestEncryptionMaterialsProvider()));
     }
 

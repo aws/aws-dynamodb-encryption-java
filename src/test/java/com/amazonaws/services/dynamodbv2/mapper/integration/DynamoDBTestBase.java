@@ -1,7 +1,7 @@
 package com.amazonaws.services.dynamodbv2.mapper.integration;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -15,7 +15,8 @@ public class DynamoDBTestBase {
     protected static AmazonDynamoDB dynamo;
 
     public static void setUpTestBase() {
-        dynamo = AmazonDynamoDBClient.builder().build();
+        dynamo = DynamoDBEmbedded.create();
+        // dynamo = AmazonDynamoDBClient.builder().build();
     }
 
     public static AmazonDynamoDB getClient() {

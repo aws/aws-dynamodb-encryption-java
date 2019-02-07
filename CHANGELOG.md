@@ -1,4 +1,6 @@
 # Changelog
+## HEAD
+* Replace Base64 implementation with Java 8's #82
 
 ## 1.13.0 -- 2018-12-10
 

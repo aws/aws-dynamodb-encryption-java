@@ -14,19 +14,6 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
-import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.KEY_WRAPPING_ALGORITHM;
-
-import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import com.amazonaws.AmazonWebServiceRequest;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
@@ -34,6 +21,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Decry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.SymmetricRawMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials;
+import com.amazonaws.services.dynamodbv2.datamodeling.internal.Base64;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.Hkdf;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.kms.AWSKMS;
@@ -41,9 +29,20 @@ import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
-import com.amazonaws.util.Base64;
 import com.amazonaws.util.StringUtils;
 import com.amazonaws.util.VersionInfoUtils;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
+import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
+import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.KEY_WRAPPING_ALGORITHM;
 
 /**
  * Generates a unique data key for each record in DynamoDB and protects that key
@@ -175,7 +174,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
         materialDescription.put(KEY_WRAPPING_ALGORITHM, "kms");
         materialDescription.put(CONTENT_KEY_ALGORITHM, dataKeyDesc);
         materialDescription.put(SIGNING_KEY_ALGORITHM, sigKeyDesc);
-        materialDescription.put(ENVELOPE_KEY, Base64.encodeAsString(toArray(dataKeyResult.getCiphertextBlob())));
+        materialDescription.put(ENVELOPE_KEY, Base64.encodeToString(toArray(dataKeyResult.getCiphertextBlob())));
 
         final Hkdf kdf;
         try {
@@ -273,7 +272,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
             } else if (hashKey.getS() != null) {
                 kmsEc.put(hashKeyName, hashKey.getS());
             } else if (hashKey.getB() != null) {
-                kmsEc.put(hashKeyName, Base64.encodeAsString(toArray(hashKey.getB())));
+                kmsEc.put(hashKeyName, Base64.encodeToString(toArray(hashKey.getB())));
             } else {
                 throw new UnsupportedOperationException("DirectKmsMaterialProvider only supports String, Number, and Binary HashKeys");
             }
@@ -286,7 +285,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
             } else if (rangeKey.getS() != null) {
                 kmsEc.put(rangeKeyName, rangeKey.getS());
             } else if (rangeKey.getB() != null) {
-                kmsEc.put(rangeKeyName, Base64.encodeAsString(toArray(rangeKey.getB())));
+                kmsEc.put(rangeKeyName, Base64.encodeToString(toArray(rangeKey.getB())));
             } else {
                 throw new UnsupportedOperationException("DirectKmsMaterialProvider only supports String, Number, and Binary RangeKeys");
             }

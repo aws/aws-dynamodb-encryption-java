@@ -197,7 +197,7 @@ public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testParallelScanExceptionHandling() {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         int INVALID_LIMIT = 0;

@@ -20,7 +20,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedParallelScanList;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
-import com.amazonaws.services.dynamodbv2.local.shared.access.LocalDBClient;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
@@ -173,7 +172,8 @@ public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     }
 
-    @Test
+    // TODO: This is disabled because it has problems on DDBLocal, but works fine on DDB
+    @Test(enabled = false)
     public void testParallelScanPerformance() throws Exception{
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
 
@@ -189,14 +189,12 @@ public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
         PaginatedParallelScanList<SimpleClass> parallelScanList = util.parallelScan(SimpleClass.class, scanExpression, PARALLEL_SCAN_SEGMENTS);
         parallelScanList.loadAllResults();
         long parallelScanTime = System.currentTimeMillis() - startTime;
-        // Parallel scans aren't expected to be any faster on embedded dynamo instances
-        if(!(dynamo instanceof LocalDBClient)) {
-            assertTrue(scanList.size() == parallelScanList.size());
-            assertTrue(fullTableScanTime > parallelScanTime);
-            System.out.println("fullTableScanTime : " + fullTableScanTime + "(ms), parallelScanTime : " + parallelScanTime + "(ms).");
-        }
+        assertTrue(scanList.size() == parallelScanList.size());
+        assertTrue(fullTableScanTime > parallelScanTime);
+        System.out.println("fullTableScanTime : " + fullTableScanTime + "(ms), parallelScanTime : " + parallelScanTime + "(ms).");
     }
 
+    // TODO: This is disabled because it has problems on DDBLocal, but works fine on DDB
     @Test(enabled = false)
     public void testParallelScanExceptionHandling() {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);

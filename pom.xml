@@ -31,6 +31,8 @@
 
   <scm>
     <url>https://github.com/aws/aws-dynamodb-encryption-java.git</url>
+    <connection>scm:git:git@github.com:aws/aws-dynamodb-encryption-java.git</connection>
+    <developerConnection>scm:git:git@github.com:aws/aws-dynamodb-encryption-java.git</developerConnection>
   </scm>
   
   <properties>

@@ -1,68 +1,55 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>com.amazonaws</groupId>
-  <artifactId>aws-dynamodb-encryption-java</artifactId>
-  <version>1.13.0</version>
-  <packaging>jar</packaging>
-  
-  <name>aws-dynamodb-encryption-java</name>
-  <description>AWS DynamoDB Encryption Client for Java</description>
+  <groupId>software.amazon.cryptools</groupId>
+  <artifactId>dynamodbencryptionclient-pom</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>aws-dynamodb-encryption-java :: POM</name>
+  <description>AWS DynamoDB Encryption Client for Java Aggregation POM</description>
   <url>https://github.com/aws/aws-dynamodb-encryption-java</url>
-  
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>https://aws.amazon.com/apache2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  
-  <developers>
-    <developer>
-      <id>amazonwebservices</id>
-      <organization>Amazon Web Services</organization>
-      <organizationUrl>https://aws.amazon.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
 
   <scm>
     <url>https://github.com/aws/aws-dynamodb-encryption-java.git</url>
     <connection>scm:git:git@github.com:aws/aws-dynamodb-encryption-java.git</connection>
     <developerConnection>scm:git:git@github.com:aws/aws-dynamodb-encryption-java.git</developerConnection>
   </scm>
-  
+
+  <modules>
+      <module>common</module>
+      <module>sdk1</module>
+      <module>sdk2</module>
+  </modules>
+
+  <licenses>
+      <license>
+          <name>Apache License, Version 2.0</name>
+          <url>https://aws.amazon.com/apache2.0</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sqlite4java.version>1.0.392</sqlite4java.version>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-bom</artifactId>
-        <version>1.11.460</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <developers>
+      <developer>
+          <id>amazonwebservices</id>
+          <organization>Amazon Web Services</organization>
+          <organizationUrl>https://aws.amazon.com</organizationUrl>
+          <roles>
+              <role>developer</role>
+          </roles>
+      </developer>
+  </developers>
 
   <dependencies>
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-dynamodb</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-kms</artifactId>
-    </dependency>
-
     <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
@@ -138,7 +125,7 @@
       <url>https://s3-us-west-2.amazonaws.com/dynamodb-local/release</url>
     </repository>
   </repositories>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -288,9 +275,9 @@
                <nexusUrl>https://oss.sonatype.org/</nexusUrl>
             </configuration>
           </plugin>
-
        </plugins>
       </build>
     </profile>
   </profiles>
+
 </project>

@@ -164,15 +164,15 @@ For signing, the user specified signing key can be either symmetric or asymmetri
 
 1. During retrieval of an item, all the attributes of the item that have been involved for encryption or signing must also be included for signature verification.  Otherwise, the signature would fail to verify.
 
-[attrencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
+[attrencryptor]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/AttributeEncryptor.java
 [createtable]: https://github.com/aws/aws-sdk-java/blob/master/src/samples/AmazonDynamoDBDocumentAPI/quick-start/com/amazonaws/services/dynamodbv2/document/quickstart/A_CreateTableTest.java
 [ddb]: http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
-[ddbencryptor]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DynamoDBEncryptor.java
+[ddbencryptor]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DynamoDBEncryptor.java
 [ddbmapper]: http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/datamodeling/DynamoDBMapper.html
-[donotencrypt]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotEncrypt.java
-[donottouch]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotTouch.java
-[keystoreprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/KeyStoreMaterialsProvider.java
-[materialprovider]: src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java
+[donotencrypt]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotEncrypt.java
+[donottouch]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/DoNotTouch.java
+[keystoreprovider]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/KeyStoreMaterialsProvider.java
+[materialprovider]: sdk1/src/main/java/com/amazonaws/services/dynamodbv2/datamodeling/encryption/providers/EncryptionMaterialsProvider.java
 [privatekey]: http://docs.oracle.com/javase/7/docs/api/java/security/PrivateKey.html
 [secretkey]: http://docs.oracle.com/javase/7/docs/api/javax/crypto/SecretKey.html
 [download]: https://github.com/aws/aws-dynamodb-encryption-java/releases/tag/1.13.0

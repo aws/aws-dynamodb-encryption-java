@@ -23,6 +23,7 @@
       <module>common</module>
       <module>sdk1</module>
       <module>sdk2</module>
+      <module>sdk2examples</module>
       <module>examples</module>
   </modules>
 

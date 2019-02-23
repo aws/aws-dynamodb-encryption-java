@@ -20,6 +20,7 @@
   </scm>
 
   <modules>
+      <module>ddej-build-tools</module>
       <module>common</module>
       <module>sdk1</module>
       <module>sdk2</module>
@@ -37,6 +38,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sqlite4java.version>1.0.392</sqlite4java.version>
+    <checkstyle.version>8.17</checkstyle.version>
+    <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
+    <ddej-build-tools.version>0.1.0</ddej-build-tools.version>
+    <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
+    <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+    <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
+    <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
+    <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+    <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
   </properties>
 
   <developers>
@@ -179,7 +189,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
           <includes>
@@ -199,9 +209,44 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven-checkstyle-plugin.version}</version>
+        <dependencies>
+            <dependency>
+                <groupId>com.puppycrawl.tools</groupId>
+                <artifactId>checkstyle</artifactId>
+                <version>${checkstyle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.cryptools</groupId>
+                <artifactId>ddej-build-tools</artifactId>
+                <version>${ddej-build-tools.version}</version>
+            </dependency>
+        </dependencies>
+        <executions>
+            <execution>
+                <id>checkstyle</id>
+                <phase>validate</phase>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <configLocation>software/amazon/cryptools/ddej-build-tools/checkstyle/checkstyle.xml</configLocation>
+            <suppressionsLocation>software/amazon/cryptools/ddej-build-tools/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+            <logViolationsToConsole>true</logViolationsToConsole>
+            <failOnViolation>true</failOnViolation>
+        </configuration>
+    </plugin>
+
+      <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>${maven-failsafe-plugin.version}</version>
           <configuration>
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemProperties>
@@ -227,7 +272,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.3</version>
+        <version>${jacoco-maven-plugin.version}</version>
         <executions>
           <execution>
             <goals>
@@ -245,4 +290,14 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jxr-plugin</artifactId>
+              <version>${maven-jxr-plugin.version}</version>
+          </plugin>
+      </plugins>
+  </reporting>
 </project>

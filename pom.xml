@@ -241,27 +241,27 @@
             <logViolationsToConsole>true</logViolationsToConsole>
             <failOnViolation>true</failOnViolation>
         </configuration>
-    </plugin>
+      </plugin>
 
       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${maven-failsafe-plugin.version}</version>
-          <configuration>
-              <useSystemClassLoader>false</useSystemClassLoader>
-              <systemProperties>
-                  <property>
-                      <name>sqlite4java.library.path</name>
-                      <value>${project.build.directory}/test-lib</value>
-                  </property>
-              </systemProperties>
-              <includes>
-                  <include>**/*ITCase.java</include>
-              </includes>
-          </configuration>
-          <executions>
-              <execution>
-                  <goals>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+        <configuration>
+            <useSystemClassLoader>false</useSystemClassLoader>
+            <systemProperties>
+                <property>
+                    <name>sqlite4java.library.path</name>
+                    <value>${project.build.directory}/test-lib</value>
+                </property>
+            </systemProperties>
+            <includes>
+                <include>**/*ITCase.java</include>
+            </includes>
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
                       <goal>integration-test</goal>
                       <goal>verify</goal>
                   </goals>

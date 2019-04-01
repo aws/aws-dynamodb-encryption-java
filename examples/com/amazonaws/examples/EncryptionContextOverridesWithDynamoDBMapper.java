@@ -62,6 +62,8 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
 
         encryptor.setEncryptionContextOverrideOperator(EncryptionContextOperators.overrideEncryptionContextTableName(
                 dynamoBackupName, dynamoTableName));
+        // EncryptionContextOperators.overrideEncryptionContextTableNameUsingMap may also be used to create overrides
+        // for several tables
 
         DynamoDBMapper mapper = new DynamoDBMapper(ddb, mapperConfig, new AttributeEncryptor(encryptor));
 

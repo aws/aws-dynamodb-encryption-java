@@ -1,6 +1,8 @@
 # Changelog
 ## HEAD
 * Replace Base64 implementation with Java 8's #82
+* Add ExtraDataSupplier to Metastore #76
+* Add support for overriding KMS requests in DirectKMSMaterialProvider #76
 
 ## 1.13.0 -- 2018-12-10
 

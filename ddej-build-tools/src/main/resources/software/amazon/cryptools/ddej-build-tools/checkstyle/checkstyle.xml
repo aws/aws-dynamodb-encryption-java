@@ -8,6 +8,6 @@
     <property name="fileExtensions" value="java"/>
     <module name="RegexpHeader">
         <property name="header"
-                  value="^/*\n * Copyright \d{4} Amazon\.com, Inc\. or its affiliates\. All Rights Reserved\.$"/>
+                  value="^/*\n * Copyright \d{4}([-]\d{4})? Amazon\.com, Inc\. or its affiliates\. All Rights Reserved\.$"/>
     </module>
 </module>

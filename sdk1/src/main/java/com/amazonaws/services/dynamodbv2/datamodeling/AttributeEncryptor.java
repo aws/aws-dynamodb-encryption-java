@@ -207,7 +207,8 @@ public class AttributeEncryptor implements AttributeTransformer {
      * @return True if {@link DoNotTouch} IS present on the getter level. False otherwise.
      */
     private boolean doNotTouch(Mapping mapping) {
-        return mapping.getter().isAnnotationPresent(DoNotTouch.class);
+        return StandardAnnotationMaps.of(mapping.getter(), null)
+            .actualOf(DoNotTouch.class) != null;
     }
 
     /**
@@ -228,7 +229,8 @@ public class AttributeEncryptor implements AttributeTransformer {
      * @return True if {@link DoNotEncrypt} IS present on the getter level. False otherwise.
      */
     private boolean doNotEncrypt(Mapping mapping) {
-        return mapping.getter().isAnnotationPresent(DoNotEncrypt.class);
+        return StandardAnnotationMaps.of(mapping.getter(), null)
+            .actualOf(DoNotEncrypt.class) != null;
     }
 
     /**

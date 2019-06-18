@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * 
  * @author Greg Rubin 
  */
-@Target(value = {ElementType.TYPE, ElementType.METHOD})
+@Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface DoNotTouch {
 

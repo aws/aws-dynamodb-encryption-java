@@ -526,7 +526,7 @@ public class AttributeEncryptorTest {
         params = FakeParameters.getInstance(
             DoNotTouchField.class, encryptedAttributes, null,
             TABLE_NAME, HASH_KEY, RANGE_KEY);
-        encryptedAttributes.get("value").setN("200");
+        encryptedAttributes.put("value", new AttributeValue().withN("200"));
         Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
         assertThat(decryptedAttributes, AttrMatcher.invert(attributes));
         assertAttrEquals(new AttributeValue().withN("200"), decryptedAttributes.get("value"));

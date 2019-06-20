@@ -14,43 +14,14 @@
  */
 package com.amazonaws.services.dynamodbv2.testing.types;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
 
 @DynamoDBTable(tableName = "TableName")
-public class DoNotEncryptField {
-    @DynamoDBHashKey
-    int hashKey;
-    @DynamoDBRangeKey
-    int rangeKey;
+public class DoNotEncryptField extends Mixed {
+
     @DoNotEncrypt
     int value;
-
-    public DoNotEncryptField() {
-    }
-
-    public DoNotEncryptField(int hashKey, int rangeKey) {
-        this.hashKey = hashKey;
-        this.rangeKey = rangeKey;
-    }
-
-    public int getRangeKey() {
-        return rangeKey;
-    }
-
-    public void setRangeKey(int rangeKey) {
-        this.rangeKey = rangeKey;
-    }
-
-    public int getHashKey() {
-        return hashKey;
-    }
-
-    public void setHashKey(int hashKey) {
-        this.hashKey = hashKey;
-    }
 
     public int getValue() {
         return value;
@@ -62,12 +33,7 @@ public class DoNotEncryptField {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + hashKey;
-        result = prime * result + rangeKey;
-        result = prime * result + value;
-        return result;
+        return 31 * super.hashCode() + value;
     }
 
     @Override
@@ -79,10 +45,6 @@ public class DoNotEncryptField {
         if (getClass() != obj.getClass())
             return false;
         DoNotEncryptField other = (DoNotEncryptField) obj;
-        if (hashKey != other.hashKey)
-            return false;
-        if (rangeKey != other.rangeKey)
-            return false;
         if (value != other.value)
             return false;
         return true;

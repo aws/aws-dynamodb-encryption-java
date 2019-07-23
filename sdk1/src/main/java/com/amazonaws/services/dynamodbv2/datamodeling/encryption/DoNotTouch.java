@@ -19,12 +19,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
+
 /**
  * Prevents the associated item from being encrypted or signed.
  * 
  * @author Greg Rubin 
  */
-@Target(value = {ElementType.TYPE, ElementType.METHOD})
+@DynamoDB
+@Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface DoNotTouch {
 

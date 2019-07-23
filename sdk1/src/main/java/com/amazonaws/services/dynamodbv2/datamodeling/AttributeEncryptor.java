@@ -157,8 +157,9 @@ public class AttributeEncryptor implements AttributeTransformer {
 
                 for (Mapping mapping : mappings.getMappings()) {
                     final EnumSet<EncryptionFlags> flags = EnumSet.noneOf(EncryptionFlags.class);
-                    if (shouldTouch(mapping)) {
-                        if (shouldEncryptAttribute(clazz, mapping)) {
+                    StandardAnnotationMaps.FieldMap<?> fieldMap = StandardAnnotationMaps.of(mapping.getter(), null);
+                    if (shouldTouch(fieldMap)) {
+                        if (shouldEncryptAttribute(clazz, mapping, fieldMap)) {
                             flags.add(EncryptionFlags.ENCRYPT);
                         }
                         flags.add(EncryptionFlags.SIGN);
@@ -192,8 +193,8 @@ public class AttributeEncryptor implements AttributeTransformer {
     /**
      * @return True if {@link DoNotTouch} is not present on the getter level. False otherwise.
      */
-    private boolean shouldTouch(Mapping mapping) {
-        return !doNotTouch(mapping);
+    private boolean shouldTouch(StandardAnnotationMaps.FieldMap<?> fieldMap) {
+        return !doNotTouch(fieldMap);
     }
 
     /**
@@ -206,8 +207,8 @@ public class AttributeEncryptor implements AttributeTransformer {
     /**
      * @return True if {@link DoNotTouch} IS present on the getter level. False otherwise.
      */
-    private boolean doNotTouch(Mapping mapping) {
-        return mapping.getter().isAnnotationPresent(DoNotTouch.class);
+    private boolean doNotTouch(StandardAnnotationMaps.FieldMap<?> fieldMap) {
+        return fieldMap.actualOf(DoNotTouch.class) != null;
     }
 
     /**
@@ -227,15 +228,19 @@ public class AttributeEncryptor implements AttributeTransformer {
     /**
      * @return True if {@link DoNotEncrypt} IS present on the getter level. False otherwise.
      */
-    private boolean doNotEncrypt(Mapping mapping) {
-        return mapping.getter().isAnnotationPresent(DoNotEncrypt.class);
+    private boolean doNotEncrypt(StandardAnnotationMaps.FieldMap<?> fieldMap) {
+        return fieldMap.actualOf(DoNotEncrypt.class) != null;
     }
 
     /**
      * @return True if the attribute should be encrypted, false otherwise.
      */
-    private boolean shouldEncryptAttribute(final Class<?> clazz, final Mapping mapping) {
-        return !(doNotEncrypt(clazz) || doNotEncrypt(mapping) || mapping.isPrimaryKey() || mapping.isVersion());
+    private boolean shouldEncryptAttribute(
+        final Class<?> clazz,
+        final Mapping mapping,
+        final StandardAnnotationMaps.FieldMap<?> fieldMap) {
+
+        return !(doNotEncrypt(clazz) || doNotEncrypt(fieldMap) || mapping.isPrimaryKey() || mapping.isVersion());
     }
 
     private static EncryptionContext paramsToContext(Parameters<?> params) {

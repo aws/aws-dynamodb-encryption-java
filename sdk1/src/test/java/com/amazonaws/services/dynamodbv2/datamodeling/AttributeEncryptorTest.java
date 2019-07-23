@@ -24,6 +24,8 @@ import com.amazonaws.services.dynamodbv2.testing.FakeParameters;
 import com.amazonaws.services.dynamodbv2.testing.types.BaseClass;
 import com.amazonaws.services.dynamodbv2.testing.types.BaseClassWithNewAttribute;
 import com.amazonaws.services.dynamodbv2.testing.types.BaseClassWithUnknownAttributeAnnotation;
+import com.amazonaws.services.dynamodbv2.testing.types.DoNotEncryptField;
+import com.amazonaws.services.dynamodbv2.testing.types.DoNotTouchField;
 import com.amazonaws.services.dynamodbv2.testing.types.Mixed;
 import com.amazonaws.services.dynamodbv2.testing.types.SignOnly;
 import com.amazonaws.services.dynamodbv2.testing.types.SignOnlyWithUnknownAttributeAnnotation;
@@ -450,6 +452,151 @@ public class AttributeEncryptorTest {
                 TABLE_NAME, HASH_KEY, RANGE_KEY);
         encryptedAttributes.get("newAttribute").setB(ByteBuffer.allocate(0));
         encryptor.untransform(params);
+    }
+
+    @Test
+    public void testEncryptWithFieldLevelDoNotEncryptAnnotation() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotEncryptField> params = FakeParameters.getInstance(
+            DoNotEncryptField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotEncryptField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+
+    @Test
+    public void testEncryptWithFieldLevelDoNotEncryptAnnotationWithChangedDoNotTouchSuperClass() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotEncryptField> params = FakeParameters.getInstance(
+            DoNotEncryptField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotEncryptField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+
+        // Change a DoNotTouch value on Mixed super class
+        encryptedAttributes.put("intValue", new AttributeValue().withN("666"));
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+
+        Map<String, AttributeValue> modifiedAttributes = new HashMap<>(attributes);
+        modifiedAttributes.put("intValue", new AttributeValue().withN("666"));
+
+        assertThat(decryptedAttributes, AttrMatcher.match(modifiedAttributes));
+    }
+
+    @Test(expectedExceptions = DynamoDBMappingException.class)
+    public void testEncryptWithFieldLevelDoNotEncryptAnnotationBadSignature() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotEncryptField> params = FakeParameters.getInstance(
+            DoNotEncryptField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotEncryptField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        encryptedAttributes.put("value", new AttributeValue().withN("200"));
+        encryptor.untransform(params);
+    }
+
+    @Test(expectedExceptions = DynamoDBMappingException.class)
+    public void testEncryptWithFieldLevelDoNotEncryptAnnotationBadSignatureSuperClass() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotEncryptField> params = FakeParameters.getInstance(
+            DoNotEncryptField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotEncryptField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+
+        // Change DoNotEncrypt value on Mixed super class
+        encryptedAttributes.put("doubleValue", new AttributeValue().withN("200"));
+        encryptor.untransform(params);
+    }
+
+    @Test
+    public void testEncryptWithFieldLevelDoNotTouchAnnotation() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotTouchField> params = FakeParameters.getInstance(
+            DoNotTouchField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotTouchField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+    }
+
+    @Test
+    public void testEncryptWithFieldLevelDoNotTouchAnnotationChangeValue() {
+        Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+        attributes.put("value", new AttributeValue().withN("100"));
+        Parameters<? extends DoNotTouchField> params = FakeParameters.getInstance(
+            DoNotTouchField.class, attributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+        assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+        params = FakeParameters.getInstance(
+            DoNotTouchField.class, encryptedAttributes, null,
+            TABLE_NAME, HASH_KEY, RANGE_KEY);
+        encryptedAttributes.put("value", new AttributeValue().withN("200"));
+        Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+        assertThat(decryptedAttributes, AttrMatcher.invert(attributes));
+        assertAttrEquals(new AttributeValue().withN("200"), decryptedAttributes.get("value"));
+
+      // Change a DoNotTouch value on Mixed super class
+      encryptedAttributes.put("intValue", new AttributeValue().withN("666"));
+      decryptedAttributes = encryptor.untransform(params);
+
+      Map<String, AttributeValue> modifiedAttributes = new HashMap<>(attributes);
+      modifiedAttributes.put("intValue", new AttributeValue().withN("666"));
+      modifiedAttributes.put("value", new AttributeValue().withN("200"));
+
+      assertThat(decryptedAttributes, AttrMatcher.match(modifiedAttributes));
+    }
+
+    @Test(expectedExceptions = DynamoDBMappingException.class)
+    public void testEncryptWithFieldLevelDoNotTouchAnnotationBadSignatureSuperClass() {
+      Map<String, AttributeValue> attributes = new HashMap<>(attribs);
+      attributes.put("value", new AttributeValue().withN("100"));
+      Parameters<? extends DoNotTouchField> params = FakeParameters.getInstance(
+          DoNotTouchField.class, attributes, null,
+          TABLE_NAME, HASH_KEY, RANGE_KEY);
+      Map<String, AttributeValue> encryptedAttributes = encryptor.transform(params);
+      assertThat(encryptedAttributes, AttrMatcher.invert(attributes));
+      assertAttrEquals(attributes.get("value"), encryptedAttributes.get("value"));
+      params = FakeParameters.getInstance(
+          DoNotTouchField.class, encryptedAttributes, null,
+          TABLE_NAME, HASH_KEY, RANGE_KEY);
+
+      Map<String, AttributeValue> decryptedAttributes = encryptor.untransform(params);
+      assertThat(decryptedAttributes, AttrMatcher.match(attributes));
+
+      // Change DoNotEncrypt value on Mixed super class
+      encryptedAttributes.put("doubleValue", new AttributeValue().withN("200"));
+      encryptor.untransform(params);
     }
 
     private void assertAttrEquals(AttributeValue o1, AttributeValue o2) {

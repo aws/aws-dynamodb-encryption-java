@@ -254,7 +254,8 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
 
     /**
      * Extracts relevant information from {@code context} and uses it to populate fields in
-     * {@code kmsEc}. Currently, these fields are:
+     * {@code kmsEc}. Subclass can override the default implementation to provide an alternative
+     * encryption context in calls to KMS. Currently, the default implementation includes these fields:
      * <dl>
      * <dt>{@code HashKeyName}</dt>
      * <dd>{@code HashKeyValue}</dd>
@@ -263,7 +264,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
      * <dt>{@link #TABLE_NAME_EC_KEY}</dt>
      * <dd>{@code TableName}</dd>
      */
-    private static void populateKmsEcFromEc(EncryptionContext context, Map<String, String> kmsEc) {
+    protected void populateKmsEcFromEc(EncryptionContext context, Map<String, String> kmsEc) {
         final String hashKeyName = context.getHashKeyName();
         if (hashKeyName != null) {
             final AttributeValue hashKey = context.getAttributeValues().get(hashKeyName);

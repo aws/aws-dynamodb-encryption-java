@@ -1,10 +1,10 @@
 # Changelog
-## 1.14.0 -- 2019-10-10
+## 1.14.0 -- 2019-10-11
 
 ### Minor Changes
 * Add ExtraDataSupplier to Metastore #76
 * Add support for overriding KMS requests in DirectKMSMaterialProvider #76
-* Allow DoNotEncrypt and DoNotTouch to be used a a field level #95
+* Allow DoNotEncrypt and DoNotTouch to be used at a field level #95
 * Allow overriding KMS encryption context #102
 
 ### Maintanence

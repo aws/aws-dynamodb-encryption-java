@@ -1,5 +1,5 @@
 # Changelog
-## 1.14.0 -- 2019-10-11
+## 1.14.0 -- 2019-10-14
 
 ### Minor Changes
 * Add ExtraDataSupplier to Metastore #76

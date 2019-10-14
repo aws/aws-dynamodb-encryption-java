@@ -14,7 +14,7 @@
 
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-dynamodb-encryption-java</artifactId>
-    <version>1.14.0</version>
+    <version>1.14.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>aws-dynamodb-encryption-java :: SDK1</name>
     <description>AWS DynamoDB Encryption Client for AWS Java SDK v1</description>
@@ -50,7 +50,7 @@
             <distributionManagement>
                 <snapshotRepository>
                     <id>sonatype-nexus-staging</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                    <url>https://aws.oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
             </distributionManagement>
 

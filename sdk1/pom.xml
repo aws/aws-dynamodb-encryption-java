@@ -7,7 +7,7 @@
 
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-dynamodb-encryption-java</artifactId>
-    <version>1.14.1</version>
+    <version>1.15.0</version>
     <packaging>jar</packaging>
     <name>aws-dynamodb-encryption-java :: SDK1</name>
     <description>AWS DynamoDB Encryption Client for AWS Java SDK v1</description>

@@ -117,7 +117,7 @@ You can download the [latest snapshot release][download] or pick it up from Mave
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-dynamodb-encryption-java</artifactId>
-    <version>1.14.0</version>
+    <version>1.14.1</version>
   </dependency>
 ```
 

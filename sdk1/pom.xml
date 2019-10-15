@@ -11,6 +11,7 @@
     <packaging>jar</packaging>
     <name>aws-dynamodb-encryption-java :: SDK1</name>
     <description>AWS DynamoDB Encryption Client for AWS Java SDK v1</description>
+    <url>https://github.com/aws/aws-dynamodb-encryption-java</url>
 
     <profiles>
         <profile>

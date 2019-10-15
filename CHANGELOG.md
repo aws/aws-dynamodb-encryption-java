@@ -1,5 +1,10 @@
 # Changelog
+## 1.14.1 -- 2019-10-14
+Fixes `com.amazonaws:aws-dynamodb-encryption-java` so that it may be consumed
+in mavenCentral.
 ## 1.14.0 -- 2019-10-14
+Use 1.14.1 instead. This release relies on a dependency that isn't
+available in mavenCentral.
 
 ### Minor Changes
 * Add ExtraDataSupplier to Metastore #76
@@ -7,7 +12,7 @@
 * Allow DoNotEncrypt and DoNotTouch to be used at a field level #95
 * Allow overriding KMS encryption context #102
 
-### Maintanence
+### Maintenance
 * Migrate from JUnit to TestNG
 * Added JaCoCo for code coverage
 * Replace Base64 implementation with Java 8's #82

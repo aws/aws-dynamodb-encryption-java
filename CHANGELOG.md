@@ -17,6 +17,7 @@ available in mavenCentral.
 * Added JaCoCo for code coverage
 * Replace Base64 implementation with Java 8's #82
 * Added checkstyle
+* Upgrade Bouncy Castle from 1.61 to 1.65 #119
 
 
 

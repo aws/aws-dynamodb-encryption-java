@@ -14,14 +14,6 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mapping;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingsRegistry.Mappings;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
@@ -33,19 +25,29 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.TableAadOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import org.apache.commons.codec.digest.Crypt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
  * <em>This must be used with @{link SaveBehavior#PUT} or @{link SaveBehavior#CLOBBER}.</em>
- * 
- * @author Greg Rubin 
+ *
+ * @author Greg Rubin
  */
 public class AttributeEncryptor implements AttributeTransformer {
     private static final Log LOG = LogFactory.getLog(AttributeEncryptor.class);
     private final DynamoDBEncryptor encryptor;
-    private final Map<Class<?>, ModelClassMetadata> metadataCache = new ConcurrentHashMap<>();
+    private final Map<Class<?>, CryptoMapperMetaData> metadataCache = new ConcurrentHashMap<>();
 
     public AttributeEncryptor(final DynamoDBEncryptor encryptor) {
         this.encryptor = encryptor;
@@ -67,7 +69,7 @@ public class AttributeEncryptor implements AttributeTransformer {
         final Map<String, AttributeValue> attributeValues = parameters.getAttributeValues();
         // If this class is marked as "DoNotTouch" then we know our encryptor will not change it at all
         // so we may as well fast-return and do nothing. This also avoids emitting errors when they would not apply.
-        if (metadata.doNotTouch) {
+        if (metadata.getDoNotTouch()) {
             return attributeValues;
         }
 
@@ -77,9 +79,9 @@ public class AttributeEncryptor implements AttributeTransformer {
         // expected fields.
         if (parameters.isPartialUpdate()) {
             throw new DynamoDBMappingException(
-                "Use of AttributeEncryptor without SaveBehavior.PUT or SaveBehavior.CLOBBER is an error " +
-	        "and can result in data-corruption. This occured while trying to save " +
-	        parameters.getModelClass());
+                    "Use of AttributeEncryptor without SaveBehavior.PUT or SaveBehavior.CLOBBER is an error " +
+                            "and can result in data-corruption. This occured while trying to save " +
+                            parameters.getModelClass());
         }
 
         try {
@@ -114,7 +116,7 @@ public class AttributeEncryptor implements AttributeTransformer {
      */
     private Map<String, Set<EncryptionFlags>> getEncryptionFlags(final Parameters<?> parameters) {
         final ModelClassMetadata metadata = getModelClassMetadata(parameters);
-        
+
         // If the class is annotated with @DoNotTouch, then none of the attributes are
         // encrypted or signed, so we don't need to bother looking for unknown attributes.
         if (metadata.getDoNotTouch()) {
@@ -124,16 +126,16 @@ public class AttributeEncryptor implements AttributeTransformer {
         final Set<EncryptionFlags> unknownAttributeBehavior = metadata.getUnknownAttributeBehavior();
         final Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<>();
         attributeFlags.putAll(metadata.getEncryptionFlags());
-        
+
         for (final String attributeName : parameters.getAttributeValues().keySet()) {
-            if (!attributeFlags.containsKey(attributeName) && 
+            if (!attributeFlags.containsKey(attributeName) &&
                     !encryptor.getSignatureFieldName().equals(attributeName) &&
                     !encryptor.getMaterialDescriptionFieldName().equals(attributeName)) {
 
                 attributeFlags.put(attributeName, unknownAttributeBehavior);
             }
         }
-        
+
         return attributeFlags;
     }
 
@@ -144,7 +146,11 @@ public class AttributeEncryptor implements AttributeTransformer {
         // means that in the general (retrieval) case, should never block and
         // should be extremely fast.
         final Class<T> clazz = parameters.getModelClass();
-        ModelClassMetadata metadata = metadataCache.get(clazz);
+        return getModelClassMetadata(clazz);
+    }
+
+    private <T> CryptoMapperMetaData getModelClassMetadata(Class<T> clazz) {
+        CryptoMapperMetaData metadata = metadataCache.get(clazz);
 
         if (metadata == null) {
             Map<String, Set<EncryptionFlags>> attributeFlags = new HashMap<>();
@@ -176,8 +182,11 @@ public class AttributeEncryptor implements AttributeTransformer {
                 }
             }
 
-            metadata = new ModelClassMetadata(Collections.unmodifiableMap(attributeFlags), doNotTouch(clazz),
-                    Collections.unmodifiableSet(unknownAttributeBehavior));
+            metadata = new CryptoMapperMetaData(
+                    Collections.unmodifiableMap(attributeFlags),
+                    doNotTouch(clazz),
+                    Collections.unmodifiableSet(unknownAttributeBehavior)
+            );
             metadataCache.put(clazz, metadata);
         }
         return metadata;
@@ -236,9 +245,9 @@ public class AttributeEncryptor implements AttributeTransformer {
      * @return True if the attribute should be encrypted, false otherwise.
      */
     private boolean shouldEncryptAttribute(
-        final Class<?> clazz,
-        final Mapping mapping,
-        final StandardAnnotationMaps.FieldMap<?> fieldMap) {
+            final Class<?> clazz,
+            final Mapping mapping,
+            final StandardAnnotationMaps.FieldMap<?> fieldMap) {
 
         return !(doNotEncrypt(clazz) || doNotEncrypt(fieldMap) || mapping.isPrimaryKey() || mapping.isVersion());
     }
@@ -260,28 +269,9 @@ public class AttributeEncryptor implements AttributeTransformer {
         return clazz.getAnnotation(HandleUnknownAttributes.class) != null;
     }
 
-    private static class ModelClassMetadata {
-        private final Map<String, Set<EncryptionFlags>> encryptionFlags;
-        private final boolean doNotTouch;
-        private final Set<EncryptionFlags> unknownAttributeBehavior;
-
-        public ModelClassMetadata(Map<String, Set<EncryptionFlags>> encryptionFlags, 
-                boolean doNotTouch, Set<EncryptionFlags> unknownAttributeBehavior) {
-            this.encryptionFlags = encryptionFlags;
-            this.doNotTouch = doNotTouch;
-            this.unknownAttributeBehavior = unknownAttributeBehavior;
-        }
-
-        public Map<String, Set<EncryptionFlags>> getEncryptionFlags() {
-            return encryptionFlags;
-        }
-
-        public boolean getDoNotTouch() {
-            return doNotTouch;
-        }
-
-        public Set<EncryptionFlags> getUnknownAttributeBehavior() {
-            return unknownAttributeBehavior;
-        }
+    public <T> CryptoMapperMetaData metaData(Class<T> dynamoModel) {
+        return getModelClassMetadata(dynamoModel);
     }
+
+
 }

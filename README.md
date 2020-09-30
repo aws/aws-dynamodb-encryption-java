@@ -9,6 +9,8 @@ When PUT or CLOBBER is not specified, fields that are present in the record may 
 
 For more advanced use cases where tighter control over the encryption and signing process is necessary, the low-level [DynamoDBEncryptor][ddbencryptor] can be used directly.
 
+[Security issue notifications](./CONTRIBUTING.md#security-issue-notifications)
+
 ## Getting Started
 
 ### Required Prerequisites

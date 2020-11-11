@@ -23,7 +23,6 @@
       <module>ddej-build-tools</module>
       <module>common</module>
       <module>sdk1</module>
-      <module>sdk2</module>
       <module>examples</module>
   </modules>
 

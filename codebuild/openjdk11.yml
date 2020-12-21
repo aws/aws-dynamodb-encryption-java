@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    CODECOV_TOKEN: "codecov/token/aws/aws-dynamodb-encryption-java:CODECOV_TOKEN"
+
 phases:
     install:
         runtime-versions:
@@ -7,3 +11,6 @@ phases:
     build:
         commands:
           - mvn install
+    post_build:
+        commands:
+          - bash codebuild/codecov.sh

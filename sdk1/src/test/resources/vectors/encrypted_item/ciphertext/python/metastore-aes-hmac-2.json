@@ -1,0 +1,33 @@
+{
+    "metastore": [
+        {
+            "N": {
+                "S": "materialName"
+            },
+            "V": {
+                "N": "0"
+            },
+            "t": {
+                "B": "u/m1JEvU36YBaRyqjUi/9XF6iaxBrmTW/Ta2vTCQD9c="
+            },
+            "encAlg": {
+                "B": "CzmDPsshipn9Uj+D9w4gDYDE0TF175l+TEu5VmH8zk8="
+            },
+            "enc": {
+                "B": "mnKFr2Ec4oJRSJdBOZfEd8lLVrC5KhkTgGiVT2hk+UDswPi5HV0l205l2lHialmvwpmFNKaUYEYo4Ceeg08W0A=="
+            },
+            "intAlg": {
+                "B": "V4kF2DsNjy4/1wbCo16sksDie5botukvkzJMqlJ3iO4ULeSBc9KjtC3xPBGZEzF/"
+            },
+            "int": {
+                "B": "qGNnZkEjDmMtQuu4fqnJ+GD+1+v53vzW4GCcS3lpbhWuOMGyKoqZ63pSSKX3u3C7FwvCqh279G43kY6lKRQivw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "tXbeYVfF9NnJnenfnYzTOUd58LIBLY/kqmZt9Ra5xLk="
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABdhbXpuLWRkYi1tYXAtc2lnbmluZ0FsZwAAAApIbWFjU0hBMjU2AAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            }
+        }
+    ]
+}

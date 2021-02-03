@@ -39,4 +39,12 @@ public class Utils {
         getRng().nextBytes(result);
         return result;
     }
+
+    public static <V> V checkNotNull(final V ref, final String errMsg) {
+        if (ref == null) {
+            throw new NullPointerException(errMsg);
+        } else {
+            return ref;
+        }
+    }
 }

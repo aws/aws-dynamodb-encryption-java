@@ -1,0 +1,300 @@
+{
+    "plaintext": "file://plaintext.json",
+    "keys": "file://keys.json",
+    "scenarios": [
+        {
+            "version": "v0",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/static-aes-hmac-1.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/static-aes-hmac-2.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/static-aes-hmac-3.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/wrapped-rsa-rsa-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/wrapped-rsa-rsa-2.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/wrapped-rsa-rsa-3.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "wrapped",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/wrapped-aes-hmac-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "awskms",
+            "keys": {
+                "decrypt": "awsKmsUsWest2",
+                "verify": "awsKmsUsWest2"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/aws-kms-direct-1.json",
+            "network": true
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "my material name",
+            "metastore": {
+                "table_name": "MetaTable",
+                "provider": "wrapped",
+                "keys": {
+                    "encrypt": "rsaEncPub",
+                    "decrypt": "rsaEncPriv",
+                    "verify": "rsaSignPub",
+                    "sign": "rsaSignPriv"
+                },
+                "ciphertext": "file://ciphertext/python/metastore-rsa-rsa-1.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/metastore-data-tables-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "materialName",
+            "metastore": {
+                "table_name": "metastore",
+                "provider": "static",
+                "keys": {
+                    "decrypt": "aesKey",
+                    "verify": "hmacKey"
+                },
+                "ciphertext": "file://ciphertext/python/metastore-aes-hmac-2.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/metastore-data-tables-2.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "materialName",
+            "metastore": {
+                "table_name": "metastore",
+                "provider": "awskms",
+                "keys": {
+                    "decrypt": "awsKmsUsWest2",
+                    "verify": "awsKmsUsWest2"
+                },
+                "ciphertext": "file://ciphertext/python/metastore-aws-kms-1.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/python/metastore-data-tables-3.json",
+            "network": true
+        },
+        {
+            "version": "v0",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/static-aes-hmac-1.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/static-aes-hmac-2.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "static",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/static-aes-hmac-3.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/wrapped-rsa-rsa-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/wrapped-rsa-rsa-2.json",
+            "network": false
+        },
+        {
+            "version": "v0",
+            "provider": "wrapped",
+            "keys": {
+                "encrypt": "rsaEncPub",
+                "decrypt": "rsaEncPriv",
+                "verify": "rsaSignPub",
+                "sign": "rsaSignPriv"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/wrapped-rsa-rsa-3.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "wrapped",
+            "keys": {
+                "decrypt": "aesKey",
+                "verify": "hmacKey"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/wrapped-aes-hmac-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "materialName",
+            "metastore": {
+                "table_name": "metastore",
+                "provider": "static",
+                "keys": {
+                    "decrypt": "aesKey",
+                    "verify": "hmacKey"
+                },
+                "ciphertext": "file://ciphertext/java/metastore-aes-hmac-2.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/metastore-data-tables-2.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "awskms",
+            "keys": {
+                "decrypt": "awsKmsUsWest2",
+                "verify": "awsKmsUsWest2"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/aws-kms-direct-1.json",
+            "network": true
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "java-rsa-material-name",
+            "metastore": {
+                "table_name": "java-rsa-metatable",
+                "provider": "wrapped",
+                "keys": {
+                    "encrypt": "rsaEncPub",
+                    "decrypt": "rsaEncPriv",
+                    "verify": "rsaSignPub",
+                    "sign": "rsaSignPriv"
+                },
+                "ciphertext": "file://ciphertext/java/metastore-rsa-rsa-1.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/metastore-data-tables-1.json",
+            "network": false
+        },
+        {
+            "version": "v1",
+            "provider": "most_recent",
+            "material_name": "java-kms-material-name",
+            "metastore": {
+                "table_name": "java-kms-metatable",
+                "provider": "awskms",
+                "keys": {
+                    "decrypt": "awsKmsUsWest2",
+                    "verify": "awsKmsUsWest2"
+                },
+                "ciphertext": "file://ciphertext/java/metastore-kms-3.json"
+            },
+            "plaintext": "file://plaintext.json",
+            "ciphertext": "file://ciphertext/java/metastore-data-tables-3.json",
+            "network": true
+        }
+    ]
+}

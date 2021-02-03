@@ -1,0 +1,31 @@
+{
+  "java-kms-metatable" : [ {
+    "*amzn-ddb-map-desc*" : {
+      "B" : "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRUROeWZYRXBrdnRNOFJ4SjdpZ0lCRUlBN3RoNk9DemtMOGlWU2lLdFFucmJWZVZuRjdkTzdPemd2Y2NnMnJHNExDUlZUVzREYmtFelovaysyZU9hWDhRbWd1d3BKNmdmKytxQ21qYmM9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+    },
+    "t" : {
+      "B" : "umnxJZ3TTBpM8+hy+2v7yz6SllE/FemGyyzPuqD5YI0="
+    },
+    "V" : {
+      "N" : "0"
+    },
+    "encAlg" : {
+      "B" : "XiZ0+sYasuStPkGN7Z2KgiNr7/1uCQHVV6RTML1JeKk="
+    },
+    "enc" : {
+      "B" : "FFo+FzNGNhOpk1YdLR8tZhPxCGjUru324LwTfWoyVaUBipRwlgHo75fJiHmgV9Yt3gfOKhLw+VWnnF9blrG5ag=="
+    },
+    "intAlg" : {
+      "B" : "hrie6pasAp0wKS8dlab/VaxS8xnpfwcvnbt6XSUSHmyRrozUtIf2LBBdoLTPASIi"
+    },
+    "N" : {
+      "S" : "java-kms-material-name"
+    },
+    "int" : {
+      "B" : "ii6lOKwLziK98SReZ8qLUJUaip0fKE2Mm4Knjb4F6qZfM49e4VcTtpnT9S/PFLqe1ZdU502UVxXR56PL9PqenA=="
+    },
+    "*amzn-ddb-map-sig*" : {
+      "B" : "w6DYQSzqyHzl7pHlv+oW4/H9+uCiJXwwQk1djzB0g1Q="
+    }
+  } ]
+}

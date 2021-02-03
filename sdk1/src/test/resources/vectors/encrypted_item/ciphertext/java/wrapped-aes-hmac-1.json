@@ -1,0 +1,351 @@
+{
+    "HashKeyOnly": [
+        {
+            "hashKey": {
+                "S": "Bar"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODNvNHkzTTB3UUFCRXl1UXN0SFVQUGF1NkpPMUhiNk1OWGxXQW5aWDhYdmFYTlUwNUluTFUxZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "iZXCp3s7VEMYdf01YEWqMlXOBHv3+e8gKbECrPUW47I="
+            }
+        },
+        {
+            "hashKey": {
+                "S": "Baz"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODlZdEVSWXVDT3A4MHlKVnJOYytYREFoaVN6UHdlRnNJQk1YRXMxSEQ2eGdvdmYveldabmMrQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "zh74eH/yJQFzkm5mq52iFAlSDpXAFe3ZP2nv7X/xY1w="
+            }
+        },
+        {
+            "hashKey": {
+                "S": "Foo"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOEw2YkExbWszYTZxek1YNUkyMkYyYzRvU0FmZ2VZdCtjQmtFYndDTzhYUzlkL0ZqV20wekpZUT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "HR5P6kozMSqqs+rnDMaCiymH8++OwEVzx2Y13ZMp5P8="
+            }
+        }
+    ],
+    "TableName": [
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOEpKNDk2UGRpcDViOHlldTVxbEE0STNOUjFTVHdtZEd2REJwQWowNXprUmN0OFh6T3E1TmRJZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "yT2ehLcx/a609Ez6laLkTAqCtp0IYzzKV8Amv8jdQMw="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHNVQzNEekp5Tk1tZ3ZUSE1EVnh2Sng1OCtDT1h0UStwRzR4ZlVQL0pJTkRHOGI1M00wOFRBZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "YAai32/7MVrGjSzgcVxkFDqU+G9HcmuiNSWZHcnvfjg="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOEZGdjVQNjAxZzF0eXhoaDhxQmlCdDB1d2JoODlRaDdyeTcxL2lJdWxvSWNvQzFBV3JHczhtdz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "0iwjbBLCdtSosmDTDYzKxu3Q5qda0Ok9q3VbIJczBV0="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHJ3OU5qdU53dkhENTZPTmlqWC9nbUlGZ051ZDk3OS94QXhlaTVjbmdJbmxhajdpSVg0RDdadz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "Gl1jMNLZl/B70Hz2B4K4K46kir+hE6AeX8azZfFi8GA="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "7"
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "stringValue": {
+                "B": "MyVrAzOuKFS+hAiVq0jlmIJcwMP2w62LdWChncBN0q0HMB3WpADYK2BF1q+oQP83"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHlUK09JWlpaWkE5VmU0dTdwRE1zNG9TUVZTNlFYZEFmQjZkVjlMMUg4QzBrRXliQ0Nad0JRQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "intSet": {
+                "B": "0iLxGtvyDaUNXY1iYwcDlZX3zIs+QOMsBQ+RbX6YlAgFdMK/k57OXPH3jMIptzkNAKNWFea+NAz+AXFd2jPC8w=="
+            },
+            "doubleSet": {
+                "B": "0nazy+tnY85GZpSANJzBLXZHPKzCvN4ggpopjujfAOO37wDi6zrSwhurLpjFIJGR27pn5azaroZWYA8GLfiGIw=="
+            },
+            "byteArrayValue": {
+                "B": "w9sfXioZCE9luCt4qiOixyRJVlJ6zbTwFoFg0wQNJbA="
+            },
+            "stringSet": {
+                "B": "8057NGIAJADqX/KzkjZl7XzFMI/6j7vAbp5F83tZjOQhguhp8hheXAzcsrCmM6sME1oGEmJEran4Svs1qT5ChA=="
+            },
+            "intValue": {
+                "B": "LFHv7oLor2SoKypi/gubI0IsipoLd/I20qPr2wHOgOs="
+            },
+            "doubleValue": {
+                "B": "uq8MBbPKDskxhyJ6VCmd9EC6+tD3EuiqhgFUpxckzdk="
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "FhpaX3jXqz+Pg4QETqcNBULC+OBOTkux2BFGCdnr5PY="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "10"
+            },
+            "hashKey": {
+                "N": "8"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAODRhOGRFc01ybDR6ODlVM1RkOWh4L0J2cms4cVZEODlOaklkMnU0d2NGSnBxbUVkc1lka2ZXZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "5NHNzCBtZcVAUlz1ymLB7Ta+1n3VjffLj5WniFA9afo="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOE55eTdqK3FkNEJMNzV2MTlnRHdHVHdtTGgrbmlMaER0cjdaL3ZZMVFmQTFEQmE5Y0JGdzIxdz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "cSTe0npOBBtsxSN4F9mLF2WTyCN1+1owsVoGkYumiZQ="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "9"
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOGcrY1NpV2I3eWZYZ2pQS2gzOVM0anBZZWFNeEhHRG90c2JCOG5sQkp3ei9vclBRQzhOZFNxdz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "lBLoUXuc8TgsJJlItgBh6PJ1YVk52nvQE9aErEB8jK8="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOHlKa2M4OW9HNEpoajhyazlEQnpVeEQ1cForN1Q4Z2pQUEU1TE9uVDhvd2tJWDJ6bGFpdUJKQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "cjd91WBBFWPnrJxIJ2p2hnXFVCemgYw0HqRWcnoQcq4="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOG9kQ2hPVmtiYkN3S3V3VHYrVjYvelNwcnZIUWVhWlpqaDZvU3JzMHV4T255bFQzSUZ0TjVVZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "uXZKvYmUgZEOunUJctXpkvqhrgUoK1eLi8JpvlRozTI="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOEJLV0Z2T0hRVUxCMTcxTW56dkQrVVYyMVpmTUxhSXl4QjB3ekdZbStzY2VFd2pNekgxTFhVQT09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "66Vz0G8nOQzlvIpImXSkl+nmCpTYeRy8mAF4qgGgMw0="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "8"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAAOEdncWp2Q3JaYzhZL2RrMGxmQlk5K09tbWNXUWIvbjVYMW01YTNBcElZb3JLVzU0RVhRYTgrZz09AAAAEGFtem4tZGRiLWVudi1hbGcAAAADQUVTAAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAB0FFU1dyYXAAAAAVYW16bi1kZGItbWFwLXN5bS1tb2RlAAAAES9DQkMvUEtDUzVQYWRkaW5n"
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "intSet": {
+                "B": "eBhcgBr8TocxVsTw8tJtcAK2VKFOkoZlWBUusFNtKbTulghzdpT3iTMqIJB86ViXXguO43XqMZWs1U3G/IaF+g=="
+            },
+            "byteArrayValue": {
+                "B": "Y3ciZfN54gf86a4mxRfon9CgzQkNIxrtWV8s6tg/6G0="
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "stringSet": {
+                "B": "RhykbS8bqGEd2LEGtLV0S6Pj+4KjuVc15ExkUmlCKlClAgNpukA5Tp0FjU/XL0Qli4v6apZaraKgBC1l4YlRDg=="
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "mC10Qiw1c/P8Bab4SaP3kmsPMBVfOZKjZ3SgvXyd3Vg="
+            }
+        }
+    ]
+}

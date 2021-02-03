@@ -1,0 +1,427 @@
+{
+    "TableName": [
+        {
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "m1KU7lGZlO6bNSxx1ZMr6pVmY1PuYw8uDIcFDisFjSw="
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "intSet": {
+                "B": "vTohJVr6lrUAhSuZT7nPaxgL6iW+IC0TZA1/ht30GWig2OO7JQFIS4O6Kk2ANI6w"
+            },
+            "stringValue": {
+                "S": "Blargh!"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "rangeKey": {
+                "N": "15"
+            },
+            "intValue": {
+                "N": "0"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "m1KU7lGZlO6bNSxx1ZMr6pVmY1PuYw8uDIcFDisFjSw="
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "intSet": {
+                "B": "vTohJVr6lrUAhSuZT7nPaxgL6iW+IC0TZA1/ht30GWig2OO7JQFIS4O6Kk2ANI6w"
+            },
+            "stringValue": {
+                "S": "Blargh!"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "rangeKey": {
+                "N": "15"
+            },
+            "intValue": {
+                "N": "0"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "lBLoUXuc8TgsJJlItgBh6PJ1YVk52nvQE9aErEB8jK8="
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "1"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "cjd91WBBFWPnrJxIJ2p2hnXFVCemgYw0HqRWcnoQcq4="
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "2"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "uXZKvYmUgZEOunUJctXpkvqhrgUoK1eLi8JpvlRozTI="
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "3"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "yT2ehLcx/a609Ez6laLkTAqCtp0IYzzKV8Amv8jdQMw="
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "1"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "YAai32/7MVrGjSzgcVxkFDqU+G9HcmuiNSWZHcnvfjg="
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "2"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "0iwjbBLCdtSosmDTDYzKxu3Q5qda0Ok9q3VbIJczBV0="
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "3"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "Gl1jMNLZl/B70Hz2B4K4K46kir+hE6AeX8azZfFi8GA="
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "1"
+            }
+        },
+        {
+            "doubleSet": {
+                "B": "bu/qi2UnCw6Saur96Xjc+1sQQzo6ZUdeu9W0/uX958B9utw+rDlclexaDcf6VGnz7OYM18eeEXrpjIgLtH4iaQ=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "fqIf7vj1G3qbcEv1nbyTqNoKSAFfj9fLMb3S8YEFjfM="
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "intSet": {
+                "B": "j0vcD4vvFrL/7JHHgnyBCIHb5u/WvT/Uc/kk4lBMFKV2NXshqqEmBu8UK96OLbYAK3+vW4mwm4rIZ7MqgV95LQ=="
+            },
+            "stringValue": {
+                "B": "yV633bs6t+yjSw6vHtUgrpDNB5YyMgXue0prPMXVm6SmGiUxS5l93cJx4vPWF/bi"
+            },
+            "doubleValue": {
+                "B": "BhZIjFx+b3DExrUfnOkJjYNw0/Bw+KoDxG4LUyzQoRA="
+            },
+            "stringSet": {
+                "B": "WsWFF2IDOEl0f4PlW73arTFdMCyS6lMbvnrH9sPnCCMCQzEaSmdZmz1Kcb3ZDxRiaeLLWV2om/J9b260y2igRg=="
+            },
+            "rangeKey": {
+                "N": "7"
+            },
+            "byteArrayValue": {
+                "B": "LB7p2Ewobv+WsSeh1KxHx0Gkw0e1sKTbZBfjkvoEZBs="
+            },
+            "intValue": {
+                "B": "O8EY3/1vRX0odEkXQejXrUP24ToyD+4EHJ6TmKZVPkk="
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "66Vz0G8nOQzlvIpImXSkl+nmCpTYeRy8mAF4qgGgMw0="
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "2"
+            }
+        },
+        {
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "QWOgS/Ba8ZZa9Y2l8DolewfyZosDKcLysahlumr0MVk="
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "intSet": {
+                "B": "AtJqJj1aokidlC6qr8L3xZQNo7Yl2z8DsEXgJLRKnK73Oyg7jRDF0zjgp02qNae7mYNDkK2QeafeAexk8s7qdw=="
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "stringSet": {
+                "B": "nJNYeqOA5x3J3k3zO7CWUcbD1gU2xifPxQ4sraRhsnKyd+mE+ouhX2LpMwQ45nRXxV1nSeaN7MW+4vYn/sA/oQ=="
+            },
+            "rangeKey": {
+                "N": "8"
+            },
+            "byteArrayValue": {
+                "B": "/icc0cvbG45rqCNdeMFJaklPx69nXo3/8XTE+vQafmI="
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "cSTe0npOBBtsxSN4F9mLF2WTyCN1+1owsVoGkYumiZQ="
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "rangeKey": {
+                "N": "3"
+            }
+        },
+        {
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "rangeKey": {
+                "N": "9"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "5NHNzCBtZcVAUlz1ymLB7Ta+1n3VjffLj5WniFA9afo="
+            },
+            "hashKey": {
+                "N": "8"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "rangeKey": {
+                "N": "10"
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "version": {
+                "N": "1"
+            }
+        }
+    ],
+    "HashKeyOnly": [
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "iZXCp3s7VEMYdf01YEWqMlXOBHv3+e8gKbECrPUW47I="
+            },
+            "hashKey": {
+                "S": "Bar"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "zh74eH/yJQFzkm5mq52iFAlSDpXAFe3ZP2nv7X/xY1w="
+            },
+            "hashKey": {
+                "S": "Baz"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            }
+        },
+        {
+            "*amzn-ddb-map-sig*": {
+                "B": "HR5P6kozMSqqs+rnDMaCiymH8++OwEVzx2Y13ZMp5P8="
+            },
+            "hashKey": {
+                "S": "Foo"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            }
+        }
+    ]
+}

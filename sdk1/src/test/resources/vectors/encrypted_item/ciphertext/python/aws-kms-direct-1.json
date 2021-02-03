@@ -1,0 +1,351 @@
+{
+    "HashKeyOnly": [
+        {
+            "hashKey": {
+                "S": "Bar"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURJMGMzcU5iZnlEYmRid0Z2UUlCRUlBN3hua1VpeVFwUXJRdXVqSXoxNE5OV0R5b0IxbzJ1V1AzUitVeGxsZ1V3NEFKdmlFWmRoRHdxa0dxYkFxc0gyY1Y4c25sS1NqV0ZZRWVQanc9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "4KWMhWdLB1IIEkiFiVzsTaCq9GfcR9cBhES2SD/cHUs="
+            }
+        },
+        {
+            "hashKey": {
+                "S": "Baz"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURHYXVhbmUwajBwRnRQUWR0d0lCRUlBN2x5dnhYdElETDhOVm1ReVFWNGNXb3dZMkF0eE52UlFjU0NPT083UDdzZkpibFFBQjVjUEE4bXhaTmp1cU5CSDVzbUNENVZMZWZjMG54eVU9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "EcV3233Pj6RJYZu+gLvnxMrnyuH6/6ST+taydye+nL0="
+            }
+        },
+        {
+            "hashKey": {
+                "S": "Foo"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURNSHhMZjIxSkZLV2pjTVlxd0lCRUlBN2h2VmdyZEVBMTM3eUR3Q085VG1UZ004dXBGOCsybElNN1VCN0hiS01vamdoT0dtd0N5QkNRWlozNXhYbEJMMmRydExSMno2WHg5M0ZoQk09AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "NZ1LSE6c+yyiO2fEnK8Q4IKEO2HdN0WbdOqDbn1bwqc="
+            }
+        }
+    ],
+    "TableName": [
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRUREbDdLcTVlNXVWait6Uk1qZ0lCRUlBNzdndlR0SnJsRHZoRHUyNEFsVGdqVFVtM2dldjJYdXFUbTkySytpeFhObmRzRk8zYXN1WXhNVUlXa25hNVVyTG1FR0lKVStSMlQrdjhEWFk9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "2iR8uzVwsAG0gLmqqss8Fv+VzUjuRkuu1bKlVo8LzzE="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURBOXVxSWhDeVdLTTY1emZjd0lCRUlBN08vVUtDYXN2aTFESG1YbXpzOUJyeG1qOXhpWVg1djJwZmY1OXZMUHpPaU5tRXhrSUJWRXM3UkUxM0lZWGJ6Q3dFdy91WWhrbTJGa0xaaUE9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "rE1g6e/1KgcISWNQibGJSWqY39fIlLW0wG6PaY8tPj0="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURKY0lVSVRaanFYbmlGcGYxUUlCRUlBN1hXa1VFa1VzM0RkRDBUNldoQ2twMmRDN25SRE9ucEZYS3E0RDVWMzd1UzZ6UWtld3piaVBRbU02b21ubmt1V0lwWXdyQXljaUk4akl6UjA9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "Ii2EFI5uNLWBEHyTda9+KMd6FJe5WoiGPosBdtFPABI="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURENXc1blJwWjl1MU80Z1NId0lCRUlBN1l5Y1JFK0tJQ1R1Q1lSRXpUSFk4NExFdUJYZmR5T0F6SjVOa1hvaHZzbzc2WU1BQjArTkVvNm1CQkxOMWFPZHdyRkVXUWJtWUJteWt4Mm89AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "ymzwGBr64Ssl0voq4HWgne6kQUXrACTwS0ZyoZebsPM="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "7"
+            },
+            "hashKey": {
+                "N": "5"
+            },
+            "stringValue": {
+                "B": "HUDWgAqIhfBwAaFjZabfDAeWAtI3A8ezikmik8R5NjsMDe1YqaRo+iZ/GHrhX8PO"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRUROTjBJRS80Y1F2ZFVET0VJUUlCRUlBN3lwTGdYVlJGS3pMbktQbW9vWWhuaTZCTGpwTmhEanMwY2xHZ0dhcXhscE5tZUpDMGVWT0hwbms4N1RTRmt5bllNNnZFSUh0aUQwcU1JbGM9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "intSet": {
+                "B": "RckR1Xxwyye6qKeyqJibwop/Vl9igtdY1HVFy7aKSg1cQDz/dZ2ja2vqaauEC3vGJ0PDh/QuKT50M/VmNpt0Dg=="
+            },
+            "doubleSet": {
+                "B": "HRYNY8rrnf1bG78poir81vw5Ysf7zFN6GpVSeYrlaiXKEEutlGTv9XFjJNUBJwx6mdUJ7Mohq1zL0lDxcugSKw=="
+            },
+            "byteArrayValue": {
+                "B": "wek+Pe9GW5sxIP8necYRjb7RJ+gPDcxzsokrZfCX1G8="
+            },
+            "intValue": {
+                "B": "TTDppst6s6EY1iam9uuce2DngA963n7OJ8mA7sqJS4E="
+            },
+            "stringSet": {
+                "B": "JT5jP4Lz+23ofyavj0hilbhi65W5uEh9F1A2N0Xo80JCZMbJb6rM53w5FOwXkUxPwfVPPJhN3qyT3jgR+JuUXw=="
+            },
+            "doubleValue": {
+                "B": "kEJrOuSP5caPu/4c7WufpmZ8oZpoPdPjsOb2M7RCHd4="
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "QeN4uscVc+4qbZUiAks9JMbAudHwA0r7GQSCfmofOOU="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "10"
+            },
+            "hashKey": {
+                "N": "8"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURNbk9wQTJ2UVRLcmtLS3Uzd0lCRUlBN3NKaEFGNnU5MmZ1ejJSN2F4V1VmYXNRQjhxTzUrbEJoTGZoQk5NZkVvRld2VVNrK1ZhTS9lOTJrNlRubEh3SXhRNFpSNnlhRXZtWFV5Ykk9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "HxDRQ38quspO149EFkFZWCiPAE3mUyuM2t5IFNs3xwY="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURNcUhpQlRzc1I5aldCWkFYZ0lCRUlBN3pkblF4SVQzQlFjVjAyVlRicWJEN1VyaGJkYWVMdjdoYTRoK1A2TW9ocjNjcXNpaVJ4OURmQ2k5M1FwZG9yZUlXVUJoR09OMm84NjQzc3M9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "VtM0QSOzR5Es/TPTa3AjMmYHXy6dk1noQYyiMQ/xbiw="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "9"
+            },
+            "hashKey": {
+                "N": "7"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "intSet": {
+                "NS": [
+                    "0",
+                    "1",
+                    "15",
+                    "10",
+                    "200"
+                ]
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "byteArrayValue": {
+                "B": "AAECAwQF"
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "stringSet": {
+                "SS": [
+                    "?",
+                    "Cruel",
+                    "Goodbye",
+                    "World"
+                ]
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "1"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURIcmVWblF3MVdBRC9Ga1Z5d0lCRUlBN3N3a0o4dXRuNXNKOEdXRnNrL0N1dzJ6ci83eHpyL2pKcEt5K2tTZWg1cUVRSmJ6WTVrQ25RSXpLQXpuNW9QbW0zR09WSDUwRHh1ZE5wMk09AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "Pmgj931I+SMdqZ0L51QFo7KtyJoXEMuvQJFqNWJYSqU="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURDTGtFbENIOHRUSXRWNnM0Z0lCRUlBN2ZtaHRzY0lydUNSc1ArN2xGcFYxZlZ3WDAzUSt4V2pzUXd4L0N4Zi9Wd01pTnZkNlR2a3JxWFpXNHNwOXN6YzRkQ0FaYkF3ZC90WFY5enM9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "KXJCn95HwKvrtVS83pGmo4Ar0e8soJmhapq6F+JnR7o="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "3"
+            },
+            "hashKey": {
+                "N": "0"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURDam0wSUNIbW5lOG1TdEp6UUlCRUlBN0gwblpmRmtVTWtpWjdqL1JtZUJiZTdDTGpBMk50cWhXSGhIYmcwSVpjcC9wMWhxMVArMVNQZjk1TVExQ0xrQ29nWmZFYlA0M1poOGhQb009AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "70IJrf42tAvfTTmRcVy8EMMZLtzfs/FFJXDeUSPHOqs="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "2"
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURFd1duekd5N25qSDJ1WWM0Z0lCRUlBN20ya2NSYUlWTFFkblo4WlRNYjlNOEI5OStpbVNIYTRJY3ZUYVJqTUc4bmZxY0EySXZ0RHlLc1NNQThhemV6clpEcEN1dUcyOG4xVS9CdUk9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "DrDiH4WP0beWbUUqTKuHAOq9lifGJPcyO1K45chJkLE="
+            }
+        },
+        {
+            "rangeKey": {
+                "N": "8"
+            },
+            "stringValue": {
+                "S": "Hello world!"
+            },
+            "hashKey": {
+                "N": "6"
+            },
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYta2V5AAAA4EFRRUJBSGhBODR3blhqRUpkQmJCQnlsUlVGY1paSzJqN3h3aDZVeUxvTDI4blErMEZBQUFBSDR3ZkFZSktvWklodmNOQVFjR29HOHdiUUlCQURCb0Jna3Foa2lHOXcwQkJ3RXdIZ1lKWUlaSUFXVURCQUV1TUJFRURIbi9JbTRzTUJ2OUtrcnJoZ0lCRUlBN3FTK2YzMkFlZnRWYTEzOWpOZzJtV1ZhY3VqMHduYWtGNnZOZnEydHAyMjBpN1RVSzZhYnpnWGNXbFRTQnQ2RUNGWUtWTGU1L1JKalg5eFU9AAAAD2F3cy1rbXMtZWMtYXR0cgAAAAYqa2V5cyoAAAAQYW16bi1kZGItZW52LWFsZwAAAAdBRVMvMjU2AAAAEGFtem4tZGRiLXNpZy1hbGcAAAAOSG1hY1NIQTI1Ni8yNTYAAAARYW16bi1kZGItd3JhcC1hbGcAAAADa21zAAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZw=="
+            },
+            "doubleSet": {
+                "NS": [
+                    "-3",
+                    "-34.2",
+                    "0",
+                    "15",
+                    "7.6"
+                ]
+            },
+            "intSet": {
+                "B": "xg5UKrtqhXgskeHlZfOHZ/i6brTno1EVtOkrp41mYgHHE5l5thbRv54se4idk6LAS7NQFPVeo8BxK1LHGC+pRQ=="
+            },
+            "byteArrayValue": {
+                "B": "qjBTlgKf30lw90GQgndc5rTsqXeohitptYJMlNSdl9c="
+            },
+            "intValue": {
+                "N": "123"
+            },
+            "stringSet": {
+                "B": "Lf+u/7I/4dNMj7hQQLwwe3FfRetLh83vKkKjJDoxv+vci7DuePL/s7Q9y0sJpt+rjmKt5grqtxk2NFz2kAZI5Q=="
+            },
+            "doubleValue": {
+                "N": "15"
+            },
+            "version": {
+                "N": "1"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "dUOYJLyGg6+0iwHFzu8gr5hIRIPbQJavvxPLwhAM6iw="
+            }
+        }
+    ]
+}

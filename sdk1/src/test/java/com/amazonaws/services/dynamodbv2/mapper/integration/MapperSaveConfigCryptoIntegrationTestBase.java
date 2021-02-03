@@ -73,6 +73,7 @@ public class MapperSaveConfigCryptoIntegrationTestBase extends DynamoDBCryptoInt
 
     @BeforeClass
     public static void setUp() throws Exception {
+        System.setProperty("sqlite4java.library.path", "target/test-lib");
         DynamoDBCryptoIntegrationTestBase.setUp();
         dynamoMapper = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
 

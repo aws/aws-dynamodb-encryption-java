@@ -1,0 +1,33 @@
+{
+    "metastore": [
+        {
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABBhbXpuLWRkYi1lbnYtYWxnAAAAB0FFUy8yNTYAAAAQYW16bi1kZGItZW52LWtleQAAAOBBUUVCQUhoQTg0d25YakVKZEJiQkJ5bFJVRmNaWksyajd4d2g2VXlMb0wyOG5RKzBGQUFBQUg0d2ZBWUpLb1pJaHZjTkFRY0dvRzh3YlFJQkFEQm9CZ2txaGtpRzl3MEJCd0V3SGdZSllJWklBV1VEQkFFdU1CRUVERnVzbFhTSEdSalYvZ0tVUkFJQkVJQTdqQmFFS3ZwUFg0R3JiMGZtREkxYkpHVXNtV2lwQVJVcGhNcjJhb2JtajhkcFF4cFpwcTh2S1FWaWFVVEovN0s3YlRkejIyeHpvOG16Y3lnPQAAABdhbXpuLWRkYi1tYXAtc2lnbmluZ0FsZwAAAApIbWFjU0hBMjU2AAAAFWFtem4tZGRiLW1hcC1zeW0tbW9kZQAAABEvQ0JDL1BLQ1M1UGFkZGluZwAAABBhbXpuLWRkYi1zaWctYWxnAAAADkhtYWNTSEEyNTYvMjU2AAAAEWFtem4tZGRiLXdyYXAtYWxnAAAAA2ttcwAAAA9hd3Mta21zLWVjLWF0dHIAAAAGKmtleXMq"
+            },
+            "t": {
+                "B": "xckQnYGs0m/hcMa8NXZm8b6ALjFwHnXUGW2MmSYUFgw="
+            },
+            "V": {
+                "N": "0"
+            },
+            "encAlg": {
+                "B": "6gOxsW9IdpzvoDmqE9Q0HUbjJjVcNw+rwXZ0ewvw2Ac="
+            },
+            "enc": {
+                "B": "EV+qvAvB3HlXRSmkLmrLkDtXysFPRjaSBneRWB68pjlzjlaTQgZcXT6ocro9xkcj5q/uByiy5+UZk1lfkLD5hQ=="
+            },
+            "intAlg": {
+                "B": "r7F5AKlagMQ1CxdTxtz3ACde3LO+JpzRDcYbS2aNEfoGXCU4XDwCADXmXx6i07sI"
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "LPOagzisLozwyUORpEmeyTjVHFCbyoiTftrq1UqTfcs="
+            },
+            "int": {
+                "B": "0DmuUIf/X/zxawA3VrHtbK7FLh/4f63SOW/O/EGDqh8KSE51jLdggHuc3i9FWquxeTPEL5BVov8QF0vVRgVkaA=="
+            },
+            "N": {
+                "S": "materialName"
+            }
+        }
+    ]
+}

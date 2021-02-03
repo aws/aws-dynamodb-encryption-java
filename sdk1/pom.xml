@@ -4,16 +4,60 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-dynamodb-encryption-java</artifactId>
-    <version>1.14.1</version>
+    <version>1.15.0</version>
     <packaging>jar</packaging>
     <name>aws-dynamodb-encryption-java :: SDK1</name>
     <description>AWS DynamoDB Encryption Client for AWS Java SDK v1</description>
     <url>https://github.com/aws/aws-dynamodb-encryption-java</url>
 
     <profiles>
+        <profile>
+            <id>publishingCodeArtifact</id>
+
+            <distributionManagement>
+                <!--
+                Registers an alternate repository for testing the publishing process using CodeArtifact
+                before moving to the production sonatype repository.
+                This can be used with a mvn invocation like:
+                mvn deploy -PpublishingCodeArtifact \
+                           -DaltDeploymentRepository=codeartifact::default::$CODEARTIFACT_REPO_URL \
+                           ...
+                -->
+                <repository>
+                    <id>codeartifact</id>
+                    <name>codeartifact</name>
+                    <!-- url specified using -DaltDeploymentRepository to avoid hardcoding it here -->
+                </repository>
+            </distributionManagement>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>publishing</id>
 
@@ -81,7 +125,6 @@
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <checkstyle.version>8.29</checkstyle.version>
         <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
-        <ddej-build-tools.version>0.1.0</ddej-build-tools.version>
         <jacoco-maven-plugin.version>0.8.3</jacoco-maven-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <maven-jxr-plugin.version>3.0.0</maven-jxr-plugin.version>
@@ -148,7 +191,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>1.68</version>
             <scope>test</scope>
         </dependency>
 
@@ -187,6 +230,34 @@
             <artifactId>libsqlite4java-linux-amd64</artifactId>
             <type>so</type>
             <version>${sqlite4java.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.8</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.multithreadedtc</groupId>
+            <artifactId>multithreadedtc</artifactId>
+            <version>1.01</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -281,11 +352,6 @@
                         <artifactId>checkstyle</artifactId>
                         <version>${checkstyle.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>software.amazon.cryptools</groupId>
-                        <artifactId>ddej-build-tools</artifactId>
-                        <version>${ddej-build-tools.version}</version>
-                    </dependency>
                 </dependencies>
                 <executions>
                     <execution>
@@ -297,8 +363,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <configLocation>software/amazon/cryptools/ddej-build-tools/checkstyle/checkstyle.xml</configLocation>
-                    <suppressionsLocation>software/amazon/cryptools/ddej-build-tools/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+                    <configLocation>checkstyle/checkstyle.xml</configLocation>
+                    <suppressionsLocation>checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <logViolationsToConsole>true</logViolationsToConsole>
@@ -320,6 +386,7 @@
                     </systemProperties>
                     <includes>
                         <include>**/*ITCase.java</include>
+                        <include>**/*HolisticIT.java</include>
                     </includes>
                 </configuration>
                 <executions>
@@ -350,6 +417,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>

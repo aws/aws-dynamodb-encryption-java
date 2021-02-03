@@ -263,6 +263,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
      * <dd>{@code RangeKeyValue}</dd>
      * <dt>{@link #TABLE_NAME_EC_KEY}</dt>
      * <dd>{@code TableName}</dd>
+     * </dl>
      */
     protected void populateKmsEcFromEc(EncryptionContext context, Map<String, String> kmsEc) {
         final String hashKeyName = context.getHashKeyName();

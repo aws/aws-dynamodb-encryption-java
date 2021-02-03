@@ -1,15 +1,5 @@
-/*
- * Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
- * in compliance with the License. A copy of the License is located at
- * 
- * http://aws.amazon.com/apache2.0
- * 
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+// Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,12 +11,24 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.Encry
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store.ProviderStore;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.LRUCache;
 
+import static com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils.checkNotNull;
+
 /**
  * This meta-Provider encrypts data with the most recent version of keying materials from a
  * {@link ProviderStore} and decrypts using whichever version is appropriate. It also caches the
  * results from the {@link ProviderStore} to avoid excessive load on the backing systems. The cache
  * is not currently configurable.
+ *
+ * @deprecated This provider uses a TTL value to determine when to ping the keystore
+ * to get the current materials version, instead of using the TTL value to determine
+ * when to expire cached materials. This is unintuitive behavior for users of this provider
+ * who may wish to use a TTL to force the keystore to re-obtain materials.
+ *
+ * Use the CachingMostRecentProvider, which uses a user defined TTL value to
+ * also expire the cached materials themselves, forcing
+ * the keystore to regularly re-obtain materials.
  */
+@Deprecated
 public class MostRecentProvider implements EncryptionMaterialsProvider {
     private static final long MILLI_TO_NANO = 1000000L;
     private static final long TTL_GRACE_IN_NANO = 500 * MILLI_TO_NANO;
@@ -163,14 +165,6 @@ public class MostRecentProvider implements EncryptionMaterialsProvider {
         result.append('#');
         result.append(version);
         return result.toString();
-    }
-
-    private static <V> V checkNotNull(final V ref, final String errMsg) {
-        if (ref == null) {
-            throw new NullPointerException(errMsg);
-        } else {
-            return ref;
-        }
     }
 
     private static class LockedState {

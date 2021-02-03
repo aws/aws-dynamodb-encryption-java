@@ -1,26 +1,11 @@
-/*
- * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
+// Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
 import com.amazonaws.annotation.ThreadSafe;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,10 +21,7 @@ public final class LRUCache<T> {
      * Used for the internal cache.
      */
     private final Map<String, T> map;
-    /**
-     * Listener for cache entry eviction.
-     */
-    private final RemovalListener<T> listener;
+
     /**
      * Maximum size of the cache.
      */
@@ -48,25 +30,13 @@ public final class LRUCache<T> {
     /**
      * @param maxSize
      *            the maximum number of entries of the cache
-     * @param listener
-     *            object which is notified immediately prior to the removal of
-     *            any objects from the cache
      */
-    public LRUCache(final int maxSize, final RemovalListener<T> listener) {
+    public LRUCache(final int maxSize) {
         if (maxSize < 1) {
             throw new IllegalArgumentException("maxSize " + maxSize + " must be at least 1");
         }
         this.maxSize = maxSize;
-        this.listener = listener;
-        map = Collections.synchronizedMap(new LRUHashMap<T>(maxSize, listener));
-    }
-
-    /**
-     * @param maxSize
-     *            the maximum number of entries of the cache
-     */
-    public LRUCache(final int maxSize) {
-        this(maxSize, null);
+        map = Collections.synchronizedMap(new LRUHashMap<>(maxSize));
     }
 
     /**
@@ -96,23 +66,11 @@ public final class LRUCache<T> {
     }
 
     public void clear() {
-        // The more complicated logic is to ensure that the listener is
-        // actually called for all entries.
-        if (listener != null) {
-            List<Entry<String, T>> removedEntries = new ArrayList<Entry<String, T>>();
-            synchronized (map) {
-                Iterator<Entry<String, T>> it = map.entrySet().iterator();
-                while(it.hasNext()) {
-                    removedEntries.add(it.next());
-                    it.remove();
-                }
-            }
-            for (Entry<String, T> entry : removedEntries) {
-                listener.onRemoval(entry);
-            }
-        } else {
-            map.clear();
-        }
+        map.clear();
+    }
+
+    public T remove(String key) {
+        return map.remove(key);
     }
 
     @Override
@@ -123,27 +81,15 @@ public final class LRUCache<T> {
     @SuppressWarnings("serial")
     private static class LRUHashMap<T> extends LinkedHashMap<String, T> {
         private final int maxSize;
-        private final RemovalListener<T> listener;
 
-        private LRUHashMap(final int maxSize, final RemovalListener<T> listener) {
+        private LRUHashMap(final int maxSize) {
             super(10, 0.75F, true);
             this.maxSize = maxSize;
-            this.listener = listener;
         }
 
         @Override
         protected boolean removeEldestEntry(final Entry<String, T> eldest) {
-            if (size() > maxSize) {
-                if (listener != null) {
-                    listener.onRemoval(eldest);
-                }
-                return true;
-            }
-            return false;
+            return size() > maxSize;
         }
-    }
-
-    public static interface RemovalListener<T> {
-        public void onRemoval(Entry<String, T> entry);
     }
 }

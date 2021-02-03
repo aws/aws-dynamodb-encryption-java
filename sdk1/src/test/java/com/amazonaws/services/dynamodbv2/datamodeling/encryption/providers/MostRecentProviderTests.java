@@ -1,15 +1,5 @@
-/*
- * Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except
- * in compliance with the License. A copy of the License is located at
- *
- * http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations under the License.
- */
+// Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -40,6 +30,7 @@ import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
 
+@SuppressWarnings("deprecation")
 public class MostRecentProviderTests {
     private static final String TABLE_NAME = "keystoreTable";
     private static final String MATERIAL_NAME = "material";
@@ -488,7 +479,7 @@ public class MostRecentProviderTests {
         assertEquals(eMat3_2.getEncryptionKey(), dMat3_2.getDecryptionKey());
         assertEquals(eMat3_1.getSigningKey(), dMat3_1.getVerificationKey());
         assertEquals(eMat3_2.getSigningKey(), dMat3_2.getVerificationKey());
-        // Get item will be hit once for the one old key
+        // Get item will be hit twice, once for each old key
         assertEquals(1, methodCalls.size());
         assertEquals(2, (int) methodCalls.getOrDefault("getItem", 0));
     }

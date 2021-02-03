@@ -64,7 +64,7 @@ public class AsymmetricStaticProviderTest {
     }
 
     @Test
-    public void simpleMac() throws GeneralSecurityException {
+    public void constructWithMac() throws GeneralSecurityException {
         AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, macKey, Collections.<String, String>emptyMap());
 
         EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
@@ -78,7 +78,7 @@ public class AsymmetricStaticProviderTest {
     }
 
     @Test
-    public void simpleSig() throws GeneralSecurityException {
+    public void constructWithSigPair() throws GeneralSecurityException {
         AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, Collections.<String, String>emptyMap());
 
         EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
@@ -112,99 +112,6 @@ public class AsymmetricStaticProviderTest {
         // This does nothing, make sure we don't throw and exception.
         AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, macKey, description);
         prov.refresh();
-    }
-
-    // Following tests should be moved the WrappedRawMaterialsTests when that is created
-    @Test
-    public void explicitWrappingAlgorithmPkcs1() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
-        desc.put(WrappedRawMaterials.KEY_WRAPPING_ALGORITHM, "RSA/ECB/PKCS1Padding");
-
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, desc);
-
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
-
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("RSA/ECB/PKCS1Padding", eMat.getMaterialDescription().get(WrappedRawMaterials.KEY_WRAPPING_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
-    }
-
-    @Test
-    public void explicitWrappingAlgorithmPkcs2() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
-        desc.put(WrappedRawMaterials.KEY_WRAPPING_ALGORITHM, "RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, desc);
-
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
-
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", eMat.getMaterialDescription().get(WrappedRawMaterials.KEY_WRAPPING_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
-    }
-
-    @Test
-    public void explicitContentKeyAlgorithm() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES");
-
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, desc);
-
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
-
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
-    }
-
-    @Test
-    public void explicitContentKeyLength128() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/128");
-
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, desc);
-
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(16, encryptionKey.getEncoded().length); // 128 Bits
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
-
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
-    }
-
-    @Test
-    public void explicitContentKeyLength256() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<String, String>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/256");
-
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, desc);
-
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(32, encryptionKey.getEncoded().length); // 256 Bits
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
-
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
     }
 
     private static EncryptionContext ctx(EncryptionMaterials mat) {

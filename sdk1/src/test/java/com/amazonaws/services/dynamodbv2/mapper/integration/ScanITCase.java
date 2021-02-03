@@ -172,37 +172,16 @@ public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     }
 
-    // TODO: This is disabled because it has problems on DDBLocal, but works fine on DDB
-    @Test(enabled = false)
-    public void testParallelScanPerformance() throws Exception{
-        DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
-
-        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withLimit(SCAN_LIMIT);
-        scanExpression.addFilterCondition("value", new Condition().withComparisonOperator(ComparisonOperator.NOT_NULL.toString()));
-        scanExpression.addFilterCondition("extraData", new Condition().withComparisonOperator(ComparisonOperator.NOT_NULL.toString()));
-
-        long startTime = System.currentTimeMillis();
-        PaginatedScanList<SimpleClass> scanList = util.scan(SimpleClass.class, scanExpression);
-        scanList.loadAllResults();
-        long fullTableScanTime = System.currentTimeMillis() - startTime;
-        startTime = System.currentTimeMillis();
-        PaginatedParallelScanList<SimpleClass> parallelScanList = util.parallelScan(SimpleClass.class, scanExpression, PARALLEL_SCAN_SEGMENTS);
-        parallelScanList.loadAllResults();
-        long parallelScanTime = System.currentTimeMillis() - startTime;
-        assertTrue(scanList.size() == parallelScanList.size());
-        assertTrue(fullTableScanTime > parallelScanTime);
-        System.out.println("fullTableScanTime : " + fullTableScanTime + "(ms), parallelScanTime : " + parallelScanTime + "(ms).");
-    }
-
-    // TODO: This is disabled because it has problems on DDBLocal, but works fine on DDB
-    @Test(enabled = false)
+    @Test
     public void testParallelScanExceptionHandling() {
         DynamoDBMapper util = TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo);
         int INVALID_LIMIT = 0;
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression().withLimit(INVALID_LIMIT);
         try {
-            PaginatedParallelScanList<SimpleClass> parallelScanList = util.parallelScan(SimpleClass.class, scanExpression, PARALLEL_SCAN_SEGMENTS);
-            fail("Should have seen the AmazonServiceException");
+            // Using 2 segments to reduce the chance of a RejectedExecutionException occurring when too many threads are spun up
+            // An alternative would be to maintain a higher segment count, but re-test when a RejectedExecutionException occurs
+            PaginatedParallelScanList<SimpleClass> parallelScanList = util.parallelScan(SimpleClass.class, scanExpression, 2);
+            fail("Test succeeded when it should have failed");
         } catch (AmazonServiceException ase) {
             assertNotNull(ase.getErrorCode());
             assertNotNull(ase.getErrorType());
@@ -210,7 +189,6 @@ public class ScanITCase extends DynamoDBMapperCryptoIntegrationTestBase {
         } catch (Exception e) {
             fail("Should have seen the AmazonServiceException");
         }
-
     }
 
     @Test

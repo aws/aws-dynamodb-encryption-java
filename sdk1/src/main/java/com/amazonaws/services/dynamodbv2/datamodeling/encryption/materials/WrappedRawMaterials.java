@@ -162,9 +162,15 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
                     description.get(CONTENT_KEY_ALGORITHM), Cipher.SECRET_KEY, null, wrappingAlgorithm);
         } else {
             Cipher cipher = Cipher.getInstance(wrappingAlgorithm);
+
+            // This can be of the form "AES/256" as well as "AES" e.g.,
+            // but we want to set the SecretKey with just "AES" in either case
+            String[] algPieces = description.get(CONTENT_KEY_ALGORITHM).split("/", 2);
+            String contentKeyAlgorithm = algPieces[0];
+
             cipher.init(Cipher.UNWRAP_MODE, unwrappingKey, Utils.getRng());
             return (SecretKey) cipher.unwrap(encryptedKey,
-                    description.get(CONTENT_KEY_ALGORITHM), Cipher.SECRET_KEY);
+                    contentKeyAlgorithm, Cipher.SECRET_KEY);
         }
     }
     

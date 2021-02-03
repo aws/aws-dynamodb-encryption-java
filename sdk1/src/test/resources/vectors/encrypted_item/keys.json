@@ -1,0 +1,41 @@
+{
+    "aesKey": {
+        "material": "AAECAwQFBgcICQoLDA0ODw==",
+        "algorithm": "AES",
+        "encoding": "RAW",
+        "type": "symmetric"
+    },
+    "hmacKey": {
+        "material": "AAECAwQFBgc=",
+        "algorithm": "HmacSHA256",
+        "encoding": "RAW",
+        "type": "symmetric"
+    },
+    "rsaEncPub": {
+        "material": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtiNSLSvT9cExXOcD0dGZ9DFEMHw8895gAZcCdSppDrxbD7XgZiQYTlgt058i5fS+l11guAUJtKt5sZ2u8Fx0K9pxMdlczGtvQJdx/LQETEnLnfzAijvHisJ8h6dQOVczM7t01KIkS24QZElyO+kYqMWLytUV4RSHnrnIuUtPHCe6LieDWT2+1UBguxgtFt1xdXlquACLVv/Em3wp40XcbIwzhqLitb98rTY/wqSiGTz1uvvBX46n+f2j3geZKCEDGkWcXYw3dH4lRtDWTbqweRcaNDT/MJswQlBk/Up9KCyN7gjX67gttiCO6jMoTNDejGeJhG4Dd2o0vmn8WJlr5wIDAQAB",
+        "algorithm": "RSA",
+        "encoding": "DER",
+        "type": "public"
+    },
+    "rsaEncPriv": {
+        "material": "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2I1ItK9P1wTFc5wPR0Zn0MUQwfDzz3mABlwJ1KmkOvFsPteBmJBhOWC3TnyLl9L6XXWC4BQm0q3mxna7wXHQr2nEx2VzMa29Al3H8tARMScud/MCKO8eKwnyHp1A5VzMzu3TUoiRLbhBkSXI76RioxYvK1RXhFIeeuci5S08cJ7ouJ4NZPb7VQGC7GC0W3XF1eWq4AItW/8SbfCnjRdxsjDOGouK1v3ytNj/CpKIZPPW6+8Ffjqf5/aPeB5koIQMaRZxdjDd0fiVG0NZNurB5Fxo0NP8wmzBCUGT9Sn0oLI3uCNfruC22II7qMyhM0N6MZ4mEbgN3ajS+afxYmWvnAgMBAAECggEBAIIU293zDWDZZ73oJ+w0fHXQsdjHAmlRitPX3CN99KZXk9m2ldudL9bUV3Zqk2wUzgIg6LDEuFfWmAVojsaP4VBopKtriEFfAYfqIbjPgLpTgh8FoyWW6D6MBJCFyGALjUAHQ7uRScathvt5ESMEqV3wKJTmdsfX97w/B8J+rLN33fT3ZJUck5duZ8XKD+UtX1Y3UE1hTWo3Ae2MFND964XyUqy+HaYXjH0x6dhZzqyJ/OJ/MPGeMJgxp+nUbMWerwxrLQceNFVgnQgHj8e8k4fd04rkowkkPua912gNtmz7DuIEvcMnY64z585cn+cnXUPJwtu3JbAmn/AyLsV9FLECgYEA798Ut/r+vORB16JDKFu38pQCgIbdCPkXeI0DC6u1cW8JFhgRqi+AqSrEy5SzY3IY7NVMSRsBI9Y026BlR9OQwTrOzLRAw26NPSDvbTkeYXlY9+hX7IovHjGkho/OxyTJ7bKRDYLoNCz56BC1khIWvECpcf/fZU0nqOFVFqF3H/UCgYEAwmJ4rjl5fksTNtNRL6ivkqkHIPKXzk5wC+L90HKNicic9bqyX8K4JRkGKSNYN3mkjrguAzUlEld390qNBw5Lu7PwATv0e2i+6hdwJsjTKNpj7Nh4Mieq6d7lWe1L8FLyHEhxgIeQ4BgqrVtPPOH8IBGpuzVZdWwIdgOvEvAi/usCgYBdfk3NB/+SEEW5jn0uldE0s4vmHKq6fJwxWIT/X4XxGJ4qBmecNbeoOAtMbkEdWbNtXBXHyMbA+RTRJctUG5ooNou0Le2wPr6+PMAVilXVGD8dIWpjv9htpFvENvkZlbU++IKhCY0ICR++3ARpUrOZ3Hou/NRN36y9nlZT48tSoQKBgES2Bi6fxmBsLUiN/f64xAc1lH2DA0I728N343xRYdK4hTMfYXoUHH+QjurvwXkqmI6ScEFWAdqv7IoPYjaCSSb6ffYRuWP+LK4WxuAO0QV53SSViDdCalntHmlhRhyXVVnGCckDIqT0JfHNev7savDzDWpNe2fUXlFJEBPDqrstAoGBAOpd5+QBHF/tP5oPILH4aD/zmqMH7VtB+b/fOPwtIM+B/WnU7hHLO5t2lJYu18Be3amPkfoQIB7bpkM3Cer2G7Jw+TcHrY+EtIziDB5vwau1fl4VcbA9SfWpBojJ5Ifo9ELVxGiK95WxeQNSmLUy7AJzhK1Gwey8a/v+xfqiu9sE",
+        "algorithm": "RSA",
+        "encoding": "DER",
+        "type": "private"
+    },
+    "rsaSignPub": {
+        "material": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtiNSLSvT9cExXOcD0dGZ9DFEMHw8895gAZcCdSppDrxbD7XgZiQYTlgt058i5fS+l11guAUJtKt5sZ2u8Fx0K9pxMdlczGtvQJdx/LQETEnLnfzAijvHisJ8h6dQOVczM7t01KIkS24QZElyO+kYqMWLytUV4RSHnrnIuUtPHCe6LieDWT2+1UBguxgtFt1xdXlquACLVv/Em3wp40XcbIwzhqLitb98rTY/wqSiGTz1uvvBX46n+f2j3geZKCEDGkWcXYw3dH4lRtDWTbqweRcaNDT/MJswQlBk/Up9KCyN7gjX67gttiCO6jMoTNDejGeJhG4Dd2o0vmn8WJlr5wIDAQAB",
+        "algorithm": "SHA256withRSA",
+        "encoding": "DER",
+        "type": "public"
+    },
+    "rsaSignPriv": {
+        "material": "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2I1ItK9P1wTFc5wPR0Zn0MUQwfDzz3mABlwJ1KmkOvFsPteBmJBhOWC3TnyLl9L6XXWC4BQm0q3mxna7wXHQr2nEx2VzMa29Al3H8tARMScud/MCKO8eKwnyHp1A5VzMzu3TUoiRLbhBkSXI76RioxYvK1RXhFIeeuci5S08cJ7ouJ4NZPb7VQGC7GC0W3XF1eWq4AItW/8SbfCnjRdxsjDOGouK1v3ytNj/CpKIZPPW6+8Ffjqf5/aPeB5koIQMaRZxdjDd0fiVG0NZNurB5Fxo0NP8wmzBCUGT9Sn0oLI3uCNfruC22II7qMyhM0N6MZ4mEbgN3ajS+afxYmWvnAgMBAAECggEBAIIU293zDWDZZ73oJ+w0fHXQsdjHAmlRitPX3CN99KZXk9m2ldudL9bUV3Zqk2wUzgIg6LDEuFfWmAVojsaP4VBopKtriEFfAYfqIbjPgLpTgh8FoyWW6D6MBJCFyGALjUAHQ7uRScathvt5ESMEqV3wKJTmdsfX97w/B8J+rLN33fT3ZJUck5duZ8XKD+UtX1Y3UE1hTWo3Ae2MFND964XyUqy+HaYXjH0x6dhZzqyJ/OJ/MPGeMJgxp+nUbMWerwxrLQceNFVgnQgHj8e8k4fd04rkowkkPua912gNtmz7DuIEvcMnY64z585cn+cnXUPJwtu3JbAmn/AyLsV9FLECgYEA798Ut/r+vORB16JDKFu38pQCgIbdCPkXeI0DC6u1cW8JFhgRqi+AqSrEy5SzY3IY7NVMSRsBI9Y026BlR9OQwTrOzLRAw26NPSDvbTkeYXlY9+hX7IovHjGkho/OxyTJ7bKRDYLoNCz56BC1khIWvECpcf/fZU0nqOFVFqF3H/UCgYEAwmJ4rjl5fksTNtNRL6ivkqkHIPKXzk5wC+L90HKNicic9bqyX8K4JRkGKSNYN3mkjrguAzUlEld390qNBw5Lu7PwATv0e2i+6hdwJsjTKNpj7Nh4Mieq6d7lWe1L8FLyHEhxgIeQ4BgqrVtPPOH8IBGpuzVZdWwIdgOvEvAi/usCgYBdfk3NB/+SEEW5jn0uldE0s4vmHKq6fJwxWIT/X4XxGJ4qBmecNbeoOAtMbkEdWbNtXBXHyMbA+RTRJctUG5ooNou0Le2wPr6+PMAVilXVGD8dIWpjv9htpFvENvkZlbU++IKhCY0ICR++3ARpUrOZ3Hou/NRN36y9nlZT48tSoQKBgES2Bi6fxmBsLUiN/f64xAc1lH2DA0I728N343xRYdK4hTMfYXoUHH+QjurvwXkqmI6ScEFWAdqv7IoPYjaCSSb6ffYRuWP+LK4WxuAO0QV53SSViDdCalntHmlhRhyXVVnGCckDIqT0JfHNev7savDzDWpNe2fUXlFJEBPDqrstAoGBAOpd5+QBHF/tP5oPILH4aD/zmqMH7VtB+b/fOPwtIM+B/WnU7hHLO5t2lJYu18Be3amPkfoQIB7bpkM3Cer2G7Jw+TcHrY+EtIziDB5vwau1fl4VcbA9SfWpBojJ5Ifo9ELVxGiK95WxeQNSmLUy7AJzhK1Gwey8a/v+xfqiu9sE",
+        "algorithm": "SHA256withRSA",
+        "encoding": "DER",
+        "type": "private"
+    },
+    "awsKmsUsWest2": {
+        "keyId": "arn:aws:kms:us-west-2:658956600833:key/b3537ef1-d8dc-4780-9f5a-55776cbb2f7f"
+    }
+}

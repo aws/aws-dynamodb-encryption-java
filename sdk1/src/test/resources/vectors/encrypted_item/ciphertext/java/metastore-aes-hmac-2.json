@@ -1,0 +1,33 @@
+{
+    "metastore": [
+        {
+            "*amzn-ddb-map-desc*": {
+                "B": "AAAAAAAAABVhbXpuLWRkYi1tYXAtc3ltLW1vZGUAAAARL0NCQy9QS0NTNVBhZGRpbmc="
+            },
+            "t": {
+                "B": "eJcKzY3SHwBIhXdfxeYWd9UE5yX+RxaPJQ7L2TdgDxs="
+            },
+            "V": {
+                "N": "0"
+            },
+            "encAlg": {
+                "B": "XJilRkdsIP0bqzvqutJc8AC8YhY1YApJCgTLXgAqtwU="
+            },
+            "enc": {
+                "B": "DvDUW2Ao1YWp7uxxEL+mv5uqHCrSNIDR18CgBD8XHCuNlBPC6GXxk9YnFmv3kgVDlMdEo0wE79zRoETB7GmjcA=="
+            },
+            "intAlg": {
+                "B": "I//7G2LUrAQ2EwQGQr7ZIKyXl1AlGeB+kfvZGmCj6wShZpMKPXjyBF/9RvIz3clQ"
+            },
+            "N": {
+                "S": "materialName"
+            },
+            "int": {
+                "B": "zFha4J4gPaiwhjiQs47L0bTf4WSNemVAxKJJnBnujl7OajvO7ZW3zehGJlaai4tCLxTwoLPI+Ig/a+zCdau4iw=="
+            },
+            "*amzn-ddb-map-sig*": {
+                "B": "aklO+h7kSUjXEt6pBA03G4wiIU20XKT/sP+rKSeNAKc="
+            }
+        }
+    ]
+}

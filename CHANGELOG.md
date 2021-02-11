@@ -1,4 +1,8 @@
 # Changelog
+## 2.0.1 -- 2021-02-11
+### Bugfix
+Fixes released jar files to ensure JDK 8 compatibility.
+
 ## 2.0.0 -- 2021-02-04
 Removes MostRecentProvider.
 MostRecentProvider is replaced by CachingMostRecentProvider as of 1.15.0.

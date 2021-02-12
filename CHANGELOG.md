@@ -1,5 +1,5 @@
 # Changelog
-## 2.0.1 -- 2021-02-11
+## 2.0.1 -- 2021-02-12
 ### Bugfix
 Fixes released jar files to ensure JDK 8 compatibility.
 

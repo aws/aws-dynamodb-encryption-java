@@ -237,6 +237,11 @@ public class DynamoDBEncryptor {
         if (attributeFlags.isEmpty()) {
             return itemAttributes;
         }
+        if (itemAttributes != null
+              && !itemAttributes.containsKey(DEFAULT_SIGNATURE_FIELD)
+              && !itemAttributes.containsKey(DEFAULT_METADATA_FIELD)) {
+            return itemAttributes;
+        }
         // Copy to avoid changing anyone elses objects
         itemAttributes = new HashMap<String, AttributeValue>(itemAttributes);
         

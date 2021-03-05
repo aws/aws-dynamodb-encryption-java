@@ -23,6 +23,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
 
 /**
  * Prevents the associated item from being encrypted or signed.
+ *
+ * <p>For guidance on performing a safe data model change procedure, please see
+ * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
+ * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
  * 
  * @author Greg Rubin 
  */

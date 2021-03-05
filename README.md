@@ -111,6 +111,18 @@ Note that by default all attributes except the primary keys are both encrypted a
 
 There is a variety of existing [EncryptionMaterialsProvider][materialprovider] implementations that you can use to provide the encryption material, including [KeyStoreMaterialsProvider][keystoreprovider] which makes use of a Java keystore.  Alternatively, you can also plug in your own custom implementation.
 
+### Changing Your Data Model
+
+Every time you encrypt or decrypt an item, you need to provide attribute actions that tell the DynamoDB Encryption
+Client which attributes to encrypt and sign, which attributes to sign (but not encrypt), and which to ignore. Attribute
+actions are not saved in the encrypted item and the DynamoDB Encryption Client does not update your attribute actions
+automatically.
+
+Whenever you change your data model, that is, when you add or remove attributes from your table items, you need to take
+additional steps to safely migrate the client-side encryption configuration.
+
+For guidance on this process, please see the developer guide on [Changing Your Data Model](https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html).
+
 ### Downloads
 
 You can download the [latest snapshot release][download] or pick it up from Maven:

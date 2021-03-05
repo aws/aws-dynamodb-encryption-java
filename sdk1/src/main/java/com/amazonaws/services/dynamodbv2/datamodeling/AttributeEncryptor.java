@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
- * <em>This must be used with @{link SaveBehavior#PUT} or @{link SaveBehavior#CLOBBER}.</em>
+ * <em>This must be used with {@link SaveBehavior#PUT} or {@link SaveBehavior#CLOBBER}.</em>
  *
  * <p>For guidance on performing a safe data model change procedure, please see
  * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">

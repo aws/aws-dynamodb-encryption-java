@@ -34,11 +34,13 @@ import com.amazonaws.util.VersionInfoUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
@@ -53,9 +55,8 @@ import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.material
  * @see <a href="http://docs.aws.amazon.com/kms/latest/developerguide/encrypt-context.html">KMS Encryption Context</a>
  */
 public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
-    private static final String VERSION_STRING = "1.0";
-    private static final String USER_AGENT = DirectKmsMaterialProvider.class.getName()
-            + "/" + VERSION_STRING + "/" + VersionInfoUtils.getVersion();
+    static final String USER_AGENT_PREFIX = "DynamodbEncryptionSdkJava/";
+    private static final String USER_AGENT = USER_AGENT_PREFIX + loadVersion();
     private static final String COVERED_ATTR_CTX_KEY = "aws-kms-ec-attr";
     private static final String SIGNING_KEY_ALGORITHM = "amzn-ddb-sig-alg";
     private static final String TABLE_NAME_EC_KEY = "*aws-kms-table*";
@@ -76,6 +77,17 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     private final String sigKeyAlg;
     private final int sigKeyLength;
     private final String sigKeyDesc;
+
+    private static String loadVersion() {
+        try {
+            final Properties properties = new Properties();
+            properties.load(DirectKmsMaterialProvider.class.getClassLoader()
+                    .getResourceAsStream("project.properties"));
+            return properties.getProperty("foo");
+        } catch (final IOException ex) {
+            return "unknown";
+        }
+    }
 
     public DirectKmsMaterialProvider(AWSKMS kms) {
         this(kms, null);

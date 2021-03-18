@@ -12,6 +12,7 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
+import com.amazonaws.RequestClientOptions;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
@@ -335,6 +336,19 @@ public class DirectKmsMaterialProviderTest {
         assertFalse(gdkCalled.get());
         new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
         assertTrue(gdkCalled.get());
+    }
+
+    @Test
+    public void userAgentIsAdded() {
+        AWSKMS kmsSpy = new FakeKMS() {
+            @Override
+            public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
+                assertTrue(r.getRequestClientOptions().getClientMarker(RequestClientOptions.Marker.USER_AGENT)
+                        .contains(DirectKmsMaterialProvider.USER_AGENT_PREFIX));
+                return super.generateDataKey(r);
+            }
+        };
+        new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
     }
 
     private static class ExtendedKmsMaterialProvider extends DirectKmsMaterialProvider {

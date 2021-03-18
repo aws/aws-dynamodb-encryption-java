@@ -14,7 +14,9 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
+import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Properties;
 
 public class Utils {
     private static final ThreadLocal<SecureRandom> RND = new ThreadLocal<SecureRandom>() {
@@ -47,4 +49,18 @@ public class Utils {
             return ref;
         }
     }
+
+    /*
+     * Loads the version of the library
+     */
+    public static String loadVersion() {
+        try {
+            final Properties properties = new Properties();
+            properties.load(ClassLoader.getSystemResourceAsStream("project.properties"));
+            return properties.getProperty("version");
+        } catch (final IOException ex) {
+            return "unknown";
+        }
+    }
+
 }

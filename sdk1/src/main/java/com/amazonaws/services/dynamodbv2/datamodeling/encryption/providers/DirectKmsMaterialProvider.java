@@ -30,21 +30,19 @@ import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.StringUtils;
-import com.amazonaws.util.VersionInfoUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials.KEY_WRAPPING_ALGORITHM;
+import static com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils.loadVersion;
 
 /**
  * Generates a unique data key for each record in DynamoDB and protects that key
@@ -77,17 +75,6 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     private final String sigKeyAlg;
     private final int sigKeyLength;
     private final String sigKeyDesc;
-
-    private static String loadVersion() {
-        try {
-            final Properties properties = new Properties();
-            properties.load(DirectKmsMaterialProvider.class.getClassLoader()
-                    .getResourceAsStream("project.properties"));
-            return properties.getProperty("foo");
-        } catch (final IOException ex) {
-            return "unknown";
-        }
-    }
 
     public DirectKmsMaterialProvider(AWSKMS kms) {
         this(kms, null);

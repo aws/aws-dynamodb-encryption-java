@@ -30,8 +30,12 @@ import java.lang.annotation.Target;
  * attributes will only be included in the signature calculation, and if it's
  * added to a class with default encryption behavior, the unknown attributes
  * will be signed and decrypted.
+ *
+ * <p>For guidance on performing a safe data model change procedure, please see
+ * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
+ * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
  * 
- * @author Dan Cavallaro 
+ * @author Dan Cavallaro
  */
 @Target(value = {ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)

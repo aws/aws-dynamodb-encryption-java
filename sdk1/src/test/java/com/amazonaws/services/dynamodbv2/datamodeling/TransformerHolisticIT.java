@@ -397,7 +397,7 @@ public class TransformerHolisticIT {
 
     /**
      * This test ensures that optimistic locking can be successfully done through the {@link DynamoDBMapper} when
-     * combined with the @{link AttributeEncryptor}. Specifically it checks that {@link SaveBehavior#PUT} properly
+     * combined with the {@link AttributeEncryptor}. Specifically it checks that {@link SaveBehavior#PUT} properly
      * enforces versioning and will result in a {@link ConditionalCheckFailedException} when optimistic locking should
      * prevent a write. Finally, it checks that {@link SaveBehavior#CLOBBER} properly ignores optimistic locking and
      * overwrites the old value.

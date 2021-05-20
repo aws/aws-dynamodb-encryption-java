@@ -1,8 +1,6 @@
 name: Repo Sync
 
 on:
-  schedule: 
-  - cron: "*/15 * * * *" # every 15 minutes
   workflow_dispatch:     # allows triggering this manually through the Actions UI
 
 jobs:

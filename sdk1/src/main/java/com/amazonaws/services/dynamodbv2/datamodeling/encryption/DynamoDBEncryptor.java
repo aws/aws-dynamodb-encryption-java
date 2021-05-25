@@ -50,7 +50,11 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 /**
  * The low-level API used by {@link AttributeEncryptor} to perform crypto
  * operations on the record attributes.
- * 
+ *
+ * <p>For guidance on performing a safe data model change procedure, please see
+ * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
+ * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
+ *
  * @author Greg Rubin 
  */
 public class DynamoDBEncryptor {

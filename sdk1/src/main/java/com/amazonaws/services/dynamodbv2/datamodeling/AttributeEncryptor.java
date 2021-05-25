@@ -38,9 +38,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB.
- * <em>This must be used with @{link SaveBehavior#PUT} or @{link SaveBehavior#CLOBBER}.</em>
- * 
- * @author Greg Rubin 
+ * <em>This must be used with {@link SaveBehavior#PUT} or {@link SaveBehavior#CLOBBER}.</em>
+ *
+ * <p>For guidance on performing a safe data model change procedure, please see
+ * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
+ * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
+ *
+ *  @author Greg Rubin
  */
 public class AttributeEncryptor implements AttributeTransformer {
     private static final Log LOG = LogFactory.getLog(AttributeEncryptor.class);

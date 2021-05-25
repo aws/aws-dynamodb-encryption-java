@@ -9,7 +9,7 @@ assignees: ''
 
 ### Security issue notifications
 
-If you discover a potential security issue in the AWS Encryption SDK we ask that you notify AWS Security via our [vulnerability reporting page](https://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public GitHub issue.
+If you discover a potential security issue in the Amazon DynamoDB Encryption Client we ask that you notify AWS Security via our [vulnerability reporting page](https://aws.amazon.com/security/vulnerability-reporting/). Please do **not** create a public GitHub issue.
 
 ### Problem:
 
@@ -17,7 +17,7 @@ A short description of what the problem is and why we need to fix it. Add reprod
 
 ### Solution:
 
-A description of the possible solution in terms of Encryption SDK architecture.
+A description of the possible solution in terms of DynamoDB Encryption Client architecture.
 
 ### Out of scope:
 

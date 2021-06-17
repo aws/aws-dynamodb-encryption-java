@@ -23,3 +23,8 @@ batch:
       env:
         env:
         image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+    - identifier: format-check
+      buildspec: codebuild/format-check.yml
+      env:
+        env:
+        image: aws/codebuild/amazonlinux2-x86_64-standard:3.0

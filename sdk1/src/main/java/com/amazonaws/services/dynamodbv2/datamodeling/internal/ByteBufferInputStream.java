@@ -17,40 +17,38 @@ package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-/**
- * @author Greg Rubin 
- */
+/** @author Greg Rubin */
 public class ByteBufferInputStream extends InputStream {
-    private final ByteBuffer buffer;
+  private final ByteBuffer buffer;
 
-    public ByteBufferInputStream(ByteBuffer buffer) {
-        this.buffer = buffer;
-    }
+  public ByteBufferInputStream(ByteBuffer buffer) {
+    this.buffer = buffer;
+  }
 
-    @Override
-    public int read() {
-        if (buffer.hasRemaining()) {
-            int tmp = buffer.get();
-            if (tmp < 0) {
-                tmp += 256;
-            }
-            return tmp;
-        } else {
-            return -1;
-        }
+  @Override
+  public int read() {
+    if (buffer.hasRemaining()) {
+      int tmp = buffer.get();
+      if (tmp < 0) {
+        tmp += 256;
+      }
+      return tmp;
+    } else {
+      return -1;
     }
-    
-    @Override
-    public int read(byte[] b, int off, int len) {
-        if (available() < len) {
-            len = available();
-        }
-        buffer.get(b, off, len);
-        return len;
+  }
+
+  @Override
+  public int read(byte[] b, int off, int len) {
+    if (available() < len) {
+      len = available();
     }
-    
-    @Override
-    public int available() {
-        return buffer.remaining();
-    }
+    buffer.get(b, off, len);
+    return len;
+  }
+
+  @Override
+  public int available() {
+    return buffer.remaining();
+  }
 }

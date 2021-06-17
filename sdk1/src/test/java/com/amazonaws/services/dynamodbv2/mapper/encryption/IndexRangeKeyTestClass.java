@@ -20,163 +20,154 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
 
-/**
- * Comprehensive domain class
- */
+/** Comprehensive domain class */
 @DynamoDBTable(tableName = "aws-java-sdk-index-range-test-crypto")
 public class IndexRangeKeyTestClass {
 
-    private long key;
-    private double rangeKey;
-    private Double indexFooRangeKey;
-    private Double indexBarRangeKey;
-    private Double multipleIndexRangeKey;
-    private Long version;
+  private long key;
+  private double rangeKey;
+  private Double indexFooRangeKey;
+  private Double indexBarRangeKey;
+  private Double multipleIndexRangeKey;
+  private Long version;
 
-    private String fooAttribute;
-    private String barAttribute;
+  private String fooAttribute;
+  private String barAttribute;
 
-    @DynamoDBHashKey
-    public long getKey() {
-        return key;
-    }
+  @DynamoDBHashKey
+  public long getKey() {
+    return key;
+  }
 
-    public void setKey(long key) {
-        this.key = key;
-    }
+  public void setKey(long key) {
+    this.key = key;
+  }
 
-    @DynamoDBRangeKey
-    public double getRangeKey() {
-        return rangeKey;
-    }
+  @DynamoDBRangeKey
+  public double getRangeKey() {
+    return rangeKey;
+  }
 
-    public void setRangeKey(double rangeKey) {
-        this.rangeKey = rangeKey;
-    }
+  public void setRangeKey(double rangeKey) {
+    this.rangeKey = rangeKey;
+  }
 
-    @DoNotEncrypt
-    @DynamoDBIndexRangeKey(
-            localSecondaryIndexName = "index_foo",
-            attributeName = "indexFooRangeKey"
-    )
-    public Double getIndexFooRangeKeyWithFakeName() {
-        return indexFooRangeKey;
-    }
+  @DoNotEncrypt
+  @DynamoDBIndexRangeKey(localSecondaryIndexName = "index_foo", attributeName = "indexFooRangeKey")
+  public Double getIndexFooRangeKeyWithFakeName() {
+    return indexFooRangeKey;
+  }
 
-    public void setIndexFooRangeKeyWithFakeName(Double indexFooRangeKey) {
-        this.indexFooRangeKey = indexFooRangeKey;
-    }
+  public void setIndexFooRangeKeyWithFakeName(Double indexFooRangeKey) {
+    this.indexFooRangeKey = indexFooRangeKey;
+  }
 
-    @DoNotEncrypt
-    @DynamoDBIndexRangeKey(
-            localSecondaryIndexName = "index_bar"
-    )
-    public Double getIndexBarRangeKey() {
-        return indexBarRangeKey;
-    }
+  @DoNotEncrypt
+  @DynamoDBIndexRangeKey(localSecondaryIndexName = "index_bar")
+  public Double getIndexBarRangeKey() {
+    return indexBarRangeKey;
+  }
 
-    public void setIndexBarRangeKey(Double indexBarRangeKey) {
-        this.indexBarRangeKey = indexBarRangeKey;
-    }
+  public void setIndexBarRangeKey(Double indexBarRangeKey) {
+    this.indexBarRangeKey = indexBarRangeKey;
+  }
 
-    @DoNotEncrypt
-    @DynamoDBIndexRangeKey(
-            localSecondaryIndexNames = {"index_foo_copy", "index_bar_copy"}
-    )
-    public Double getMultipleIndexRangeKey() {
-        return multipleIndexRangeKey;
-    }
+  @DoNotEncrypt
+  @DynamoDBIndexRangeKey(localSecondaryIndexNames = {"index_foo_copy", "index_bar_copy"})
+  public Double getMultipleIndexRangeKey() {
+    return multipleIndexRangeKey;
+  }
 
-    public void setMultipleIndexRangeKey(Double multipleIndexRangeKey) {
-        this.multipleIndexRangeKey = multipleIndexRangeKey;
-    }
+  public void setMultipleIndexRangeKey(Double multipleIndexRangeKey) {
+    this.multipleIndexRangeKey = multipleIndexRangeKey;
+  }
 
-    @DynamoDBAttribute
-    public String getFooAttribute() {
-        return fooAttribute;
-    }
+  @DynamoDBAttribute
+  public String getFooAttribute() {
+    return fooAttribute;
+  }
 
-    public void setFooAttribute(String fooAttribute) {
-        this.fooAttribute = fooAttribute;
-    }
+  public void setFooAttribute(String fooAttribute) {
+    this.fooAttribute = fooAttribute;
+  }
 
-    @DynamoDBAttribute
-    public String getBarAttribute() {
-        return barAttribute;
-    }
+  @DynamoDBAttribute
+  public String getBarAttribute() {
+    return barAttribute;
+  }
 
-    public void setBarAttribute(String barAttribute) {
-        this.barAttribute = barAttribute;
-    }
+  public void setBarAttribute(String barAttribute) {
+    this.barAttribute = barAttribute;
+  }
 
-    @DoNotEncrypt
-    @DynamoDBVersionAttribute
-    public Long getVersion() {
-        return version;
-    }
+  @DoNotEncrypt
+  @DynamoDBVersionAttribute
+  public Long getVersion() {
+    return version;
+  }
 
-    public void setVersion(Long version) {
-        this.version = version;
-    }
+  public void setVersion(Long version) {
+    this.version = version;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((fooAttribute == null) ? 0 : fooAttribute.hashCode());
-        result = prime * result + ((barAttribute == null) ? 0 : barAttribute.hashCode());
-        result = prime * result + (int) (key ^ (key >>> 32));
-        long temp;
-        temp = Double.doubleToLongBits(rangeKey);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(indexFooRangeKey);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(indexBarRangeKey);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fooAttribute == null) ? 0 : fooAttribute.hashCode());
+    result = prime * result + ((barAttribute == null) ? 0 : barAttribute.hashCode());
+    result = prime * result + (int) (key ^ (key >>> 32));
+    long temp;
+    temp = Double.doubleToLongBits(rangeKey);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(indexFooRangeKey);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(indexBarRangeKey);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        IndexRangeKeyTestClass other = (IndexRangeKeyTestClass) obj;
-        if (fooAttribute == null) {
-            if (other.fooAttribute != null)
-                return false;
-        } else if (!fooAttribute.equals(other.fooAttribute))
-            return false;
-        if (barAttribute == null) {
-            if (other.barAttribute != null)
-                return false;
-        } else if (!barAttribute.equals(other.barAttribute))
-            return false;
-        if (key != other.key)
-            return false;
-        if (Double.doubleToLongBits(rangeKey) != Double.doubleToLongBits(other.rangeKey))
-            return false;
-        if (Double.doubleToLongBits(indexFooRangeKey) != Double.doubleToLongBits(other.indexFooRangeKey))
-            return false;
-        if (Double.doubleToLongBits(indexBarRangeKey) != Double.doubleToLongBits(other.indexBarRangeKey))
-            return false;
-        if (version == null) {
-            if (other.version != null)
-                return false;
-        } else if (!version.equals(other.version))
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    IndexRangeKeyTestClass other = (IndexRangeKeyTestClass) obj;
+    if (fooAttribute == null) {
+      if (other.fooAttribute != null) return false;
+    } else if (!fooAttribute.equals(other.fooAttribute)) return false;
+    if (barAttribute == null) {
+      if (other.barAttribute != null) return false;
+    } else if (!barAttribute.equals(other.barAttribute)) return false;
+    if (key != other.key) return false;
+    if (Double.doubleToLongBits(rangeKey) != Double.doubleToLongBits(other.rangeKey)) return false;
+    if (Double.doubleToLongBits(indexFooRangeKey)
+        != Double.doubleToLongBits(other.indexFooRangeKey)) return false;
+    if (Double.doubleToLongBits(indexBarRangeKey)
+        != Double.doubleToLongBits(other.indexBarRangeKey)) return false;
+    if (version == null) {
+      if (other.version != null) return false;
+    } else if (!version.equals(other.version)) return false;
+    return true;
+  }
 
-    @Override
-    public String toString() {
-        return "IndexRangeKeyTestClass [key=" + key + ", rangeKey=" + rangeKey + ", version=" + version
-                + ", indexFooRangeKey=" + indexFooRangeKey + ", indexBarRangeKey=" + indexBarRangeKey
-                + ", fooAttribute=" + fooAttribute + ", barAttribute=" + barAttribute + "]";
-    }
-
+  @Override
+  public String toString() {
+    return "IndexRangeKeyTestClass [key="
+        + key
+        + ", rangeKey="
+        + rangeKey
+        + ", version="
+        + version
+        + ", indexFooRangeKey="
+        + indexFooRangeKey
+        + ", indexBarRangeKey="
+        + indexBarRangeKey
+        + ", fooAttribute="
+        + fooAttribute
+        + ", barAttribute="
+        + barAttribute
+        + "]";
+  }
 }

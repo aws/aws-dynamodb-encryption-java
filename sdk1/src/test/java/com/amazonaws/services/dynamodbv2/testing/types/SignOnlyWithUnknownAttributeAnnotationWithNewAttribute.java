@@ -17,16 +17,16 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotEncrypt;
 
 @DoNotEncrypt
-public class SignOnlyWithUnknownAttributeAnnotationWithNewAttribute extends SignOnlyWithUnknownAttributeAnnotation {
+public class SignOnlyWithUnknownAttributeAnnotationWithNewAttribute
+    extends SignOnlyWithUnknownAttributeAnnotation {
 
-    private String newAttribute;
+  private String newAttribute;
 
-    public String getNewAttribute() {
-        return newAttribute;
-    }
+  public String getNewAttribute() {
+    return newAttribute;
+  }
 
-    public void setNewAttribute(String newAttribute) {
-        this.newAttribute = newAttribute;
-    }
-
+  public void setNewAttribute(String newAttribute) {
+    this.newAttribute = newAttribute;
+  }
 }

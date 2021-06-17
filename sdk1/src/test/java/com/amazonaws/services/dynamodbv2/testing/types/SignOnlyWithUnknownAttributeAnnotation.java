@@ -19,5 +19,4 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 
 @DoNotEncrypt
 @HandleUnknownAttributes
-public class SignOnlyWithUnknownAttributeAnnotation extends BaseClass {
-}
+public class SignOnlyWithUnknownAttributeAnnotation extends BaseClass {}

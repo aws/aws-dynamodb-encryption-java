@@ -14,13 +14,6 @@
  */
 package com.amazonaws.examples;
 
-import java.nio.ByteBuffer;
-import java.security.GeneralSecurityException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
@@ -28,10 +21,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.Direc
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Example showing use of AWS KMS CMP with record encryption functions directly.
- */
+/** Example showing use of AWS KMS CMP with record encryption functions directly. */
 public class AwsKmsEncryptedItem {
   private static final String STRING_FIELD_NAME = "example";
   private static final String BINARY_FIELD_NAME = "and some binary";
@@ -54,7 +51,9 @@ public class AwsKmsEncryptedItem {
     }
   }
 
-  public static void encryptRecord(final String tableName, final String cmkArn, final AWSKMS kmsClient) throws GeneralSecurityException {
+  public static void encryptRecord(
+      final String tableName, final String cmkArn, final AWSKMS kmsClient)
+      throws GeneralSecurityException {
     // Sample record to be encrypted
     final String partitionKeyName = "partition_attribute";
     final String sortKeyName = "sort_attribute";
@@ -63,10 +62,15 @@ public class AwsKmsEncryptedItem {
     record.put(sortKeyName, new AttributeValue().withN("55"));
     record.put(STRING_FIELD_NAME, new AttributeValue().withS("data"));
     record.put(NUMBER_FIELD_NAME, new AttributeValue().withN("99"));
-    record.put(BINARY_FIELD_NAME, new AttributeValue().withB(ByteBuffer.wrap(new byte[]{0x00, 0x01, 0x02})));
-    record.put(IGNORED_FIELD_NAME, new AttributeValue().withS("alone")); // We want to ignore this attribute
+    record.put(
+        BINARY_FIELD_NAME,
+        new AttributeValue().withB(ByteBuffer.wrap(new byte[] {0x00, 0x01, 0x02})));
+    record.put(
+        IGNORED_FIELD_NAME,
+        new AttributeValue().withS("alone")); // We want to ignore this attribute
 
-    // Set up our configuration and clients. All of this is thread-safe and can be reused across calls.
+    // Set up our configuration and clients. All of this is thread-safe and can be reused across
+    // calls.
     // This example assumes we already have a AWS KMS client `kmsClient`
     // Provider Configuration
     final DirectKmsMaterialProvider cmp = new DirectKmsMaterialProvider(kmsClient, cmkArn);
@@ -74,15 +78,17 @@ public class AwsKmsEncryptedItem {
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
 
     // Information about the context of our data (normally just Table information)
-    final EncryptionContext encryptionContext = new EncryptionContext.Builder()
-        .withTableName(tableName)
-        .withHashKeyName(partitionKeyName)
-        .withRangeKeyName(sortKeyName)
-        .build();
+    final EncryptionContext encryptionContext =
+        new EncryptionContext.Builder()
+            .withTableName(tableName)
+            .withHashKeyName(partitionKeyName)
+            .withRangeKeyName(sortKeyName)
+            .build();
 
     // Describe what actions need to be taken for each attribute
     final EnumSet<EncryptionFlags> signOnly = EnumSet.of(EncryptionFlags.SIGN);
-    final EnumSet<EncryptionFlags> encryptAndSign = EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
+    final EnumSet<EncryptionFlags> encryptAndSign =
+        EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
     final Map<String, Set<EncryptionFlags>> actions = new HashMap<>();
     for (final String attributeName : record.keySet()) {
       switch (attributeName) {
@@ -103,13 +109,22 @@ public class AwsKmsEncryptedItem {
     // End set-up
 
     // Encrypt the plaintext record directly
-    final Map<String, AttributeValue> encrypted_record = encryptor.encryptRecord(record, actions, encryptionContext);
+    final Map<String, AttributeValue> encrypted_record =
+        encryptor.encryptRecord(record, actions, encryptionContext);
 
     // Encrypted record fields change as expected
-    assert encrypted_record.get(STRING_FIELD_NAME).getB() != null; // the encrypted string is stored as bytes
-    assert encrypted_record.get(NUMBER_FIELD_NAME).getB() != null; // the encrypted number is stored as bytes
-    assert !record.get(BINARY_FIELD_NAME).getB().equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
-    assert record.get(IGNORED_FIELD_NAME).getS().equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
+    assert encrypted_record.get(STRING_FIELD_NAME).getB()
+        != null; // the encrypted string is stored as bytes
+    assert encrypted_record.get(NUMBER_FIELD_NAME).getB()
+        != null; // the encrypted number is stored as bytes
+    assert !record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
+    assert record
+        .get(IGNORED_FIELD_NAME)
+        .getS()
+        .equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
 
     // We could now put the encrypted item to DynamoDB just as we would any other item.
     // We're skipping it to to keep the example simpler.
@@ -118,12 +133,22 @@ public class AwsKmsEncryptedItem {
     System.out.println("Encrypted Record: " + encrypted_record);
 
     // Decryption is identical. We'll pretend that we retrieved the record from DynamoDB.
-    final Map<String, AttributeValue> decrypted_record = encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
+    final Map<String, AttributeValue> decrypted_record =
+        encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
     System.out.println("Decrypted Record: " + decrypted_record);
 
     // The decrypted fields match the original fields before encryption
-    assert record.get(STRING_FIELD_NAME).getS().equals(decrypted_record.get(STRING_FIELD_NAME).getS());
-    assert record.get(NUMBER_FIELD_NAME).getN().equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
-    assert record.get(BINARY_FIELD_NAME).getB().equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
+    assert record
+        .get(STRING_FIELD_NAME)
+        .getS()
+        .equals(decrypted_record.get(STRING_FIELD_NAME).getS());
+    assert record
+        .get(NUMBER_FIELD_NAME)
+        .getN()
+        .equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
+    assert record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
   }
 }

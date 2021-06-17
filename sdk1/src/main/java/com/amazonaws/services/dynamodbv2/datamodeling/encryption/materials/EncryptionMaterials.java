@@ -15,13 +15,11 @@
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials;
 
 import java.security.Key;
-
 import javax.crypto.SecretKey;
 
-/**
- * @author Greg Rubin 
- */
+/** @author Greg Rubin */
 public interface EncryptionMaterials extends CryptographicMaterials {
-    public SecretKey getEncryptionKey();
-    public Key getSigningKey();
+  public SecretKey getEncryptionKey();
+
+  public Key getSigningKey();
 }

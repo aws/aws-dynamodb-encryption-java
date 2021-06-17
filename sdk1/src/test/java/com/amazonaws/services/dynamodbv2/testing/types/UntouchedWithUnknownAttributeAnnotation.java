@@ -19,5 +19,4 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 
 @DoNotTouch
 @HandleUnknownAttributes
-public class UntouchedWithUnknownAttributeAnnotation extends BaseClass {
-}
+public class UntouchedWithUnknownAttributeAnnotation extends BaseClass {}

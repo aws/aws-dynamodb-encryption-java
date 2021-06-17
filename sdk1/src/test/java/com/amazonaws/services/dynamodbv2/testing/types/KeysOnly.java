@@ -20,57 +20,51 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "TableName")
 public class KeysOnly {
-    private int hashKey;
-    private int rangeKey;
+  private int hashKey;
+  private int rangeKey;
 
-    public KeysOnly() {
-    }
+  public KeysOnly() {}
 
-    public KeysOnly(int hashKey, int rangeKey) {
-        this.hashKey = hashKey;
-        this.rangeKey = rangeKey;
-    }
+  public KeysOnly(int hashKey, int rangeKey) {
+    this.hashKey = hashKey;
+    this.rangeKey = rangeKey;
+  }
 
-    @DynamoDBRangeKey
-    public int getRangeKey() {
-        return rangeKey;
-    }
+  @DynamoDBRangeKey
+  public int getRangeKey() {
+    return rangeKey;
+  }
 
-    public void setRangeKey(int rangeKey) {
-        this.rangeKey = rangeKey;
-    }
+  public void setRangeKey(int rangeKey) {
+    this.rangeKey = rangeKey;
+  }
 
-    @DynamoDBHashKey
-    public int getHashKey() {
-        return hashKey;
-    }
+  @DynamoDBHashKey
+  public int getHashKey() {
+    return hashKey;
+  }
 
-    public void setHashKey(int hashKey) {
-        this.hashKey = hashKey;
-    }
+  public void setHashKey(int hashKey) {
+    this.hashKey = hashKey;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + hashKey;
-        result = prime * result + rangeKey;
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + hashKey;
+    result = prime * result + rangeKey;
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        KeysOnly other = (KeysOnly) obj;
-        if (hashKey != other.hashKey)
-            return false;
-        if (rangeKey != other.rangeKey)
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    KeysOnly other = (KeysOnly) obj;
+    if (hashKey != other.hashKey) return false;
+    if (rangeKey != other.rangeKey) return false;
+    return true;
+  }
 }

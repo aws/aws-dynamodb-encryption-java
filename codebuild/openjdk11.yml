@@ -6,5 +6,4 @@ phases:
             java: openjdk11
     build:
         commands:
-          - mvn com.coveo:fmt-maven-plugin:check
           - mvn install

@@ -20,19 +20,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Overrides the default tablename used as part of the data signature with
- * {@code tableName} instead. This can be useful when multiple tables are
- * used interchangably and data should be able to be copied or moved
- * between them without needing to be reencrypted.
+ * Overrides the default tablename used as part of the data signature with {@code tableName}
+ * instead. This can be useful when multiple tables are used interchangably and data should be able
+ * to be copied or moved between them without needing to be reencrypted.
  *
- * <p>For guidance on performing a safe data model change procedure, please see
- * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
- * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
- * 
- * @author Greg Rubin 
+ * <p>For guidance on performing a safe data model change procedure, please see <a
+ * href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html"
+ * target="_blank"> DynamoDB Encryption Client Developer Guide: Changing your data model</a>
+ *
+ * @author Greg Rubin
  */
 @Target(value = {ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface TableAadOverride {
-    String tableName();
+  String tableName();
 }

@@ -14,6 +14,11 @@
  */
 package com.amazonaws.examples;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
+import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.WrappedMaterialsProvider;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
@@ -21,19 +26,12 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.WrappedMaterialsProvider;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-
 /**
- * Example showing use of an AES key for encryption and an HmacSHA256 key for signing.
- * For ease of the example, we create new random ones every time.
+ * Example showing use of an AES key for encryption and an HmacSHA256 key for signing. For ease of
+ * the example, we create new random ones every time.
  */
 public class SymmetricEncryptedItem {
 
@@ -57,7 +55,8 @@ public class SymmetricEncryptedItem {
     encryptRecord(tableName, wrappingKey, signingKey);
   }
 
-  public static void encryptRecord(String tableName, SecretKey wrappingKey, SecretKey signingKey) throws GeneralSecurityException {
+  public static void encryptRecord(String tableName, SecretKey wrappingKey, SecretKey signingKey)
+      throws GeneralSecurityException {
     // Sample record to be encrypted
     final String partitionKeyName = "partition_attribute";
     final String sortKeyName = "sort_attribute";
@@ -66,28 +65,38 @@ public class SymmetricEncryptedItem {
     record.put(sortKeyName, new AttributeValue().withN("55"));
     record.put(STRING_FIELD_NAME, new AttributeValue().withS("data"));
     record.put(NUMBER_FIELD_NAME, new AttributeValue().withN("99"));
-    record.put(BINARY_FIELD_NAME, new AttributeValue().withB(ByteBuffer.wrap(new byte[]{0x00, 0x01, 0x02})));
-    record.put(IGNORED_FIELD_NAME, new AttributeValue().withS("alone")); // We want to ignore this attribute
+    record.put(
+        BINARY_FIELD_NAME,
+        new AttributeValue().withB(ByteBuffer.wrap(new byte[] {0x00, 0x01, 0x02})));
+    record.put(
+        IGNORED_FIELD_NAME,
+        new AttributeValue().withS("alone")); // We want to ignore this attribute
 
-    // Set up our configuration and clients. All of this is thread-safe and can be reused across calls.
+    // Set up our configuration and clients. All of this is thread-safe and can be reused across
+    // calls.
     // Provider Configuration
-    final WrappedMaterialsProvider cmp = new WrappedMaterialsProvider(wrappingKey, wrappingKey, signingKey);
+    final WrappedMaterialsProvider cmp =
+        new WrappedMaterialsProvider(wrappingKey, wrappingKey, signingKey);
     //  While the wrappedMaterialsProvider is better as it uses a unique encryption key per record,
-    // many existing systems use the SymmetricStaticProvider which always uses the same encryption key.
-    //    final SymmetricStaticProvider cmp = new SymmetricStaticProvider(encryptionKey, signingKey);
+    // many existing systems use the SymmetricStaticProvider which always uses the same encryption
+    // key.
+    //    final SymmetricStaticProvider cmp = new SymmetricStaticProvider(encryptionKey,
+    // signingKey);
     // Encryptor creation
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
 
     // Information about the context of our data (normally just Table information)
-    final EncryptionContext encryptionContext = new EncryptionContext.Builder()
-        .withTableName(tableName)
-        .withHashKeyName(partitionKeyName)
-        .withRangeKeyName(sortKeyName)
-        .build();
+    final EncryptionContext encryptionContext =
+        new EncryptionContext.Builder()
+            .withTableName(tableName)
+            .withHashKeyName(partitionKeyName)
+            .withRangeKeyName(sortKeyName)
+            .build();
 
     // Describe what actions need to be taken for each attribute
     final EnumSet<EncryptionFlags> signOnly = EnumSet.of(EncryptionFlags.SIGN);
-    final EnumSet<EncryptionFlags> encryptAndSign = EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
+    final EnumSet<EncryptionFlags> encryptAndSign =
+        EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
     final Map<String, Set<EncryptionFlags>> actions = new HashMap<>();
     for (final String attributeName : record.keySet()) {
       switch (attributeName) {
@@ -108,13 +117,22 @@ public class SymmetricEncryptedItem {
     // End set-up
 
     // Encrypt the plaintext record directly
-    final Map<String, AttributeValue> encrypted_record = encryptor.encryptRecord(record, actions, encryptionContext);
+    final Map<String, AttributeValue> encrypted_record =
+        encryptor.encryptRecord(record, actions, encryptionContext);
 
     // Encrypted record fields change as expected
-    assert encrypted_record.get(STRING_FIELD_NAME).getB() != null; // the encrypted string is stored as bytes
-    assert encrypted_record.get(NUMBER_FIELD_NAME).getB() != null; // the encrypted number is stored as bytes
-    assert !record.get(BINARY_FIELD_NAME).getB().equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
-    assert record.get(IGNORED_FIELD_NAME).getS().equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
+    assert encrypted_record.get(STRING_FIELD_NAME).getB()
+        != null; // the encrypted string is stored as bytes
+    assert encrypted_record.get(NUMBER_FIELD_NAME).getB()
+        != null; // the encrypted number is stored as bytes
+    assert !record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
+    assert record
+        .get(IGNORED_FIELD_NAME)
+        .getS()
+        .equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
 
     // We could now put the encrypted item to DynamoDB just as we would any other item.
     // We're skipping it to to keep the example simpler.
@@ -123,12 +141,22 @@ public class SymmetricEncryptedItem {
     System.out.println("Encrypted Record: " + encrypted_record);
 
     // Decryption is identical. We'll pretend that we retrieved the record from DynamoDB.
-    final Map<String, AttributeValue> decrypted_record = encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
+    final Map<String, AttributeValue> decrypted_record =
+        encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
     System.out.println("Decrypted Record: " + decrypted_record);
 
     // The decrypted fields match the original fields before encryption
-    assert record.get(STRING_FIELD_NAME).getS().equals(decrypted_record.get(STRING_FIELD_NAME).getS());
-    assert record.get(NUMBER_FIELD_NAME).getN().equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
-    assert record.get(BINARY_FIELD_NAME).getB().equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
+    assert record
+        .get(STRING_FIELD_NAME)
+        .getS()
+        .equals(decrypted_record.get(STRING_FIELD_NAME).getS());
+    assert record
+        .get(NUMBER_FIELD_NAME)
+        .getN()
+        .equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
+    assert record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
   }
 }

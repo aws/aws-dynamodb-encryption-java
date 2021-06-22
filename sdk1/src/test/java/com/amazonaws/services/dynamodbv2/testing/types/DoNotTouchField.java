@@ -20,33 +20,28 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
 @DynamoDBTable(tableName = "TableName")
 public class DoNotTouchField extends Mixed {
 
-    @DoNotTouch
-    int value;
+  @DoNotTouch int value;
 
-    public int getValue() {
-        return value;
-    }
+  public int getValue() {
+    return value;
+  }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
+  public void setValue(int value) {
+    this.value = value;
+  }
 
-    @Override
-    public int hashCode() {
-        return 31 * super.hashCode() + value;
-    }
+  @Override
+  public int hashCode() {
+    return 31 * super.hashCode() + value;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DoNotTouchField other = (DoNotTouchField) obj;
-        if (value != other.value)
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    DoNotTouchField other = (DoNotTouchField) obj;
+    if (value != other.value) return false;
+    return true;
+  }
 }

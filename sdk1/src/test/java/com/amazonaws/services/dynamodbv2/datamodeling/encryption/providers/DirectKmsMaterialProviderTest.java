@@ -12,6 +12,12 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
+
 import com.amazonaws.RequestClientOptions;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
@@ -26,10 +32,6 @@ import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.GenerateDataKeyRequest;
 import com.amazonaws.services.kms.model.GenerateDataKeyResult;
 import com.amazonaws.util.Base64;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import javax.crypto.SecretKey;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -38,363 +40,418 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertNull;
-import static org.testng.AssertJUnit.assertTrue;
+import javax.crypto.SecretKey;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class DirectKmsMaterialProviderTest {
-    private FakeKMS kms;
-    private String keyId;
-    private Map<String, String> description;
-    private EncryptionContext ctx;
+  private FakeKMS kms;
+  private String keyId;
+  private Map<String, String> description;
+  private EncryptionContext ctx;
 
-    @BeforeMethod
-    public void setUp() {
-        description = new HashMap<>();
-        description.put("TestKey", "test value");
-        description = Collections.unmodifiableMap(description);
-        ctx = new EncryptionContext.Builder().build();
-        kms = new FakeKMS();
-        keyId = kms.createKey().getKeyMetadata().getKeyId();
-    }
+  @BeforeMethod
+  public void setUp() {
+    description = new HashMap<>();
+    description.put("TestKey", "test value");
+    description = Collections.unmodifiableMap(description);
+    ctx = new EncryptionContext.Builder().build();
+    kms = new FakeKMS();
+    keyId = kms.createKey().getKeyMetadata().getKeyId();
+  }
 
-    @Test
-    public void simple() throws GeneralSecurityException {
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+  @Test
+  public void simple() throws GeneralSecurityException {
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        Key signingKey = eMat.getSigningKey();
-        assertNotNull(signingKey);
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    Key signingKey = eMat.getSigningKey();
+    assertNotNull(signingKey);
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(signingKey, dMat.getVerificationKey());
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(signingKey, dMat.getVerificationKey());
 
-        String expectedEncAlg = encryptionKey.getAlgorithm() + "/"
-                + (encryptionKey.getEncoded().length * 8);
-        String expectedSigAlg = signingKey.getAlgorithm() + "/"
-                + (signingKey.getEncoded().length * 8);
+    String expectedEncAlg =
+        encryptionKey.getAlgorithm() + "/" + (encryptionKey.getEncoded().length * 8);
+    String expectedSigAlg = signingKey.getAlgorithm() + "/" + (signingKey.getEncoded().length * 8);
 
-        Map<String, String> kmsCtx = kms.getSingleEc();
-        assertEquals(expectedEncAlg,
-                kmsCtx.get("*" + WrappedRawMaterials.CONTENT_KEY_ALGORITHM + "*"));
-        assertEquals(expectedSigAlg, kmsCtx.get("*amzn-ddb-sig-alg*"));
-    }
+    Map<String, String> kmsCtx = kms.getSingleEc();
+    assertEquals(expectedEncAlg, kmsCtx.get("*" + WrappedRawMaterials.CONTENT_KEY_ALGORITHM + "*"));
+    assertEquals(expectedSigAlg, kmsCtx.get("*amzn-ddb-sig-alg*"));
+  }
 
-    @Test
-    public void simpleWithKmsEc() throws GeneralSecurityException {
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+  @Test
+  public void simpleWithKmsEc() throws GeneralSecurityException {
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk", new AttributeValue("HashKeyValue"));
-        attrVals.put("rk", new AttributeValue("RangeKeyValue"));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", new AttributeValue("HashKeyValue"));
+    attrVals.put("rk", new AttributeValue("RangeKeyValue"));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        Key signingKey = eMat.getSigningKey();
-        assertNotNull(signingKey);
-        Map<String, String> kmsCtx = kms.getSingleEc();
-        assertEquals("HashKeyValue", kmsCtx.get("hk"));
-        assertEquals("RangeKeyValue", kmsCtx.get("rk"));
-        assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    Key signingKey = eMat.getSigningKey();
+    assertNotNull(signingKey);
+    Map<String, String> kmsCtx = kms.getSingleEc();
+    assertEquals("HashKeyValue", kmsCtx.get("hk"));
+    assertEquals("RangeKeyValue", kmsCtx.get("rk"));
+    assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
 
-        EncryptionContext dCtx = new EncryptionContext.Builder(ctx(eMat)).withHashKeyName("hk")
-                .withRangeKeyName("rk").withTableName("KmsTableName").withAttributeValues(attrVals)
-                .build();
+    EncryptionContext dCtx =
+        new EncryptionContext.Builder(ctx(eMat))
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(signingKey, dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(signingKey, dMat.getVerificationKey());
+  }
 
-    @Test
-    public void simpleWithKmsEc2() throws GeneralSecurityException {
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+  @Test
+  public void simpleWithKmsEc2() throws GeneralSecurityException {
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk", new AttributeValue().withN("10"));
-        attrVals.put("rk", new AttributeValue().withN("20"));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", new AttributeValue().withN("10"));
+    attrVals.put("rk", new AttributeValue().withN("20"));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        Key signingKey = eMat.getSigningKey();
-        assertNotNull(signingKey);
-        Map<String, String> kmsCtx = kms.getSingleEc();
-        assertEquals("10", kmsCtx.get("hk"));
-        assertEquals("20", kmsCtx.get("rk"));
-        assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    Key signingKey = eMat.getSigningKey();
+    assertNotNull(signingKey);
+    Map<String, String> kmsCtx = kms.getSingleEc();
+    assertEquals("10", kmsCtx.get("hk"));
+    assertEquals("20", kmsCtx.get("rk"));
+    assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
 
-        EncryptionContext dCtx = new EncryptionContext.Builder(ctx(eMat)).withHashKeyName("hk")
-                .withRangeKeyName("rk").withTableName("KmsTableName").withAttributeValues(attrVals)
-                .build();
+    EncryptionContext dCtx =
+        new EncryptionContext.Builder(ctx(eMat))
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(signingKey, dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(signingKey, dMat.getVerificationKey());
+  }
 
-    @Test
-    public void simpleWithKmsEc3() throws GeneralSecurityException {
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+  @Test
+  public void simpleWithKmsEc3() throws GeneralSecurityException {
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk",
-                new AttributeValue().withB(ByteBuffer.wrap("Foo".getBytes(StandardCharsets.UTF_8))));
-        attrVals.put("rk",
-                new AttributeValue().withB(ByteBuffer.wrap("Bar".getBytes(StandardCharsets.UTF_8))));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put(
+        "hk", new AttributeValue().withB(ByteBuffer.wrap("Foo".getBytes(StandardCharsets.UTF_8))));
+    attrVals.put(
+        "rk", new AttributeValue().withB(ByteBuffer.wrap("Bar".getBytes(StandardCharsets.UTF_8))));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        Key signingKey = eMat.getSigningKey();
-        assertNotNull(signingKey);
-        assertNotNull(signingKey);
-        Map<String, String> kmsCtx = kms.getSingleEc();
-        assertEquals(Base64.encodeAsString("Foo".getBytes(StandardCharsets.UTF_8)),
-                kmsCtx.get("hk"));
-        assertEquals(Base64.encodeAsString("Bar".getBytes(StandardCharsets.UTF_8)),
-                kmsCtx.get("rk"));
-        assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    Key signingKey = eMat.getSigningKey();
+    assertNotNull(signingKey);
+    assertNotNull(signingKey);
+    Map<String, String> kmsCtx = kms.getSingleEc();
+    assertEquals(Base64.encodeAsString("Foo".getBytes(StandardCharsets.UTF_8)), kmsCtx.get("hk"));
+    assertEquals(Base64.encodeAsString("Bar".getBytes(StandardCharsets.UTF_8)), kmsCtx.get("rk"));
+    assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
 
-        EncryptionContext dCtx = new EncryptionContext.Builder(ctx(eMat)).withHashKeyName("hk")
-                .withRangeKeyName("rk").withTableName("KmsTableName").withAttributeValues(attrVals)
-                .build();
+    EncryptionContext dCtx =
+        new EncryptionContext.Builder(ctx(eMat))
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(signingKey, dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(signingKey, dMat.getVerificationKey());
+  }
 
-    @Test
-    public void randomEnvelopeKeys() throws GeneralSecurityException {
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+  @Test
+  public void randomEnvelopeKeys() throws GeneralSecurityException {
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
 
-        EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey2 = eMat2.getEncryptionKey();
+    EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey2 = eMat2.getEncryptionKey();
 
-        assertFalse("Envelope keys must be different", encryptionKey.equals(encryptionKey2));
-    }
+    assertFalse("Envelope keys must be different", encryptionKey.equals(encryptionKey2));
+  }
 
-    @Test
-    public void testRefresh() {
-        // This does nothing, make sure we don't throw and exception.
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
-        prov.refresh();
-    }
+  @Test
+  public void testRefresh() {
+    // This does nothing, make sure we don't throw and exception.
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId);
+    prov.refresh();
+  }
 
-    @Test
-    public void explicitContentKeyAlgorithm() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES");
+  @Test
+  public void explicitContentKeyAlgorithm() throws GeneralSecurityException {
+    Map<String, String> desc = new HashMap<>();
+    desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES");
 
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES",
-                eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(
+        "AES", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+  }
 
-    @Test
-    public void explicitContentKeyLength128() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/128");
+  @Test
+  public void explicitContentKeyLength128() throws GeneralSecurityException {
+    Map<String, String> desc = new HashMap<>();
+    desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/128");
 
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(16, encryptionKey.getEncoded().length); // 128 Bits
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    assertEquals(16, encryptionKey.getEncoded().length); // 128 Bits
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES/128",
-                eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals("AES", eMat.getEncryptionKey().getAlgorithm());
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(
+        "AES/128", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
+    assertEquals("AES", eMat.getEncryptionKey().getAlgorithm());
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+  }
 
-    @Test
-    public void explicitContentKeyLength256() throws GeneralSecurityException {
-        Map<String, String> desc = new HashMap<>();
-        desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/256");
+  @Test
+  public void explicitContentKeyLength256() throws GeneralSecurityException {
+    Map<String, String> desc = new HashMap<>();
+    desc.put(WrappedRawMaterials.CONTENT_KEY_ALGORITHM, "AES/256");
 
-        DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
+    DirectKmsMaterialProvider prov = new DirectKmsMaterialProvider(kms, keyId, desc);
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(32, encryptionKey.getEncoded().length); // 256 Bits
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    assertEquals(32, encryptionKey.getEncoded().length); // 256 Bits
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals("AES/256",
-                eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
-        assertEquals("AES", eMat.getEncryptionKey().getAlgorithm());
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(
+        "AES/256", eMat.getMaterialDescription().get(WrappedRawMaterials.CONTENT_KEY_ALGORITHM));
+    assertEquals("AES", eMat.getEncryptionKey().getAlgorithm());
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+  }
 
-    @Test
-    public void extendedWithDerivedEncryptionKeyId() throws GeneralSecurityException {
-        ExtendedKmsMaterialProvider prov = new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
-        String customKeyId = kms.createKey().getKeyMetadata().getKeyId();
+  @Test
+  public void extendedWithDerivedEncryptionKeyId() throws GeneralSecurityException {
+    ExtendedKmsMaterialProvider prov =
+        new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
+    String customKeyId = kms.createKey().getKeyMetadata().getKeyId();
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk", new AttributeValue().withN("10"));
-        attrVals.put("rk", new AttributeValue().withN("20"));
-        attrVals.put("encryptionKeyId", new AttributeValue().withS(customKeyId));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", new AttributeValue().withN("10"));
+    attrVals.put("rk", new AttributeValue().withN("20"));
+    attrVals.put("encryptionKeyId", new AttributeValue().withS(customKeyId));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        Key signingKey = eMat.getSigningKey();
-        assertNotNull(signingKey);
-        Map<String, String> kmsCtx = kms.getSingleEc();
-        assertEquals("10", kmsCtx.get("hk"));
-        assertEquals("20", kmsCtx.get("rk"));
-        assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    Key signingKey = eMat.getSigningKey();
+    assertNotNull(signingKey);
+    Map<String, String> kmsCtx = kms.getSingleEc();
+    assertEquals("10", kmsCtx.get("hk"));
+    assertEquals("20", kmsCtx.get("rk"));
+    assertEquals("KmsTableName", kmsCtx.get("*aws-kms-table*"));
 
-        EncryptionContext dCtx = new EncryptionContext.Builder(ctx(eMat)).withHashKeyName("hk")
-                .withRangeKeyName("rk").withTableName("KmsTableName").withAttributeValues(attrVals)
-                .build();
+    EncryptionContext dCtx =
+        new EncryptionContext.Builder(ctx(eMat))
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(signingKey, dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(dCtx);
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(signingKey, dMat.getVerificationKey());
+  }
 
-    @Test(expectedExceptions = DynamoDBMappingException.class)
-    public void encryptionKeyIdMismatch() throws GeneralSecurityException {
-        DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, keyId);
-        String customKeyId = kms.createKey().getKeyMetadata().getKeyId();
+  @Test(expectedExceptions = DynamoDBMappingException.class)
+  public void encryptionKeyIdMismatch() throws GeneralSecurityException {
+    DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, keyId);
+    String customKeyId = kms.createKey().getKeyMetadata().getKeyId();
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk", new AttributeValue().withN("10"));
-        attrVals.put("rk", new AttributeValue().withN("20"));
-        attrVals.put("encryptionKeyId", new AttributeValue().withS(customKeyId));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", new AttributeValue().withN("10"));
+    attrVals.put("rk", new AttributeValue().withN("20"));
+    attrVals.put("encryptionKeyId", new AttributeValue().withS(customKeyId));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        EncryptionMaterials eMat = directProvider.getEncryptionMaterials(ctx);
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    EncryptionMaterials eMat = directProvider.getEncryptionMaterials(ctx);
 
-        EncryptionContext dCtx = new EncryptionContext.Builder(ctx(eMat)).withHashKeyName("hk")
-                .withRangeKeyName("rk").withTableName("KmsTableName").withAttributeValues(attrVals)
-                .build();
+    EncryptionContext dCtx =
+        new EncryptionContext.Builder(ctx(eMat))
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
 
-        ExtendedKmsMaterialProvider extendedProvider = new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
+    ExtendedKmsMaterialProvider extendedProvider =
+        new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
 
-        extendedProvider.getDecryptionMaterials(dCtx);
-    }
+    extendedProvider.getDecryptionMaterials(dCtx);
+  }
 
-    @Test(expectedExceptions = DynamoDBMappingException.class)
-    public void missingEncryptionKeyId() throws GeneralSecurityException {
-        ExtendedKmsMaterialProvider prov = new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
+  @Test(expectedExceptions = DynamoDBMappingException.class)
+  public void missingEncryptionKeyId() throws GeneralSecurityException {
+    ExtendedKmsMaterialProvider prov =
+        new ExtendedKmsMaterialProvider(kms, keyId, "encryptionKeyId");
 
-        Map<String, AttributeValue> attrVals = new HashMap<>();
-        attrVals.put("hk", new AttributeValue().withN("10"));
-        attrVals.put("rk", new AttributeValue().withN("20"));
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", new AttributeValue().withN("10"));
+    attrVals.put("rk", new AttributeValue().withN("20"));
 
-        ctx = new EncryptionContext.Builder().withHashKeyName("hk").withRangeKeyName("rk")
-                .withTableName("KmsTableName").withAttributeValues(attrVals).build();
-        prov.getEncryptionMaterials(ctx);
-    }
+    ctx =
+        new EncryptionContext.Builder()
+            .withHashKeyName("hk")
+            .withRangeKeyName("rk")
+            .withTableName("KmsTableName")
+            .withAttributeValues(attrVals)
+            .build();
+    prov.getEncryptionMaterials(ctx);
+  }
 
-    @Test
-    public void generateDataKeyIsCalledWith256NumberOfBits() {
-        final AtomicBoolean gdkCalled = new AtomicBoolean(false);
-        AWSKMS kmsSpy = new FakeKMS() {
-            @Override
-            public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
-                gdkCalled.set(true);
-                assertEquals((Integer) 32, r.getNumberOfBytes());
-                assertNull(r.getKeySpec());
-                return super.generateDataKey(r);
-            }
+  @Test
+  public void generateDataKeyIsCalledWith256NumberOfBits() {
+    final AtomicBoolean gdkCalled = new AtomicBoolean(false);
+    AWSKMS kmsSpy =
+        new FakeKMS() {
+          @Override
+          public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
+            gdkCalled.set(true);
+            assertEquals((Integer) 32, r.getNumberOfBytes());
+            assertNull(r.getKeySpec());
+            return super.generateDataKey(r);
+          }
         };
-        assertFalse(gdkCalled.get());
-        new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
-        assertTrue(gdkCalled.get());
-    }
+    assertFalse(gdkCalled.get());
+    new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
+    assertTrue(gdkCalled.get());
+  }
 
-    @Test
-    public void userAgentIsAdded() {
-        AWSKMS kmsSpy = new FakeKMS() {
-            @Override
-            public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
-                assertTrue(r.getRequestClientOptions().getClientMarker(RequestClientOptions.Marker.USER_AGENT)
-                        .contains(DirectKmsMaterialProvider.USER_AGENT_PREFIX));
-                return super.generateDataKey(r);
-            }
+  @Test
+  public void userAgentIsAdded() {
+    AWSKMS kmsSpy =
+        new FakeKMS() {
+          @Override
+          public GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest r) {
+            assertTrue(
+                r.getRequestClientOptions()
+                    .getClientMarker(RequestClientOptions.Marker.USER_AGENT)
+                    .contains(DirectKmsMaterialProvider.USER_AGENT_PREFIX));
+            return super.generateDataKey(r);
+          }
         };
-        new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
+    new DirectKmsMaterialProvider(kmsSpy, keyId).getEncryptionMaterials(ctx);
+  }
+
+  private static class ExtendedKmsMaterialProvider extends DirectKmsMaterialProvider {
+    private final String encryptionKeyIdAttributeName;
+
+    public ExtendedKmsMaterialProvider(
+        AWSKMS kms, String encryptionKeyId, String encryptionKeyIdAttributeName) {
+      super(kms, encryptionKeyId);
+
+      this.encryptionKeyIdAttributeName = encryptionKeyIdAttributeName;
     }
 
-    private static class ExtendedKmsMaterialProvider extends DirectKmsMaterialProvider {
-        private final String encryptionKeyIdAttributeName;
+    @Override
+    protected String selectEncryptionKeyId(EncryptionContext context)
+        throws DynamoDBMappingException {
+      if (!context.getAttributeValues().containsKey(encryptionKeyIdAttributeName)) {
+        throw new DynamoDBMappingException("encryption key attribute is not provided");
+      }
 
-        public ExtendedKmsMaterialProvider(AWSKMS kms, String encryptionKeyId, String encryptionKeyIdAttributeName) {
-            super(kms, encryptionKeyId);
-
-            this.encryptionKeyIdAttributeName = encryptionKeyIdAttributeName;
-        }
-
-        @Override
-        protected String selectEncryptionKeyId(EncryptionContext context) throws DynamoDBMappingException {
-            if (!context.getAttributeValues().containsKey(encryptionKeyIdAttributeName)) {
-                throw new DynamoDBMappingException("encryption key attribute is not provided");
-            }
-
-            return context.getAttributeValues().get(encryptionKeyIdAttributeName).getS();
-        }
-
-        @Override
-        protected void validateEncryptionKeyId(String encryptionKeyId, EncryptionContext context)
-                throws DynamoDBMappingException {
-            if (!context.getAttributeValues().containsKey(encryptionKeyIdAttributeName)) {
-                throw new DynamoDBMappingException("encryption key attribute is not provided");
-            }
-
-            String customEncryptionKeyId = context.getAttributeValues().get(encryptionKeyIdAttributeName).getS();
-            if (!customEncryptionKeyId.equals(encryptionKeyId)) {
-                throw new DynamoDBMappingException("encryption key ids do not match.");
-            }
-        }
-
-        @Override
-        protected DecryptResult decrypt(DecryptRequest request, EncryptionContext context) {
-            return super.decrypt(request, context);
-        }
-
-        @Override
-        protected GenerateDataKeyResult generateDataKey(GenerateDataKeyRequest request, EncryptionContext context) {
-            return super.generateDataKey(request, context);
-        }
+      return context.getAttributeValues().get(encryptionKeyIdAttributeName).getS();
     }
 
-    private static EncryptionContext ctx(EncryptionMaterials mat) {
-        return new EncryptionContext.Builder()
-                .withMaterialDescription(mat.getMaterialDescription()).build();
+    @Override
+    protected void validateEncryptionKeyId(String encryptionKeyId, EncryptionContext context)
+        throws DynamoDBMappingException {
+      if (!context.getAttributeValues().containsKey(encryptionKeyIdAttributeName)) {
+        throw new DynamoDBMappingException("encryption key attribute is not provided");
+      }
+
+      String customEncryptionKeyId =
+          context.getAttributeValues().get(encryptionKeyIdAttributeName).getS();
+      if (!customEncryptionKeyId.equals(encryptionKeyId)) {
+        throw new DynamoDBMappingException("encryption key ids do not match.");
+      }
     }
+
+    @Override
+    protected DecryptResult decrypt(DecryptRequest request, EncryptionContext context) {
+      return super.decrypt(request, context);
+    }
+
+    @Override
+    protected GenerateDataKeyResult generateDataKey(
+        GenerateDataKeyRequest request, EncryptionContext context) {
+      return super.generateDataKey(request, context);
+    }
+  }
+
+  private static EncryptionContext ctx(EncryptionMaterials mat) {
+    return new EncryptionContext.Builder()
+        .withMaterialDescription(mat.getMaterialDescription())
+        .build();
+  }
 }

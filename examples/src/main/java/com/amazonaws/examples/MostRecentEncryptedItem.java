@@ -14,13 +14,6 @@
  */
 package com.amazonaws.examples;
 
-import java.nio.ByteBuffer;
-import java.security.GeneralSecurityException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
@@ -33,12 +26,17 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * This demonstrates how to use the {@link CachingMostRecentProvider} backed by a
- * {@link MetaStore} and the {@link DirectKmsMaterialProvider} to encrypt
- * your data. Before you can use this, you need to set up a table to hold the
- * intermediate keys or use --setup mode to construct the table once
+ * This demonstrates how to use the {@link CachingMostRecentProvider} backed by a {@link MetaStore}
+ * and the {@link DirectKmsMaterialProvider} to encrypt your data. Before you can use this, you need
+ * to set up a table to hold the intermediate keys or use --setup mode to construct the table once
  * and then re-run the example without the --setup mode
  */
 public class MostRecentEncryptedItem {
@@ -80,39 +78,54 @@ public class MostRecentEncryptedItem {
     }
   }
 
-  public static void encryptRecord(String tableName, String keyTableName, String cmkArn, String materialName,
-                                   AmazonDynamoDB ddbClient, AWSKMS kmsClient) throws GeneralSecurityException {
+  public static void encryptRecord(
+      String tableName,
+      String keyTableName,
+      String cmkArn,
+      String materialName,
+      AmazonDynamoDB ddbClient,
+      AWSKMS kmsClient)
+      throws GeneralSecurityException {
     // Sample record to be encrypted
     final Map<String, AttributeValue> record = new HashMap<>();
     record.put(PARTITION_ATTRIBUTE, new AttributeValue().withS("is this"));
     record.put(SORT_ATTRIBUTE, new AttributeValue().withN("55"));
     record.put(STRING_FIELD_NAME, new AttributeValue().withS("data"));
     record.put(NUMBER_FIELD_NAME, new AttributeValue().withN("99"));
-    record.put(BINARY_FIELD_NAME, new AttributeValue().withB(ByteBuffer.wrap(new byte[]{0x00, 0x01, 0x02})));
-    record.put(IGNORED_FIELD_NAME, new AttributeValue().withS("alone")); // We want to ignore this attribute
+    record.put(
+        BINARY_FIELD_NAME,
+        new AttributeValue().withB(ByteBuffer.wrap(new byte[] {0x00, 0x01, 0x02})));
+    record.put(
+        IGNORED_FIELD_NAME,
+        new AttributeValue().withS("alone")); // We want to ignore this attribute
 
-    // Set up our configuration and clients. All of this is thread-safe and can be reused across calls.
+    // Set up our configuration and clients. All of this is thread-safe and can be reused across
+    // calls.
     // Provider Configuration to protect the data keys
-    // This example assumes we already have a DynamoDB client `ddbClient` and AWS KMS client `kmsClient`
+    // This example assumes we already have a DynamoDB client `ddbClient` and AWS KMS client
+    // `kmsClient`
     final DirectKmsMaterialProvider kmsProv = new DirectKmsMaterialProvider(kmsClient, cmkArn);
     final DynamoDBEncryptor keyEncryptor = DynamoDBEncryptor.getInstance(kmsProv);
     final MetaStore metaStore = new MetaStore(ddbClient, keyTableName, keyEncryptor);
-    //Provider configuration to protect the data
-    final CachingMostRecentProvider cmp = new CachingMostRecentProvider(metaStore, materialName, 60_000);
+    // Provider configuration to protect the data
+    final CachingMostRecentProvider cmp =
+        new CachingMostRecentProvider(metaStore, materialName, 60_000);
 
     // Encryptor creation
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
 
     // Information about the context of our data (normally just Table information)
-    final EncryptionContext encryptionContext = new EncryptionContext.Builder()
-        .withTableName(tableName)
-        .withHashKeyName(PARTITION_ATTRIBUTE)
-        .withRangeKeyName(SORT_ATTRIBUTE)
-        .build();
+    final EncryptionContext encryptionContext =
+        new EncryptionContext.Builder()
+            .withTableName(tableName)
+            .withHashKeyName(PARTITION_ATTRIBUTE)
+            .withRangeKeyName(SORT_ATTRIBUTE)
+            .build();
 
     // Describe what actions need to be taken for each attribute
     final EnumSet<EncryptionFlags> signOnly = EnumSet.of(EncryptionFlags.SIGN);
-    final EnumSet<EncryptionFlags> encryptAndSign = EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
+    final EnumSet<EncryptionFlags> encryptAndSign =
+        EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
     final Map<String, Set<EncryptionFlags>> actions = new HashMap<>();
     for (final String attributeName : record.keySet()) {
       switch (attributeName) {
@@ -133,13 +146,22 @@ public class MostRecentEncryptedItem {
     // End set-up
 
     // Encrypt the plaintext record directly
-    final Map<String, AttributeValue> encrypted_record = encryptor.encryptRecord(record, actions, encryptionContext);
+    final Map<String, AttributeValue> encrypted_record =
+        encryptor.encryptRecord(record, actions, encryptionContext);
 
     // Encrypted record fields change as expected
-    assert encrypted_record.get(STRING_FIELD_NAME).getB() != null; // the encrypted string is stored as bytes
-    assert encrypted_record.get(NUMBER_FIELD_NAME).getB() != null; // the encrypted number is stored as bytes
-    assert !record.get(BINARY_FIELD_NAME).getB().equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
-    assert record.get(IGNORED_FIELD_NAME).getS().equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
+    assert encrypted_record.get(STRING_FIELD_NAME).getB()
+        != null; // the encrypted string is stored as bytes
+    assert encrypted_record.get(NUMBER_FIELD_NAME).getB()
+        != null; // the encrypted number is stored as bytes
+    assert !record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
+    assert record
+        .get(IGNORED_FIELD_NAME)
+        .getS()
+        .equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
 
     // We could now put the encrypted item to DynamoDB just as we would any other item.
     // We're skipping it to to keep the example simpler.
@@ -148,12 +170,22 @@ public class MostRecentEncryptedItem {
     System.out.println("Encrypted Record: " + encrypted_record);
 
     // Decryption is identical. We'll pretend that we retrieved the record from DynamoDB.
-    final Map<String, AttributeValue> decrypted_record = encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
+    final Map<String, AttributeValue> decrypted_record =
+        encryptor.decryptRecord(encrypted_record, actions, encryptionContext);
     System.out.println("Decrypted Record: " + decrypted_record);
 
     // The decrypted fields match the original fields before encryption
-    assert record.get(STRING_FIELD_NAME).getS().equals(decrypted_record.get(STRING_FIELD_NAME).getS());
-    assert record.get(NUMBER_FIELD_NAME).getN().equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
-    assert record.get(BINARY_FIELD_NAME).getB().equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
+    assert record
+        .get(STRING_FIELD_NAME)
+        .getS()
+        .equals(decrypted_record.get(STRING_FIELD_NAME).getS());
+    assert record
+        .get(NUMBER_FIELD_NAME)
+        .getN()
+        .equals(decrypted_record.get(NUMBER_FIELD_NAME).getN());
+    assert record
+        .get(BINARY_FIELD_NAME)
+        .getB()
+        .equals(decrypted_record.get(BINARY_FIELD_NAME).getB());
   }
 }

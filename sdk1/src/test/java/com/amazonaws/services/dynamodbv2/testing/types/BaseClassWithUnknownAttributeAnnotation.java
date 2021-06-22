@@ -17,5 +17,4 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAttributes;
 
 @HandleUnknownAttributes
-public class BaseClassWithUnknownAttributeAnnotation extends BaseClass {
-}
+public class BaseClassWithUnknownAttributeAnnotation extends BaseClass {}

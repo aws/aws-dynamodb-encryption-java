@@ -16,14 +16,13 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 
 public class BaseClassWithNewAttribute extends BaseClassWithUnknownAttributeAnnotation {
 
-    private String newAttribute;
+  private String newAttribute;
 
-    public String getNewAttribute() {
-        return newAttribute;
-    }
+  public String getNewAttribute() {
+    return newAttribute;
+  }
 
-    public void setNewAttribute(String newAttribute) {
-        this.newAttribute = newAttribute;
-    }
-
+  public void setNewAttribute(String newAttribute) {
+    this.newAttribute = newAttribute;
+  }
 }

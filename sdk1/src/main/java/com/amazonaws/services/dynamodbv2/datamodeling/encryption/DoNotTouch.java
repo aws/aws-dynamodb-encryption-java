@@ -14,25 +14,22 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
-
 /**
  * Prevents the associated item from being encrypted or signed.
  *
- * <p>For guidance on performing a safe data model change procedure, please see
- * <a href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html" target="_blank">
- * DynamoDB Encryption Client Developer Guide: Changing your data model</a></p>
- * 
- * @author Greg Rubin 
+ * <p>For guidance on performing a safe data model change procedure, please see <a
+ * href="https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html"
+ * target="_blank"> DynamoDB Encryption Client Developer Guide: Changing your data model</a>
+ *
+ * @author Greg Rubin
  */
 @DynamoDB
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface DoNotTouch {
-
-}
+public @interface DoNotTouch {}

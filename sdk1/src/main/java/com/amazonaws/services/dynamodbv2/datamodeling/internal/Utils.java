@@ -19,48 +19,48 @@ import java.security.SecureRandom;
 import java.util.Properties;
 
 public class Utils {
-    private static final ThreadLocal<SecureRandom> RND = new ThreadLocal<SecureRandom>() {
+  private static final ThreadLocal<SecureRandom> RND =
+      new ThreadLocal<SecureRandom>() {
         @Override
         protected SecureRandom initialValue() {
-            final SecureRandom result = new SecureRandom();
-            result.nextBoolean(); // Force seeding
-            return result;
+          final SecureRandom result = new SecureRandom();
+          result.nextBoolean(); // Force seeding
+          return result;
         }
-    };
+      };
 
-    private Utils() {
-        // Prevent instantiation
+  private Utils() {
+    // Prevent instantiation
+  }
+
+  public static SecureRandom getRng() {
+    return RND.get();
+  }
+
+  public static byte[] getRandom(int len) {
+    final byte[] result = new byte[len];
+    getRng().nextBytes(result);
+    return result;
+  }
+
+  public static <V> V checkNotNull(final V ref, final String errMsg) {
+    if (ref == null) {
+      throw new NullPointerException(errMsg);
+    } else {
+      return ref;
     }
+  }
 
-    public static SecureRandom getRng() {
-        return RND.get();
+  /*
+   * Loads the version of the library
+   */
+  public static String loadVersion() {
+    try {
+      final Properties properties = new Properties();
+      properties.load(ClassLoader.getSystemResourceAsStream("project.properties"));
+      return properties.getProperty("version");
+    } catch (final IOException ex) {
+      return "unknown";
     }
-
-    public static byte[] getRandom(int len) {
-        final byte[] result = new byte[len];
-        getRng().nextBytes(result);
-        return result;
-    }
-
-    public static <V> V checkNotNull(final V ref, final String errMsg) {
-        if (ref == null) {
-            throw new NullPointerException(errMsg);
-        } else {
-            return ref;
-        }
-    }
-
-    /*
-     * Loads the version of the library
-     */
-    public static String loadVersion() {
-        try {
-            final Properties properties = new Properties();
-            properties.load(ClassLoader.getSystemResourceAsStream("project.properties"));
-            return properties.getProperty("version");
-        } catch (final IOException ex) {
-            return "unknown";
-        }
-    }
-
+  }
 }

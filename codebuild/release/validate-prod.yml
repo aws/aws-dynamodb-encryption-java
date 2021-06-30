@@ -1,0 +1,15 @@
+version: 0.2
+# 'validate-staging' is an AWS::CodeBuild::Project that validates a Sonatype release
+
+phases:
+  install:
+    runtime-versions:
+      java: $JAVA_ENV_VERSION
+  build:
+    commands:
+      - |
+        mvn verify \
+          -Dcheckstyle.skip \
+          -Desdk.version=$VERSION \
+          -Dmaven.compiler.target=$JAVA_NUMERIC_VERSION \
+          -Dmaven.compiler.source=$JAVA_NUMERIC_VERSION

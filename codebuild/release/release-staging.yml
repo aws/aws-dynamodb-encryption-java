@@ -3,7 +3,7 @@ version: 0.2
 # Command to trigger this codebuild from an authorized command line.
 # aws codebuild start-build-batch \
 #         --region us-west-2 \
-#         --project-name java-ddbec-test-release \
+#         --project-name java-ddb-ec-test-release \
 #         --environment-variables-override name=VERSION,value=<INSERT_VERSION>,type=PLAINTEXT name=COMMIT_ID,value=<INSERT_COMMIT_ID>,type=PLAINTEXT
 
 env:

@@ -1,5 +1,5 @@
 version: 0.2
-# 'release-prod' is an AWS::CodeBuild::Project that Releases from CodeArtifact to Sonatype and then validates the release with 'validate-prod'
+# 'release-prod' is an AWS::CodeBuild::Project that Releases to Sonatype and then validates the release with 'validate-prod'
 # Command to trigger this codebuild from an authorized command line.
 #  aws codebuild start-build-batch \
 #  --region us-west-2 \
@@ -20,7 +20,7 @@ phases:
   pre_build:
     commands:
       - git checkout $COMMIT_ID
-      - FOUND_VERSION=$(grep version pom.xml | head -n 2 | sed -n 's/[ \t]*<version>\(.*\)<\/version>/\1/p')
+      - FOUND_VERSION=$(grep version sdk1/pom.xml | head -n 2 | sed -n 's/[ \t]*<version>\(.*\)<\/version>/\1/p')
       - |
         if expr ${FOUND_VERSION} != ${VERSION}; then
           echo "pom.xml version (${FOUND_VERSION}) does not match expected version (${VERSION}), stopping"

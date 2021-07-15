@@ -24,7 +24,7 @@ phases:
   pre_build:
     commands:
       - git checkout $COMMIT_ID
-      - FOUND_VERSION=$(grep version pom.xml | head -n 2 | sed -n 's/[ \t]*<version>\(.*\)<\/version>/\1/p')
+      - FOUND_VERSION=$(grep version sdk1/pom.xml | head -n 2 | sed -n 's/[ \t]*<version>\(.*\)<\/version>/\1/p')
       - |
         if expr ${FOUND_VERSION} != ${VERSION}; then
           echo "pom.xml version (${FOUND_VERSION}) does not match expected version (${VERSION}), stopping"

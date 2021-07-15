@@ -1,5 +1,5 @@
 version: 0.2
-# 'validate-staging' is an AWS::CodeBuild::Project that validates a CodeArtifact staging before a sonatype release
+# 'validate-staging' is an AWS::CodeBuild::Project that validates artifacts from CodeArtifact against the examples
 
 env:
   variables:
@@ -17,16 +17,16 @@ phases:
       - export SETTINGS_FILE=$(pwd)/codebuild/release/settings.xml
       - export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain $DOMAIN --domain-owner $ACCOUNT --query authorizationToken --output text --region ${REGION})
       - export CODEARTIFACT_REPO_URL=https://${DOMAIN}-${ACCOUNT}.d.codeartifact.${REGION}.amazonaws.com/maven/${REPOSITORY}
+      - cd examples
   build:
     commands:
       - |
         mvn verify \
           -Pcodeartifact \
           -Dcheckstyle.skip \
-          -Desdk.version=$VERSION \
+          -Dddbec.version=$VERSION \
           -Dmaven.compiler.target=$JAVA_NUMERIC_VERSION \
           -Dmaven.compiler.source=$JAVA_NUMERIC_VERSION \
           -Dcodeartifact.token=$CODEARTIFACT_TOKEN \
           -Dcodeartifact.url=$CODEARTIFACT_REPO_URL \
           -s $SETTINGS_FILE
-

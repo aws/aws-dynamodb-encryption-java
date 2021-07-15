@@ -1,5 +1,5 @@
 version: 0.2
-# 'validate-staging' is an AWS::CodeBuild::Project that validates artifacts from CodeArtifact against the examples
+# 'validate-staging' is an AWS::CodeBuild::BuildSpec that validates artifacts from CodeArtifact against the examples
 
 env:
   variables:

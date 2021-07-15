@@ -1,5 +1,5 @@
 version: 0.2
-# 'release-prod' is an AWS::CodeBuild::Project that Releases to Sonatype and then validates the release with 'validate-prod'
+# 'release-prod' is an AWS::CodeBuild::BuildSpec that Releases to Sonatype and then validates the release with 'validate-prod'
 # Command to trigger this codebuild from an authorized command line.
 #  aws codebuild start-build-batch \
 #  --region us-west-2 \

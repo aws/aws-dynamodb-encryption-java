@@ -1,5 +1,5 @@
 version: 0.2
-# 'validate-prod' is an AWS::CodeBuild::Project that validates a Sonatype release against the examples
+# 'validate-prod' is an AWS::CodeBuild::BuildSpec that validates a Sonatype release against the examples
 
 phases:
   install:

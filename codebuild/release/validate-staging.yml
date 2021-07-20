@@ -10,8 +10,8 @@ env:
     ACCOUNT: /CodeBuild/AccountId
 
 phases:
-    runtime-versions:
-      java: $JAVA_ENV_VERSION
+  runtime-versions:
+    java: $JAVA_ENV_VERSION
   pre_build:
     commands:
       - export SETTINGS_FILE=$(pwd)/codebuild/release/settings.xml

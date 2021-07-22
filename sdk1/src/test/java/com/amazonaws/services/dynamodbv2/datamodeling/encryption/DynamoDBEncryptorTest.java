@@ -15,6 +15,7 @@
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption;
 
 import static com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils.EncryptionContextOperators.overrideEncryptionContextTableName;
+import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -23,6 +24,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.collections.Sets.newHashSet;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
@@ -496,6 +498,19 @@ public class DynamoDBEncryptorTest {
     buff.put(expected);
     buff.flip();
     assertToByteArray("Direct", expected, buff);
+  }
+
+  @Test
+  public void testDecryptWithMissingSignatureFields() throws GeneralSecurityException {
+    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags = attribs.keySet()
+            .stream()
+            .collect(toMap(k -> k, k -> newHashSet()));
+
+    Map<String, AttributeValue> decryptedAttributes =
+            encryptor.decryptRecord(
+                    attribs, attributeWithEmptyEncryptionFlags, context);
+
+    assertThat(decryptedAttributes, AttrMatcher.match(attribs));
   }
 
   private void assertToByteArray(

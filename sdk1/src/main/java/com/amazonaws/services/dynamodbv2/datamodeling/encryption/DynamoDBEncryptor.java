@@ -237,6 +237,16 @@ public class DynamoDBEncryptor {
     if (attributeFlags.isEmpty()) {
       return itemAttributes;
     }
+
+    if (!itemAttributes.containsKey(signatureFieldName)
+        && !itemAttributes.containsKey(materialDescriptionFieldName)) {
+      // Check if any key from the received raw document is marked with EncryptionFlags in model
+      if (isAnyKeyMarkedWithEncryptionFlags(itemAttributes.keySet(), attributeFlags)) {
+        throw new IllegalArgumentException("Bad data, missing " + signatureFieldName);
+      } else {
+        return itemAttributes;
+      }
+    }
     // Copy to avoid changing anyone elses objects
     itemAttributes = new HashMap<String, AttributeValue>(itemAttributes);
 
@@ -289,6 +299,12 @@ public class DynamoDBEncryptor {
 
     actualDecryption(itemAttributes, attributeFlags, decryptionKey, materialDescription);
     return itemAttributes;
+  }
+
+  private boolean isAnyKeyMarkedWithEncryptionFlags(Set<String> keysToCheck,
+                                                    Map<String, Set<EncryptionFlags>> attributeFlags) {
+    return keysToCheck.stream()
+            .anyMatch(key -> !attributeFlags.get(key).isEmpty());
   }
 
   /**

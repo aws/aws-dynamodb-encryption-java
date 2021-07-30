@@ -301,10 +301,9 @@ public class DynamoDBEncryptor {
     return itemAttributes;
   }
 
-  private boolean isAnyKeyMarkedWithEncryptionFlags(Set<String> keysToCheck,
-                                                    Map<String, Set<EncryptionFlags>> attributeFlags) {
-    return keysToCheck.stream()
-            .anyMatch(key -> !attributeFlags.get(key).isEmpty());
+  private boolean isAnyKeyMarkedWithEncryptionFlags(
+      Set<String> keysToCheck, Map<String, Set<EncryptionFlags>> attributeFlags) {
+    return keysToCheck.stream().anyMatch(key -> !attributeFlags.get(key).isEmpty());
   }
 
   /**

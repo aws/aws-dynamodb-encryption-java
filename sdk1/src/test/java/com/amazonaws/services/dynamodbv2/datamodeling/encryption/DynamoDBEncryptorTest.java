@@ -502,13 +502,11 @@ public class DynamoDBEncryptorTest {
 
   @Test
   public void testDecryptWithMissingSignatureFields() throws GeneralSecurityException {
-    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags = attribs.keySet()
-            .stream()
-            .collect(toMap(k -> k, k -> newHashSet()));
+    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
+        attribs.keySet().stream().collect(toMap(k -> k, k -> newHashSet()));
 
     Map<String, AttributeValue> decryptedAttributes =
-            encryptor.decryptRecord(
-                    attribs, attributeWithEmptyEncryptionFlags, context);
+        encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
 
     assertThat(decryptedAttributes, AttrMatcher.match(attribs));
   }

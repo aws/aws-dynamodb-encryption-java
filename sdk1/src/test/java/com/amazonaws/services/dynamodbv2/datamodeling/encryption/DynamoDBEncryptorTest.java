@@ -501,7 +501,8 @@ public class DynamoDBEncryptorTest {
   }
 
   @Test
-  public void testDecryptWithMissingSignatureFields() throws GeneralSecurityException {
+  public void testDecryptWithMissingSignatureAndMaterialDescFields()
+      throws GeneralSecurityException {
     Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
         attribs.keySet().stream().collect(toMap(k -> k, k -> newHashSet()));
 
@@ -509,6 +510,30 @@ public class DynamoDBEncryptorTest {
         encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
 
     assertThat(decryptedAttributes, AttrMatcher.match(attribs));
+  }
+
+  @Test(
+      expectedExceptions = SignatureException.class,
+      expectedExceptionsMessageRegExp = "Bad signature")
+  public void testDecryptWithMissingSignatureField() throws GeneralSecurityException {
+    Map<String, AttributeValue> encryptedAttributes =
+        encryptor.encryptAllFieldsExcept(attribs, context);
+    assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+    encryptedAttributes.remove(encryptor.getSignatureFieldName());
+    encryptor.decryptAllFieldsExcept(
+        encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+  }
+
+  @Test(
+      expectedExceptions = SignatureException.class,
+      expectedExceptionsMessageRegExp = "Bad signature")
+  public void testDecryptWithMissingMaterialDescField() throws GeneralSecurityException {
+    Map<String, AttributeValue> encryptedAttributes =
+        encryptor.encryptAllFieldsExcept(attribs, context);
+    assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
+    encryptedAttributes.remove(encryptor.getMaterialDescriptionFieldName());
+    encryptor.decryptAllFieldsExcept(
+        encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
   }
 
   private void assertToByteArray(

@@ -20,7 +20,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
-import com.amazonaws.services.dynamodbv2.mapper.encryption.StringAttributeTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
@@ -68,14 +67,17 @@ public class MissingSignatureFieldsITCase extends DynamoDBMapperCryptoIntegratio
     }
   }
 
-  @Test(expectedExceptions = DynamoDBMappingException.class)
+  @Test(
+      expectedExceptions = DynamoDBMappingException.class,
+      expectedExceptionsMessageRegExp =
+          "java.lang.IllegalArgumentException: Record did not contain encryption metadata fields: '\\*amzn-ddb-map-sig\\*', '\\*amzn-ddb-map-desc\\*'.")
   public void testLoadWithBadMissingSignatureFields() {
     TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo)
-        .load(StringAttributeTestClass.class, attrs.get(0).get(KEY_NAME).getS());
+        .load(EncryptedTable.class, attrs.get(0).get(KEY_NAME).getS());
   }
 
   @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
-  public static final class AllDoNotTouchTable {
+  public static class AllDoNotTouchTable {
 
     private String key;
 
@@ -107,6 +109,14 @@ public class MissingSignatureFieldsITCase extends DynamoDBMapperCryptoIntegratio
       if (o == null || getClass() != o.getClass()) return false;
       AllDoNotTouchTable that = (AllDoNotTouchTable) o;
       return key.equals(that.key) && stringAttribute.equals(that.stringAttribute);
+    }
+  }
+
+  public static final class EncryptedTable extends AllDoNotTouchTable {
+    @Override
+    @DynamoDBAttribute
+    public String getStringAttribute() {
+      return super.getStringAttribute();
     }
   }
 }

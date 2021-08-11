@@ -237,15 +237,15 @@ public class DynamoDBEncryptor {
     if (attributeFlags.isEmpty()) {
       return itemAttributes;
     }
-
+    if (!isDecryptionRequired(itemAttributes.keySet(), attributeFlags)) {
+      return itemAttributes;
+    }
     if (!itemAttributes.containsKey(signatureFieldName)
         && !itemAttributes.containsKey(materialDescriptionFieldName)) {
-      // Check if any key from the received raw document is marked with EncryptionFlags in model
-      if (isAnyKeyMarkedWithEncryptionFlags(itemAttributes.keySet(), attributeFlags)) {
-        throw new IllegalArgumentException("Bad data, missing " + signatureFieldName);
-      } else {
-        return itemAttributes;
-      }
+      throw new IllegalArgumentException(
+          String.format(
+              "Record did not contain encryption metadata fields: '%s', '%s'.",
+              signatureFieldName, materialDescriptionFieldName));
     }
     // Copy to avoid changing anyone elses objects
     itemAttributes = new HashMap<String, AttributeValue>(itemAttributes);
@@ -301,9 +301,11 @@ public class DynamoDBEncryptor {
     return itemAttributes;
   }
 
-  private boolean isAnyKeyMarkedWithEncryptionFlags(
-      Set<String> keysToCheck, Map<String, Set<EncryptionFlags>> attributeFlags) {
-    return keysToCheck.stream().anyMatch(key -> !attributeFlags.get(key).isEmpty());
+  private boolean isDecryptionRequired(
+      Set<String> attributeNamesToCheck, Map<String, Set<EncryptionFlags>> attributeFlags) {
+    return attributeNamesToCheck.stream()
+        .filter(attributeFlags::containsKey)
+        .anyMatch(attributeName -> !attributeFlags.get(attributeName).isEmpty());
   }
 
   /**

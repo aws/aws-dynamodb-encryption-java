@@ -33,8 +33,8 @@ import java.util.Map;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-/** Test reading of document which does not contain signature field. */
-public class MissingSignatureFieldsITCase extends DynamoDBMapperCryptoIntegrationTestBase {
+/** Test reading of document which does not contain signature meta fields. */
+public class MissingSignatureMatDescFieldsITCase extends DynamoDBMapperCryptoIntegrationTestBase {
   private static final String STRING_ATTRIBUTE = "stringAttribute";
   private static Map<String, AttributeValue> plaintextItem = new HashMap<>();
   private static Map<String, AttributeValue> encryptedItem = new HashMap<>();

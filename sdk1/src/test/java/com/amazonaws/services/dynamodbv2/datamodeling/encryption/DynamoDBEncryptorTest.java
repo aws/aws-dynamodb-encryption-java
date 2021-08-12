@@ -56,6 +56,7 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.mockito.internal.util.collections.Sets;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -508,7 +509,38 @@ public class DynamoDBEncryptorTest {
 
     Map<String, AttributeValue> decryptedAttributes =
         encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
+    assertThat(decryptedAttributes, AttrMatcher.match(attribs));
+  }
 
+  /*
+  Test decrypt with a map that contains a new key (not included in attribs) with an encryption flag set that contains ENCRYPT and SIGN.
+   */
+  @Test
+  public void testDecryptWithPlainTextItemAndAdditionNewAttributeHavingEncryptionFlag()
+      throws GeneralSecurityException {
+    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
+        attribs.keySet().stream().collect(toMap(k -> k, k -> newHashSet()));
+    attributeWithEmptyEncryptionFlags.put(
+        "newAttribute", Sets.newSet(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN));
+
+    Map<String, AttributeValue> decryptedAttributes =
+        encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
+    assertThat(decryptedAttributes, AttrMatcher.match(attribs));
+  }
+
+  @Test(
+      expectedExceptions = IllegalArgumentException.class,
+      expectedExceptionsMessageRegExp =
+          "Record did not contain encryption metadata fields: '\\*amzn-ddb-map-sig\\*', '\\*amzn-ddb-map-desc\\*'.")
+  public void testDecryptWithPlainTextItemAndAttributeHavingEncryptionFlag()
+      throws GeneralSecurityException {
+    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
+        attribs.keySet().stream()
+            .collect(
+                toMap(k -> k, k -> Sets.newSet(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN)));
+
+    Map<String, AttributeValue> decryptedAttributes =
+        encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
     assertThat(decryptedAttributes, AttrMatcher.match(attribs));
   }
 
@@ -520,8 +552,7 @@ public class DynamoDBEncryptorTest {
         encryptor.encryptAllFieldsExcept(attribs, context);
     assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
     encryptedAttributes.remove(encryptor.getSignatureFieldName());
-    encryptor.decryptAllFieldsExcept(
-        encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+    encryptor.decryptAllFieldsExcept(encryptedAttributes, context, Collections.emptyList());
   }
 
   @Test(
@@ -532,8 +563,7 @@ public class DynamoDBEncryptorTest {
         encryptor.encryptAllFieldsExcept(attribs, context);
     assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
     encryptedAttributes.remove(encryptor.getMaterialDescriptionFieldName());
-    encryptor.decryptAllFieldsExcept(
-        encryptedAttributes, context, attribs.keySet().toArray(new String[0]));
+    encryptor.decryptAllFieldsExcept(encryptedAttributes, context, Collections.emptyList());
   }
 
   private void assertToByteArray(

@@ -234,10 +234,7 @@ public class DynamoDBEncryptor {
       Map<String, Set<EncryptionFlags>> attributeFlags,
       EncryptionContext context)
       throws GeneralSecurityException {
-    if (attributeFlags.isEmpty()) {
-      return itemAttributes;
-    }
-    if (!isDecryptionRequired(itemAttributes.keySet(), attributeFlags)) {
+    if (!itemContainsFieldsToDecryptOrSign(itemAttributes.keySet(), attributeFlags)) {
       return itemAttributes;
     }
     if (!itemAttributes.containsKey(signatureFieldName)
@@ -301,7 +298,7 @@ public class DynamoDBEncryptor {
     return itemAttributes;
   }
 
-  private boolean isDecryptionRequired(
+  private boolean itemContainsFieldsToDecryptOrSign(
       Set<String> attributeNamesToCheck, Map<String, Set<EncryptionFlags>> attributeFlags) {
     return attributeNamesToCheck.stream()
         .filter(attributeFlags::containsKey)

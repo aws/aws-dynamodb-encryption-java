@@ -556,8 +556,8 @@ public class DynamoDBEncryptorTest {
   }
 
   @Test(
-      expectedExceptions = SignatureException.class,
-      expectedExceptionsMessageRegExp = "Bad signature")
+      expectedExceptions = IllegalArgumentException.class,
+      expectedExceptionsMessageRegExp = "Algorithm does not exist")
   public void testDecryptWithMissingMaterialDescField() throws GeneralSecurityException {
     Map<String, AttributeValue> encryptedAttributes =
         encryptor.encryptAllFieldsExcept(attribs, context);

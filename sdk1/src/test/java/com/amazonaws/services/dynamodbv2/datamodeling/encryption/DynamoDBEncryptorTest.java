@@ -502,7 +502,7 @@ public class DynamoDBEncryptorTest {
   }
 
   @Test
-  public void testDecryptWithMissingSignatureAndMaterialDescFields()
+  public void testDecryptWithPlaintextItem()
       throws GeneralSecurityException {
     Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
         attribs.keySet().stream().collect(toMap(k -> k, k -> newHashSet()));

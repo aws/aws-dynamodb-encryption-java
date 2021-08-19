@@ -28,8 +28,7 @@ import java.util.Map;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-/** Test reading of document which does not contain signature meta fields. */
-public class MissingSignatureMatDescFieldsITCase extends DynamoDBMapperCryptoIntegrationTestBase {
+public class PlaintextItemITCase extends DynamoDBMapperCryptoIntegrationTestBase {
   private static final String STRING_ATTRIBUTE = "stringAttribute";
   private static Map<String, AttributeValue> plaintextItem = new HashMap<>();
   // Test data

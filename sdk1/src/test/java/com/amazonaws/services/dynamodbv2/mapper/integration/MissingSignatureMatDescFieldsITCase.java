@@ -14,18 +14,13 @@ package com.amazonaws.services.dynamodbv2.mapper.integration;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
-import static org.testng.collections.Lists.newArrayList;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
-import com.amazonaws.services.dynamodbv2.mapper.encryption.TestEncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import java.util.HashMap;
@@ -37,45 +32,17 @@ import org.testng.annotations.Test;
 public class MissingSignatureMatDescFieldsITCase extends DynamoDBMapperCryptoIntegrationTestBase {
   private static final String STRING_ATTRIBUTE = "stringAttribute";
   private static Map<String, AttributeValue> plaintextItem = new HashMap<>();
-  private static Map<String, AttributeValue> encryptedItem = new HashMap<>();
-  private static Map<String, AttributeValue> encryptedItemMissingSignature = new HashMap<>();
-  private static Map<String, AttributeValue> encryptedItemMissingMatDesc = new HashMap<>();
   // Test data
   static {
-    newArrayList(
-            plaintextItem,
-            encryptedItem,
-            encryptedItemMissingSignature,
-            encryptedItemMissingMatDesc)
-        .forEach(
-            attr -> {
-              attr.put(KEY_NAME, new AttributeValue().withS("" + startKey++));
-              attr.put(STRING_ATTRIBUTE, new AttributeValue().withS("" + startKey++));
-            });
+    plaintextItem.put(KEY_NAME, new AttributeValue().withS("" + startKey++));
+    plaintextItem.put(STRING_ATTRIBUTE, new AttributeValue().withS("" + startKey++));
   }
 
   @BeforeClass
   public static void setUp() throws Exception {
     DynamoDBMapperCryptoIntegrationTestBase.setUp();
-    DynamoDBEncryptor encryptor =
-        DynamoDBEncryptor.getInstance(new TestEncryptionMaterialsProvider());
-    EncryptionContext context =
-        new EncryptionContext.Builder().withHashKeyName(KEY_NAME).withTableName(TABLE_NAME).build();
     // Insert the data
     dynamo.putItem(new PutItemRequest(TABLE_NAME, plaintextItem));
-
-    encryptedItem = encryptor.encryptAllFieldsExcept(encryptedItem, context, KEY_NAME);
-    dynamo.putItem(new PutItemRequest(TABLE_NAME, encryptedItem));
-
-    encryptedItemMissingSignature =
-        encryptor.encryptAllFieldsExcept(encryptedItemMissingSignature, context, KEY_NAME);
-    encryptedItemMissingSignature.remove(encryptor.getSignatureFieldName());
-    dynamo.putItem(new PutItemRequest(TABLE_NAME, encryptedItemMissingSignature));
-
-    encryptedItemMissingMatDesc =
-        encryptor.encryptAllFieldsExcept(encryptedItemMissingMatDesc, context, KEY_NAME);
-    encryptedItemMissingMatDesc.remove(encryptor.getMaterialDescriptionFieldName());
-    dynamo.putItem(new PutItemRequest(TABLE_NAME, encryptedItemMissingMatDesc));
   }
 
   @Test
@@ -97,31 +64,6 @@ public class MissingSignatureMatDescFieldsITCase extends DynamoDBMapperCryptoInt
     assertEquals(load.getKey(), plaintextItem.get(KEY_NAME).getS());
     assertEquals(load.getStringAttribute(), plaintextItem.get(STRING_ATTRIBUTE).getS());
     assertNull(load.getNewAttribute());
-  }
-
-  @Test(
-      expectedExceptions = DynamoDBMappingException.class,
-      expectedExceptionsMessageRegExp = "java.security.SignatureException: Bad signature")
-  public void testLoadWithBadMissingSignatureField() {
-    TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo)
-        .load(EncryptedTable.class, encryptedItemMissingSignature.get(KEY_NAME).getS());
-  }
-
-  @Test(
-      expectedExceptions = DynamoDBMappingException.class,
-      expectedExceptionsMessageRegExp = "java.security.SignatureException: Bad signature")
-  public void testLoadWithBadMissingMaterialDescField() {
-    TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo)
-        .load(EncryptedTable.class, encryptedItemMissingMatDesc.get(KEY_NAME).getS());
-  }
-
-  @Test(
-      expectedExceptions = DynamoDBMappingException.class,
-      expectedExceptionsMessageRegExp =
-          "java.lang.IllegalArgumentException: Record did not contain encryption metadata fields: '\\*amzn-ddb-map-sig\\*', '\\*amzn-ddb-map-desc\\*'.")
-  public void testLoadWithBadMissingSignatureNMaterialDescFields() {
-    TestDynamoDBMapperFactory.createDynamoDBMapper(dynamo)
-        .load(EncryptedTable.class, plaintextItem.get(KEY_NAME).getS());
   }
 
   @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
@@ -169,14 +111,6 @@ public class MissingSignatureMatDescFieldsITCase extends DynamoDBMapperCryptoInt
 
     public void setNewAttribute(String newAttribute) {
       this.newAttribute = newAttribute;
-    }
-  }
-
-  public static final class EncryptedTable extends UntouchedTable {
-    @Override
-    @DynamoDBAttribute
-    public String getStringAttribute() {
-      return super.getStringAttribute();
     }
   }
 }

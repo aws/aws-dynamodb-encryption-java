@@ -237,13 +237,6 @@ public class DynamoDBEncryptor {
     if (!itemContainsFieldsToDecryptOrSign(itemAttributes.keySet(), attributeFlags)) {
       return itemAttributes;
     }
-    if (!itemAttributes.containsKey(signatureFieldName)
-        && !itemAttributes.containsKey(materialDescriptionFieldName)) {
-      throw new IllegalArgumentException(
-          String.format(
-              "Record did not contain encryption metadata fields: '%s', '%s'.",
-              signatureFieldName, materialDescriptionFieldName));
-    }
     // Copy to avoid changing anyone elses objects
     itemAttributes = new HashMap<String, AttributeValue>(itemAttributes);
 

@@ -528,44 +528,6 @@ public class DynamoDBEncryptorTest {
     assertThat(decryptedAttributes, AttrMatcher.match(attribs));
   }
 
-  @Test(
-      expectedExceptions = IllegalArgumentException.class,
-      expectedExceptionsMessageRegExp =
-          "Record did not contain encryption metadata fields: '\\*amzn-ddb-map-sig\\*', '\\*amzn-ddb-map-desc\\*'.")
-  public void testDecryptWithPlainTextItemAndAttributeHavingEncryptionFlag()
-      throws GeneralSecurityException {
-    Map<String, Set<EncryptionFlags>> attributeWithEmptyEncryptionFlags =
-        attribs.keySet().stream()
-            .collect(
-                toMap(k -> k, k -> Sets.newSet(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN)));
-
-    Map<String, AttributeValue> decryptedAttributes =
-        encryptor.decryptRecord(attribs, attributeWithEmptyEncryptionFlags, context);
-    assertThat(decryptedAttributes, AttrMatcher.match(attribs));
-  }
-
-  @Test(
-      expectedExceptions = SignatureException.class,
-      expectedExceptionsMessageRegExp = "Bad signature")
-  public void testDecryptWithMissingSignatureField() throws GeneralSecurityException {
-    Map<String, AttributeValue> encryptedAttributes =
-        encryptor.encryptAllFieldsExcept(attribs, context);
-    assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
-    encryptedAttributes.remove(encryptor.getSignatureFieldName());
-    encryptor.decryptAllFieldsExcept(encryptedAttributes, context, Collections.emptyList());
-  }
-
-  @Test(
-      expectedExceptions = IllegalArgumentException.class,
-      expectedExceptionsMessageRegExp = "Algorithm does not exist")
-  public void testDecryptWithMissingMaterialDescField() throws GeneralSecurityException {
-    Map<String, AttributeValue> encryptedAttributes =
-        encryptor.encryptAllFieldsExcept(attribs, context);
-    assertThat(encryptedAttributes, AttrMatcher.invert(attribs));
-    encryptedAttributes.remove(encryptor.getMaterialDescriptionFieldName());
-    encryptor.decryptAllFieldsExcept(encryptedAttributes, context, Collections.emptyList());
-  }
-
   private void assertToByteArray(
       final String msg, final byte[] expected, final ByteBuffer testValue)
       throws ReflectiveOperationException {

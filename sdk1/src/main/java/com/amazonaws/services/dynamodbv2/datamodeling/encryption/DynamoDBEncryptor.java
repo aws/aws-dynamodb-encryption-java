@@ -234,7 +234,7 @@ public class DynamoDBEncryptor {
       Map<String, Set<EncryptionFlags>> attributeFlags,
       EncryptionContext context)
       throws GeneralSecurityException {
-    if (attributeFlags.isEmpty()) {
+    if (!itemContainsFieldsToDecryptOrSign(itemAttributes.keySet(), attributeFlags)) {
       return itemAttributes;
     }
     // Copy to avoid changing anyone elses objects
@@ -289,6 +289,13 @@ public class DynamoDBEncryptor {
 
     actualDecryption(itemAttributes, attributeFlags, decryptionKey, materialDescription);
     return itemAttributes;
+  }
+
+  private boolean itemContainsFieldsToDecryptOrSign(
+      Set<String> attributeNamesToCheck, Map<String, Set<EncryptionFlags>> attributeFlags) {
+    return attributeNamesToCheck.stream()
+        .filter(attributeFlags::containsKey)
+        .anyMatch(attributeName -> !attributeFlags.get(attributeName).isEmpty());
   }
 
   /**

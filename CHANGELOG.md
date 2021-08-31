@@ -1,24 +1,22 @@
 # Changelog
 ## 2.0.2 -- 2021-08-30
-Fixes:
+### Fixes
 * NPE if reading record without a signature fields
 ([#152](https://github.com/aws/aws-dynamodb-encryption-java/pull/152))
-* Add Formatter
-([#146](https://github.com/aws/aws-dynamodb-encryption-java/pull/146))
 * Update user agent string to correctly reflect version
 ([#141](https://github.com/aws/aws-dynamodb-encryption-java/pull/141))
-* Moving Javadoc to webroot
-([#140](https://github.com/aws/aws-dynamodb-encryption-java/pull/140))
 * Data model migration doc breadcrumb.
 ([#139](https://github.com/aws/aws-dynamodb-encryption-java/pull/139))
 
-Maintenance:
+### Maintenance
 * chore: bump aws-java-sdk-bom from 1.11.460 to 1.12.51
- ([#154](https://github.com/aws/aws-dynamodb-encryption-java/pull/154))
+([#154](https://github.com/aws/aws-dynamodb-encryption-java/pull/154))
 * chore: Add support policy
 ([#149](https://github.com/aws/aws-dynamodb-encryption-java/pull/149))
 * CI: Create release builds that validate on multiple JDKs
 ([#148](https://github.com/aws/aws-dynamodb-encryption-java/pull/148))
+* Add Formatter
+([#146](https://github.com/aws/aws-dynamodb-encryption-java/pull/146))
 * chore: Add example for MRKs
 ([#145](https://github.com/aws/aws-dynamodb-encryption-java/pull/145))
 * chore: Add repo-sync actions

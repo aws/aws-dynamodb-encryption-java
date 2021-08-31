@@ -1,4 +1,29 @@
 # Changelog
+## 2.0.2 -- 2021-08-31
+### Fixes
+* fix: Allow reading old plaintext records after adding new encrypted field to schema
+([#152](https://github.com/aws/aws-dynamodb-encryption-java/pull/152))
+* fix: Update user agent string to correctly reflect version
+([#141](https://github.com/aws/aws-dynamodb-encryption-java/pull/141))
+* fix: Data model migration doc breadcrumb.
+([#139](https://github.com/aws/aws-dynamodb-encryption-java/pull/139))
+
+### Maintenance
+* chore: bump aws-java-sdk-bom from 1.11.460 to 1.12.51
+([#154](https://github.com/aws/aws-dynamodb-encryption-java/pull/154))
+* chore: Add support policy
+([#149](https://github.com/aws/aws-dynamodb-encryption-java/pull/149))
+* CI: Create release builds that validate on multiple JDKs
+([#148](https://github.com/aws/aws-dynamodb-encryption-java/pull/148))
+* chore: Add format check to CI and format
+([#146](https://github.com/aws/aws-dynamodb-encryption-java/pull/146))
+* chore: Add example for MRKs
+([#145](https://github.com/aws/aws-dynamodb-encryption-java/pull/145))
+* chore: Add repo-sync actions
+([#143](https://github.com/aws/aws-dynamodb-encryption-java/pull/143))
+* chore: Add issue template
+([#142](https://github.com/aws/aws-dynamodb-encryption-java/pull/142))
+
 ## 2.0.1 -- 2021-02-12
 ### Bugfix
 Fixes released jar files to ensure JDK 8 compatibility.

@@ -1,11 +1,11 @@
 # Changelog
-## 2.0.2 -- 2021-08-30
+## 2.0.2 -- 2021-08-31
 ### Fixes
-* NPE if reading record without a signature fields
+* fix: Allow reading old plaintext records after adding new encrypted field to schema
 ([#152](https://github.com/aws/aws-dynamodb-encryption-java/pull/152))
-* Update user agent string to correctly reflect version
+* fix: Update user agent string to correctly reflect version
 ([#141](https://github.com/aws/aws-dynamodb-encryption-java/pull/141))
-* Data model migration doc breadcrumb.
+* fix: Data model migration doc breadcrumb.
 ([#139](https://github.com/aws/aws-dynamodb-encryption-java/pull/139))
 
 ### Maintenance
@@ -15,7 +15,7 @@
 ([#149](https://github.com/aws/aws-dynamodb-encryption-java/pull/149))
 * CI: Create release builds that validate on multiple JDKs
 ([#148](https://github.com/aws/aws-dynamodb-encryption-java/pull/148))
-* Add Formatter
+* chore: Add format check to CI and format
 ([#146](https://github.com/aws/aws-dynamodb-encryption-java/pull/146))
 * chore: Add example for MRKs
 ([#145](https://github.com/aws/aws-dynamodb-encryption-java/pull/145))

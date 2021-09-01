@@ -13,7 +13,7 @@
 
     <artifactId>dynamodbencryptionclient-sdk1examples</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <name>aws-dynamodb-encryption-java :: SDK1 Examples</name>
     <description>Examples for AWS DynamoDB Encryption Client for AWS Java SDK v1</description>
 
@@ -23,7 +23,7 @@
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <ddbec.version>2.0.1</ddbec.version>
+        <ddbec.version>2.0.2</ddbec.version>
     </properties>
 
     <dependencies>

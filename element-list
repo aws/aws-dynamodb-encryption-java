@@ -1,0 +1,6 @@
+com.amazonaws.services.dynamodbv2.datamodeling
+com.amazonaws.services.dynamodbv2.datamodeling.encryption
+com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials
+com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers
+com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.store
+com.amazonaws.services.dynamodbv2.datamodeling.encryption.utils

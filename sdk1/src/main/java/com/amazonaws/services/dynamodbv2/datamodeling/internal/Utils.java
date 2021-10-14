@@ -57,7 +57,8 @@ public class Utils {
   public static String loadVersion() {
     try {
       final Properties properties = new Properties();
-      properties.load(ClassLoader.getSystemResourceAsStream("project.properties"));
+      final ClassLoader loader = Utils.class.getClassLoader();
+      properties.load(loader.getResourceAsStream("project.properties"));
       return properties.getProperty("version");
     } catch (final IOException ex) {
       return "unknown";

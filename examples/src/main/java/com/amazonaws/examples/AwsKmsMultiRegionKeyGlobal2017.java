@@ -14,6 +14,7 @@ import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
 
 import java.security.GeneralSecurityException;
+import java.util.Random;
 
 /**
  * Example showing use of AWS KMS CMP with an AWS KMS Multi-Region Key. We encrypt a record with a
@@ -41,10 +42,12 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
     AmazonDynamoDB ddbDecrypt = null;
     //noinspection DuplicatedCode
     try {
+      Random random = new Random();
+      int sort_value = random.nextInt();
       // Sample object to be encrypted
       AwsKmsEncryptedGlobal2017Object.DataPoJo record = new AwsKmsEncryptedGlobal2017Object.DataPoJo();
       record.setPartitionAttribute("is this");
-      record.setSortAttribute(42);
+      record.setSortAttribute(sort_value);
       record.setExample("data");
 
       // Set up clients and configuration in the first region. All of this is thread-safe and can be
@@ -76,7 +79,7 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       // to replicate
       // to the second region
       try {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
       } catch (InterruptedException ignored) {
       }
 
@@ -95,7 +98,7 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       // call to the
       // first region if your application is running in the second region
       AwsKmsEncryptedGlobal2017Object.DataPoJo decryptedRecord =
-          decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", 42);
+          decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", sort_value);
       System.out.println("Global 2017 Decrypted Record: " + decryptedRecord);
 
       // The decrypted fields match the original fields before encryption
@@ -107,9 +110,11 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
         Thread.sleep(2000);
       } catch (InterruptedException ignored) {
       }
-      AwsKmsEncryptedGlobal2017Object.DataPoJo decryptedRecordTwo = decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", 42);
+      AwsKmsEncryptedGlobal2017Object.DataPoJo decryptedRecordTwo = decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", sort_value);
       System.out.println("Global 2017 Decrypted Record: " + decryptedRecord);
       assert decryptedRecordTwo.getExample().equals(decryptedRecord.getExample());
+
+      encryptMapper.delete(decryptedRecordTwo);
     } finally {
       if (kmsDecrypt != null) {
         kmsDecrypt.shutdown();

@@ -133,7 +133,7 @@ You can download the [latest snapshot release][download] or pick it up from Mave
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-dynamodb-encryption-java</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
   </dependency>
 ```
 

@@ -1,4 +1,15 @@
 # Changelog
+
+## 2.0.3 -- 2021-10-14
+
+### Fixes
+* load library version via local ClassLoader
+  ([#158](https://github.com/aws/aws-dynamodb-encryption-java/pull/158))
+
+### Maintenance
+* chore: upgrade BouncyCastle to 1.69
+  ([#159](https://github.com/aws/aws-dynamodb-encryption-java/pull/159/))
+
 ## 2.0.2 -- 2021-08-31
 ### Fixes
 * fix: Allow reading old plaintext records after adding new encrypted field to schema

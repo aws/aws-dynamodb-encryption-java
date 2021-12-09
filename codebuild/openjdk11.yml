@@ -6,4 +6,4 @@ phases:
             java: openjdk11
     build:
         commands:
-          - mvn install
+          - mvn install --no-transfer-progress

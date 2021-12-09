@@ -47,7 +47,8 @@ phases:
           -Dgpg.passphrase="$GPG_PASS" \
           -Dcodeartifact.token=$CODEARTIFACT_TOKEN \
           -DaltDeploymentRepository=codeartifact::default::$CODEARTIFACT_REPO_URL \
-          -s $SETTINGS_FILE
+          -s $SETTINGS_FILE \
+          --no-transfer-progress
 
 batch:
   fast-fail: false

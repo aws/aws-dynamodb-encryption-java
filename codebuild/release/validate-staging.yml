@@ -32,4 +32,5 @@ phases:
           -Dmaven.compiler.source=$JAVA_NUMERIC_VERSION \
           -Dcodeartifact.token=$CODEARTIFACT_TOKEN \
           -Dcodeartifact.url=$CODEARTIFACT_REPO_URL \
-          -s $SETTINGS_FILE
+          -s $SETTINGS_FILE \
+          --no-transfer-progress

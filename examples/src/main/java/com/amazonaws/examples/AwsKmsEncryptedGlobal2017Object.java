@@ -36,10 +36,10 @@ public class AwsKmsEncryptedGlobal2017Object {
 
   private static final String AWS_DYNAMODB_REPLICATION_DELETING_ATTRIBUTE = "aws:rep:deleting";
   private static final String AWS_DYNAMODB_REPLICATION_UPDATETIME_ATTRIBUTE = "aws:rep:updatetime";
-  private static final String AWS_DYNAMODB_REPLICATION_UPDATEREGION_ATTRIBUTE = "aws:rep:updateregion";
+  private static final String AWS_DYNAMODB_REPLICATION_UPDATEREGION_ATTRIBUTE =
+      "aws:rep:updateregion";
 
   private static final String STRING_FIELD_NAME = "example";
-
 
   @DynamoDBTable(tableName = EXAMPLE_TABLE_NAME)
   public static final class DataPoJo {
@@ -77,13 +77,13 @@ public class AwsKmsEncryptedGlobal2017Object {
       this.example = example;
     }
 
-
     @DynamoDBAttribute(attributeName = AWS_DYNAMODB_REPLICATION_DELETING_ATTRIBUTE)
     @DynamoDBIgnore
     @DoNotTouch
     public boolean getAws_dynamodb_replication_deleting() {
       return aws_dynamodb_replication_deleting;
     }
+
     public void setAws_dynamodb_replication_deleting(boolean deleting) {
       this.aws_dynamodb_replication_deleting = deleting;
     }
@@ -92,22 +92,22 @@ public class AwsKmsEncryptedGlobal2017Object {
     @DynamoDBIgnore
     @DoNotTouch
     public float getAws_dynamodb_replication_updatetime() {
-        return aws_dynamodb_replication_updatetime;
+      return aws_dynamodb_replication_updatetime;
     }
 
     public void setAws_dynamodb_replication_updatetime(float updatetime) {
-        this.aws_dynamodb_replication_updatetime = updatetime;
+      this.aws_dynamodb_replication_updatetime = updatetime;
     }
 
     @DynamoDBAttribute(attributeName = AWS_DYNAMODB_REPLICATION_UPDATEREGION_ATTRIBUTE)
     @DynamoDBIgnore
     @DoNotTouch
     public String getAws_dynamodb_replication_updateregion() {
-        return aws_dynamodb_replication_updateregion;
+      return aws_dynamodb_replication_updateregion;
     }
 
     public void setAws_dynamodb_replication_updateregion(String updateregion) {
-        this.aws_dynamodb_replication_updateregion = updateregion;
+      this.aws_dynamodb_replication_updateregion = updateregion;
     }
 
     @Override

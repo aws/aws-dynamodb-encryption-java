@@ -12,7 +12,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncrypt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.DirectKmsMaterialProvider;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
-
 import java.security.GeneralSecurityException;
 import java.util.Random;
 
@@ -45,7 +44,8 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       Random random = new Random();
       int sort_value = random.nextInt();
       // Sample object to be encrypted
-      AwsKmsEncryptedGlobal2017Object.DataPoJo record = new AwsKmsEncryptedGlobal2017Object.DataPoJo();
+      AwsKmsEncryptedGlobal2017Object.DataPoJo record =
+          new AwsKmsEncryptedGlobal2017Object.DataPoJo();
       record.setPartitionAttribute("is this");
       record.setSortAttribute(sort_value);
       record.setExample("data");
@@ -57,19 +57,19 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       kmsEncrypt = AWSKMSClientBuilder.standard().withRegion(encryptRegion).build();
       ddbEncrypt = AmazonDynamoDBClientBuilder.standard().withRegion(encryptRegion).build();
       final DirectKmsMaterialProvider cmpEncrypt =
-              new DirectKmsMaterialProvider(kmsEncrypt, cmkArnEncrypt);
+          new DirectKmsMaterialProvider(kmsEncrypt, cmkArnEncrypt);
       final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmpEncrypt);
 
       // Mapper Creation
       // Please note the use of SaveBehavior.PUT (SaveBehavior.CLOBBER works as well).
       // Omitting this can result in data-corruption.
       DynamoDBMapperConfig mapperConfig =
-              DynamoDBMapperConfig.builder()
-                      .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.PUT)
-                      .withTableNameOverride(TableNameOverride.withTableNameReplacement(tableName))
-                      .build();
+          DynamoDBMapperConfig.builder()
+              .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.PUT)
+              .withTableNameOverride(TableNameOverride.withTableNameReplacement(tableName))
+              .build();
       DynamoDBMapper encryptMapper =
-              new DynamoDBMapper(ddbEncrypt, mapperConfig, new AttributeEncryptor(encryptor));
+          new DynamoDBMapper(ddbEncrypt, mapperConfig, new AttributeEncryptor(encryptor));
 
       System.out.println("Global 2017 Plaintext Record: " + record);
       // Save the item to the DynamoDB table
@@ -79,7 +79,7 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       // to replicate
       // to the second region
       try {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
       } catch (InterruptedException ignored) {
       }
 
@@ -107,10 +107,11 @@ public class AwsKmsMultiRegionKeyGlobal2017 {
       decryptedRecord.setExample("Howdy");
       encryptMapper.save(decryptedRecord);
       try {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
       } catch (InterruptedException ignored) {
       }
-      AwsKmsEncryptedGlobal2017Object.DataPoJo decryptedRecordTwo = decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", sort_value);
+      AwsKmsEncryptedGlobal2017Object.DataPoJo decryptedRecordTwo =
+          decryptMapper.load(AwsKmsEncryptedGlobal2017Object.DataPoJo.class, "is this", sort_value);
       System.out.println("Global 2017 Decrypted Record: " + decryptedRecord);
       assert decryptedRecordTwo.getExample().equals(decryptedRecord.getExample());
 

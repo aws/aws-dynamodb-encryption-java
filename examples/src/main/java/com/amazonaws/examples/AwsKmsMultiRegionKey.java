@@ -39,8 +39,8 @@ public class AwsKmsMultiRegionKey {
     AWSKMS kmsEncrypt = null;
     AmazonDynamoDB ddbEncrypt = null;
     AmazonDynamoDB ddbDecrypt = null;
-      //noinspection DuplicatedCode
-      try {
+    //noinspection DuplicatedCode
+    try {
       // Sample object to be encrypted
       AwsKmsEncryptedObject.DataPoJo record = new AwsKmsEncryptedObject.DataPoJo();
       record.setPartitionAttribute("is this");

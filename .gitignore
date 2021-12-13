@@ -1,6 +1,9 @@
 cleanup.sh
 release.sh
 target
+.settings/
+.project
+.classpath
 .idea/
 *.iml
 .DS_Store

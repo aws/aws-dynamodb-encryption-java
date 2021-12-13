@@ -819,7 +819,7 @@ public class TransformerHolisticIT {
         }
         final File manifestFile = new File(url.getPath());
         final ObjectMapper manifestMapper = new ObjectMapper();
-        return manifestMapper.readValue(
+        return (T) manifestMapper.readValue(
                 manifestFile,
                 typeRef
         );

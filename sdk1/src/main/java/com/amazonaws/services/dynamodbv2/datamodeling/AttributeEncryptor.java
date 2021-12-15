@@ -26,7 +26,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.HandleUnknownAt
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.TableAadOverride;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.EncryptionMaterialsProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;

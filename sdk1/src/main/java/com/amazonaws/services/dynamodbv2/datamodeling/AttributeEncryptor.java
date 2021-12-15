@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Encrypts all non-key fields prior to storing them in DynamoDB. <em>This must be used with {@link
@@ -46,7 +44,6 @@ import org.apache.commons.logging.LogFactory;
  * @author Greg Rubin
  */
 public class AttributeEncryptor implements AttributeTransformer {
-  private static final Log LOG = LogFactory.getLog(AttributeEncryptor.class);
   private final DynamoDBEncryptor encryptor;
   private final Map<Class<?>, ModelClassMetadata> metadataCache = new ConcurrentHashMap<>();
 

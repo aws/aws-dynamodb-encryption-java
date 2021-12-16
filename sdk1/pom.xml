@@ -299,7 +299,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.3.1</version>
                 <configuration>
                     <excludePackageNames>*.internal:*.transform</excludePackageNames>
                     <minmemory>128m</minmemory>

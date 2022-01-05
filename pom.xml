@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>software.amazon.cryptools</groupId>
   <artifactId>dynamodbencryptionclient-pom</artifactId>
-  <version>1.15.1</version>
+  <version>1.15.2</version>
   <packaging>pom</packaging>
 
   <name>aws-dynamodb-encryption-java :: POM</name>

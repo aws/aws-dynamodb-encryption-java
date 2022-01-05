@@ -20,15 +20,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Overrides the default tablename used as part of the data signature with
- * {@code tableName} instead. This can be useful when multiple tables are
- * used interchangably and data should be able to be copied or moved
- * between them without needing to be reencrypted.
- * 
- * @author Greg Rubin 
+ * Overrides the default tablename used as part of the data signature with {@code tableName}
+ * instead. This can be useful when multiple tables are used interchangably and data should be able
+ * to be copied or moved between them without needing to be reencrypted.
+ *
+ * @author Greg Rubin
  */
 @Target(value = {ElementType.TYPE})
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface TableAadOverride {
-    String tableName();
+  String tableName();
 }

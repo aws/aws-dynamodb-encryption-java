@@ -19,47 +19,40 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "HashKeyOnly")
 public class HashKeyOnly {
-    private String hashKey;
+  private String hashKey;
 
-    public HashKeyOnly() {
+  public HashKeyOnly() {}
 
-    }
+  public HashKeyOnly(String hashKey) {
+    this.hashKey = hashKey;
+  }
 
-    public HashKeyOnly(String hashKey) {
-        this.hashKey = hashKey;
-    }
+  @DynamoDBHashKey
+  public String getHashKey() {
+    return hashKey;
+  }
 
-    @DynamoDBHashKey
-    public String getHashKey() {
-        return hashKey;
-    }
+  public void setHashKey(String hashKey) {
+    this.hashKey = hashKey;
+  }
 
-    public void setHashKey(String hashKey) {
-        this.hashKey = hashKey;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((hashKey == null) ? 0 : hashKey.hashCode());
+    return result;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((hashKey == null) ? 0 : hashKey.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        HashKeyOnly other = (HashKeyOnly) obj;
-        if (hashKey == null) {
-            if (other.hashKey != null)
-                return false;
-        } else if (!hashKey.equals(other.hashKey))
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    HashKeyOnly other = (HashKeyOnly) obj;
+    if (hashKey == null) {
+      if (other.hashKey != null) return false;
+    } else if (!hashKey.equals(other.hashKey)) return false;
+    return true;
+  }
 }

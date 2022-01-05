@@ -17,5 +17,4 @@ package com.amazonaws.services.dynamodbv2.testing.types;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
 
 @DoNotTouch
-public class Untouched extends BaseClass {
-}
+public class Untouched extends BaseClass {}

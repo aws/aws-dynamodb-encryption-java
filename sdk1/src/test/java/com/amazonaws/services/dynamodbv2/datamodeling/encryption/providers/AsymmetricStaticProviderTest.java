@@ -14,108 +14,114 @@
  */
 package com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers;
 
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.DecryptionMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.EncryptionMaterials;
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.materials.WrappedRawMaterials;
 import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertNotNull;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class AsymmetricStaticProviderTest {
-    private static KeyPair encryptionPair;
-    private static SecretKey macKey;
-    private static KeyPair sigPair;
-    private Map<String, String> description;
-    private EncryptionContext ctx;
+  private static KeyPair encryptionPair;
+  private static SecretKey macKey;
+  private static KeyPair sigPair;
+  private Map<String, String> description;
+  private EncryptionContext ctx;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
-        rsaGen.initialize(2048, Utils.getRng());
-        sigPair = rsaGen.generateKeyPair();
-        encryptionPair = rsaGen.generateKeyPair();
+  @BeforeClass
+  public static void setUpClass() throws Exception {
+    KeyPairGenerator rsaGen = KeyPairGenerator.getInstance("RSA");
+    rsaGen.initialize(2048, Utils.getRng());
+    sigPair = rsaGen.generateKeyPair();
+    encryptionPair = rsaGen.generateKeyPair();
 
-        KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
-        macGen.init(256, Utils.getRng());
-        macKey = macGen.generateKey();
-    }
+    KeyGenerator macGen = KeyGenerator.getInstance("HmacSHA256");
+    macGen.init(256, Utils.getRng());
+    macKey = macGen.generateKey();
+  }
 
-    @BeforeMethod
-    public void setUp() {
-        description = new HashMap<String, String>();
-        description.put("TestKey", "test value");
-        description = Collections.unmodifiableMap(description);
-        ctx = new EncryptionContext.Builder().build();
-    }
+  @BeforeMethod
+  public void setUp() {
+    description = new HashMap<String, String>();
+    description.put("TestKey", "test value");
+    description = Collections.unmodifiableMap(description);
+    ctx = new EncryptionContext.Builder().build();
+  }
 
-    @Test
-    public void constructWithMac() throws GeneralSecurityException {
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, macKey, Collections.<String, String>emptyMap());
+  @Test
+  public void constructWithMac() throws GeneralSecurityException {
+    AsymmetricStaticProvider prov =
+        new AsymmetricStaticProvider(
+            encryptionPair, macKey, Collections.<String, String>emptyMap());
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(macKey, eMat.getSigningKey());
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    assertEquals(macKey, eMat.getSigningKey());
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(macKey, dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(macKey, dMat.getVerificationKey());
+  }
 
-    @Test
-    public void constructWithSigPair() throws GeneralSecurityException {
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, sigPair, Collections.<String, String>emptyMap());
+  @Test
+  public void constructWithSigPair() throws GeneralSecurityException {
+    AsymmetricStaticProvider prov =
+        new AsymmetricStaticProvider(
+            encryptionPair, sigPair, Collections.<String, String>emptyMap());
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    assertEquals(sigPair.getPrivate(), eMat.getSigningKey());
 
-        DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
-        assertEquals(encryptionKey, dMat.getDecryptionKey());
-        assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
-    }
+    DecryptionMaterials dMat = prov.getDecryptionMaterials(ctx(eMat));
+    assertEquals(encryptionKey, dMat.getDecryptionKey());
+    assertEquals(sigPair.getPublic(), dMat.getVerificationKey());
+  }
 
-    @Test
-    public void randomEnvelopeKeys() throws GeneralSecurityException {
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, macKey, Collections.<String, String>emptyMap());
+  @Test
+  public void randomEnvelopeKeys() throws GeneralSecurityException {
+    AsymmetricStaticProvider prov =
+        new AsymmetricStaticProvider(
+            encryptionPair, macKey, Collections.<String, String>emptyMap());
 
-        EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey = eMat.getEncryptionKey();
-        assertNotNull(encryptionKey);
-        assertEquals(macKey, eMat.getSigningKey());
+    EncryptionMaterials eMat = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey = eMat.getEncryptionKey();
+    assertNotNull(encryptionKey);
+    assertEquals(macKey, eMat.getSigningKey());
 
-        EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
-        SecretKey encryptionKey2 = eMat2.getEncryptionKey();
-        assertEquals(macKey, eMat.getSigningKey());
+    EncryptionMaterials eMat2 = prov.getEncryptionMaterials(ctx);
+    SecretKey encryptionKey2 = eMat2.getEncryptionKey();
+    assertEquals(macKey, eMat.getSigningKey());
 
-        assertFalse("Envelope keys must be different", encryptionKey.equals(encryptionKey2));
-    }
+    assertFalse("Envelope keys must be different", encryptionKey.equals(encryptionKey2));
+  }
 
-    @Test
-    public void testRefresh() {
-        // This does nothing, make sure we don't throw and exception.
-        AsymmetricStaticProvider prov = new AsymmetricStaticProvider(encryptionPair, macKey, description);
-        prov.refresh();
-    }
+  @Test
+  public void testRefresh() {
+    // This does nothing, make sure we don't throw and exception.
+    AsymmetricStaticProvider prov =
+        new AsymmetricStaticProvider(encryptionPair, macKey, description);
+    prov.refresh();
+  }
 
-    private static EncryptionContext ctx(EncryptionMaterials mat) {
-        return new EncryptionContext.Builder()
-                .withMaterialDescription(mat.getMaterialDescription()).build();
-    }
+  private static EncryptionContext ctx(EncryptionMaterials mat) {
+    return new EncryptionContext.Builder()
+        .withMaterialDescription(mat.getMaterialDescription())
+        .build();
+  }
 }

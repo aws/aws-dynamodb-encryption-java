@@ -18,15 +18,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName = "tableNotExist")
 public class NoSuchTableTestClass {
 
-    private String key;
+  private String key;
 
-    @DynamoDBHashKey
-    public String getKey() {
-        return key;
-    }
+  @DynamoDBHashKey
+  public String getKey() {
+    return key;
+  }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
+  public void setKey(String key) {
+    this.key = key;
+  }
 }

@@ -19,55 +19,52 @@ import java.security.KeyPair;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.crypto.SecretKey;
 
-/**
- * @author Greg Rubin 
- */
+/** @author Greg Rubin */
 public abstract class AbstractRawMaterials implements DecryptionMaterials, EncryptionMaterials {
-    private Map<String, String> description;
-    private final Key signingKey;
-    private final Key verificationKey;
+  private Map<String, String> description;
+  private final Key signingKey;
+  private final Key verificationKey;
 
-    @SuppressWarnings("unchecked")
-    protected AbstractRawMaterials(KeyPair signingPair) {
-        this(signingPair, Collections.EMPTY_MAP);
-    }
+  @SuppressWarnings("unchecked")
+  protected AbstractRawMaterials(KeyPair signingPair) {
+    this(signingPair, Collections.EMPTY_MAP);
+  }
 
-    protected AbstractRawMaterials(KeyPair signingPair, Map<String, String> description) {
-        this.signingKey = signingPair.getPrivate();
-        this.verificationKey = signingPair.getPublic();
-        setMaterialDescription(description);
-    }
+  protected AbstractRawMaterials(KeyPair signingPair, Map<String, String> description) {
+    this.signingKey = signingPair.getPrivate();
+    this.verificationKey = signingPair.getPublic();
+    setMaterialDescription(description);
+  }
 
-    @SuppressWarnings("unchecked")
-    protected AbstractRawMaterials(SecretKey macKey) {
-        this(macKey, Collections.EMPTY_MAP);
-    }
+  @SuppressWarnings("unchecked")
+  protected AbstractRawMaterials(SecretKey macKey) {
+    this(macKey, Collections.EMPTY_MAP);
+  }
 
-    protected AbstractRawMaterials(SecretKey macKey, Map<String, String> description) {
-        this.signingKey = macKey;
-        this.verificationKey = macKey;
-        this.description = Collections.unmodifiableMap(new HashMap<String, String>(description));
-    }
+  protected AbstractRawMaterials(SecretKey macKey, Map<String, String> description) {
+    this.signingKey = macKey;
+    this.verificationKey = macKey;
+    this.description = Collections.unmodifiableMap(new HashMap<String, String>(description));
+  }
 
-    @Override
-    public Map<String, String> getMaterialDescription() {
-        return new HashMap<String, String>(description);
-    }
+  @Override
+  public Map<String, String> getMaterialDescription() {
+    return new HashMap<String, String>(description);
+  }
 
-    public void setMaterialDescription(Map<String, String> description) {
-        this.description = Collections.unmodifiableMap(new HashMap<String, String>(description));
-    }
+  public void setMaterialDescription(Map<String, String> description) {
+    this.description = Collections.unmodifiableMap(new HashMap<String, String>(description));
+  }
 
-    @Override
-    public Key getSigningKey() {
-        return signingKey;
-    }
+  @Override
+  public Key getSigningKey() {
+    return signingKey;
+  }
 
-    @Override
-    public Key getVerificationKey() {
-        return verificationKey;
-    }
+  @Override
+  public Key getVerificationKey() {
+    return verificationKey;
+  }
 }

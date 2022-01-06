@@ -1,0 +1,35 @@
+version: 0.2
+# 'validate-staging' is an AWS::CodeBuild::BuildSpec that validates artifacts from CodeArtifact against the examples
+
+env:
+  variables:
+    REGION: us-east-1
+    DOMAIN: crypto-tools-internal
+    REPOSITORY: java-ddbec-staging
+  parameter-store:
+    ACCOUNT: /CodeBuild/AccountId
+
+phases:
+  install:
+    commands:
+      - pip install awscli
+    runtime-versions:
+      java: $JAVA_ENV_VERSION
+  pre_build:
+    commands:
+      - export SETTINGS_FILE=$(pwd)/codebuild/release/settings.xml
+      - export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain $DOMAIN --domain-owner $ACCOUNT --query authorizationToken --output text --region ${REGION})
+      - export CODEARTIFACT_REPO_URL=https://${DOMAIN}-${ACCOUNT}.d.codeartifact.${REGION}.amazonaws.com/maven/${REPOSITORY}
+      - cd examples
+  build:
+    commands:
+      - |
+        mvn verify \
+          -Pcodeartifact \
+          -Dcheckstyle.skip \
+          -Dddbec.version=$VERSION \
+          -Dmaven.compiler.target=$JAVA_NUMERIC_VERSION \
+          -Dmaven.compiler.source=$JAVA_NUMERIC_VERSION \
+          -Dcodeartifact.token=$CODEARTIFACT_TOKEN \
+          -Dcodeartifact.url=$CODEARTIFACT_REPO_URL \
+          -s $SETTINGS_FILE

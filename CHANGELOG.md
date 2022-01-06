@@ -4,6 +4,7 @@
 ### Maintenance
 * Upgrade AWS SDK
 * Upgrade build dependencies
+* Partially automate release process
 
 ## 1.15.1 -- 2021-02-12
 Fixes released jar files to ensure JDK 8 compatibility.

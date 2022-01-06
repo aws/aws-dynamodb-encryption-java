@@ -1,0 +1,18 @@
+version: 0.2
+# 'validate-prod' is an AWS::CodeBuild::BuildSpec that validates a Sonatype release against the examples
+
+phases:
+  install:
+    runtime-versions:
+      java: $JAVA_ENV_VERSION
+  pre_build:
+    commands:
+      - cd examples
+  build:
+    commands:
+      - |
+        mvn verify \
+          -Dcheckstyle.skip \
+          -Dddbec.version=$VERSION \
+          -Dmaven.compiler.target=$JAVA_NUMERIC_VERSION \
+          -Dmaven.compiler.source=$JAVA_NUMERIC_VERSION

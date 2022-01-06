@@ -15,82 +15,69 @@ package com.amazonaws.services.dynamodbv2.mapper.encryption;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-
 import java.nio.ByteBuffer;
 import java.util.Set;
 
-/**
- * Test domain class with byteBuffer attribute, byteBuffer set and a string key
- */
+/** Test domain class with byteBuffer attribute, byteBuffer set and a string key */
 @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
 public class BinaryAttributeByteBufferTestClass {
 
-    private String key;
-    private ByteBuffer binaryAttribute;
-    private Set<ByteBuffer> binarySetAttribute;
+  private String key;
+  private ByteBuffer binaryAttribute;
+  private Set<ByteBuffer> binarySetAttribute;
 
-    @DynamoDBHashKey(attributeName = "key")
-    public String getKey() {
-        return key;
-    }
+  @DynamoDBHashKey(attributeName = "key")
+  public String getKey() {
+    return key;
+  }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-    @DynamoDBAttribute(attributeName = "binaryAttribute")
-    public ByteBuffer getBinaryAttribute() {
-        return binaryAttribute;
-    }
+  @DynamoDBAttribute(attributeName = "binaryAttribute")
+  public ByteBuffer getBinaryAttribute() {
+    return binaryAttribute;
+  }
 
-    public void setBinaryAttribute(ByteBuffer binaryAttribute) {
-        this.binaryAttribute = binaryAttribute;
-    }
+  public void setBinaryAttribute(ByteBuffer binaryAttribute) {
+    this.binaryAttribute = binaryAttribute;
+  }
 
-    @DynamoDBAttribute(attributeName = "binarySetAttribute")
-    public Set<ByteBuffer> getBinarySetAttribute() {
-        return binarySetAttribute;
-    }
+  @DynamoDBAttribute(attributeName = "binarySetAttribute")
+  public Set<ByteBuffer> getBinarySetAttribute() {
+    return binarySetAttribute;
+  }
 
-    public void setBinarySetAttribute(Set<ByteBuffer> binarySetAttribute) {
-        this.binarySetAttribute = binarySetAttribute;
-    }
+  public void setBinarySetAttribute(Set<ByteBuffer> binarySetAttribute) {
+    this.binarySetAttribute = binarySetAttribute;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((key == null) ? 0 : key.hashCode());
-        result = prime * result + ((binaryAttribute == null) ? 0 : binaryAttribute.hashCode());
-        result = prime * result + ((binarySetAttribute == null) ? 0 : binarySetAttribute.hashCode());
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    result = prime * result + ((binaryAttribute == null) ? 0 : binaryAttribute.hashCode());
+    result = prime * result + ((binarySetAttribute == null) ? 0 : binarySetAttribute.hashCode());
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        BinaryAttributeByteBufferTestClass other = (BinaryAttributeByteBufferTestClass) obj;
-        if (key == null) {
-            if (other.key != null)
-                return false;
-        } else if (!key.equals(other.key))
-            return false;
-        if (binaryAttribute == null) {
-            if (other.binaryAttribute != null)
-                return false;
-        } else if (!binaryAttribute.equals(other.binaryAttribute))
-            return false;
-        if (binarySetAttribute == null) {
-            if (other.binarySetAttribute != null)
-                return false;
-        } else if (!binarySetAttribute.equals(other.binarySetAttribute))
-            return false;
-        return true;
-    }
-
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    BinaryAttributeByteBufferTestClass other = (BinaryAttributeByteBufferTestClass) obj;
+    if (key == null) {
+      if (other.key != null) return false;
+    } else if (!key.equals(other.key)) return false;
+    if (binaryAttribute == null) {
+      if (other.binaryAttribute != null) return false;
+    } else if (!binaryAttribute.equals(other.binaryAttribute)) return false;
+    if (binarySetAttribute == null) {
+      if (other.binarySetAttribute != null) return false;
+    } else if (!binarySetAttribute.equals(other.binarySetAttribute)) return false;
+    return true;
+  }
 }

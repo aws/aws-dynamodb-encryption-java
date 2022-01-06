@@ -19,14 +19,13 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DoNotTouch;
 @DoNotTouch
 public class UntouchedWithNewAttribute extends Untouched {
 
-    private String newAttribute;
+  private String newAttribute;
 
-    public String getNewAttribute() {
-        return newAttribute;
-    }
+  public String getNewAttribute() {
+    return newAttribute;
+  }
 
-    public void setNewAttribute(String newAttribute) {
-        this.newAttribute = newAttribute;
-    }
-
+  public void setNewAttribute(String newAttribute) {
+    this.newAttribute = newAttribute;
+  }
 }

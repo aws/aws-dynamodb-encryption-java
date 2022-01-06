@@ -16,78 +16,66 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-/**
- * Test domain class with a single string attribute and a string key
- */
+/** Test domain class with a single string attribute and a string key */
 @DynamoDBTable(tableName = "aws-java-sdk-util-crypto")
 public class StringAttributeTestClass {
 
-    private String key;
-    private String stringAttribute;
-    private String renamedAttribute;
+  private String key;
+  private String stringAttribute;
+  private String renamedAttribute;
 
-    @DynamoDBHashKey
-    public String getKey() {
-        return key;
-    }
+  @DynamoDBHashKey
+  public String getKey() {
+    return key;
+  }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-    @DynamoDBAttribute
-    public String getStringAttribute() {
-        return stringAttribute;
-    }
+  @DynamoDBAttribute
+  public String getStringAttribute() {
+    return stringAttribute;
+  }
 
-    public void setStringAttribute(String stringAttribute) {
-        this.stringAttribute = stringAttribute;
-    }
+  public void setStringAttribute(String stringAttribute) {
+    this.stringAttribute = stringAttribute;
+  }
 
-    @DynamoDBAttribute(attributeName = "originalName")
-    public String getRenamedAttribute() {
-        return renamedAttribute;
-    }
+  @DynamoDBAttribute(attributeName = "originalName")
+  public String getRenamedAttribute() {
+    return renamedAttribute;
+  }
 
-    public void setRenamedAttribute(String renamedAttribute) {
-        this.renamedAttribute = renamedAttribute;
-    }
+  public void setRenamedAttribute(String renamedAttribute) {
+    this.renamedAttribute = renamedAttribute;
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((key == null) ? 0 : key.hashCode());
-        result = prime * result + ((renamedAttribute == null) ? 0 : renamedAttribute.hashCode());
-        result = prime * result + ((stringAttribute == null) ? 0 : stringAttribute.hashCode());
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    result = prime * result + ((renamedAttribute == null) ? 0 : renamedAttribute.hashCode());
+    result = prime * result + ((stringAttribute == null) ? 0 : stringAttribute.hashCode());
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        StringAttributeTestClass other = (StringAttributeTestClass) obj;
-        if (key == null) {
-            if (other.key != null)
-                return false;
-        } else if (!key.equals(other.key))
-            return false;
-        if (renamedAttribute == null) {
-            if (other.renamedAttribute != null)
-                return false;
-        } else if (!renamedAttribute.equals(other.renamedAttribute))
-            return false;
-        if (stringAttribute == null) {
-            if (other.stringAttribute != null)
-                return false;
-        } else if (!stringAttribute.equals(other.stringAttribute))
-            return false;
-        return true;
-    }
-
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    StringAttributeTestClass other = (StringAttributeTestClass) obj;
+    if (key == null) {
+      if (other.key != null) return false;
+    } else if (!key.equals(other.key)) return false;
+    if (renamedAttribute == null) {
+      if (other.renamedAttribute != null) return false;
+    } else if (!renamedAttribute.equals(other.renamedAttribute)) return false;
+    if (stringAttribute == null) {
+      if (other.stringAttribute != null) return false;
+    } else if (!stringAttribute.equals(other.stringAttribute)) return false;
+    return true;
+  }
 }

@@ -14,12 +14,6 @@
  */
 package com.amazonaws.examples;
 
-import java.nio.ByteBuffer;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.AttributeEncryptor;
@@ -36,13 +30,17 @@ import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.Direc
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * This demonstrates how to use the {@link DynamoDBMapper} with the {@link AttributeEncryptor}
- * to encrypt your data. Before you can use this you need to set up a DynamoDB table called "ExampleTable"
- * to hold the encrypted data.
- * "ExampleTable" should have a partition key named "partition_attribute" for Strings
- * and a sort (range) key named "sort_attribute" for numbers.
+ * This demonstrates how to use the {@link DynamoDBMapper} with the {@link AttributeEncryptor} to
+ * encrypt your data. Before you can use this you need to set up a DynamoDB table called
+ * "ExampleTable" to hold the encrypted data. "ExampleTable" should have a partition key named
+ * "partition_attribute" for Strings and a sort (range) key named "sort_attribute" for numbers.
  */
 public class AwsKmsEncryptedObject {
   public static final String EXAMPLE_TABLE_NAME = "ExampleTable";
@@ -74,43 +72,54 @@ public class AwsKmsEncryptedObject {
     }
   }
 
-  public static void encryptRecord(final String cmkArn, final AmazonDynamoDB ddbClient, final AWSKMS kmsClient) {
+  public static void encryptRecord(
+      final String cmkArn, final AmazonDynamoDB ddbClient, final AWSKMS kmsClient) {
     // Sample object to be encrypted
     DataPoJo record = new DataPoJo();
     record.setPartitionAttribute("is this");
     record.setSortAttribute(55);
     record.setExample("data");
     record.setSomeNumbers(99);
-    record.setSomeBinary(new byte[]{0x00, 0x01, 0x02});
+    record.setSomeBinary(new byte[] {0x00, 0x01, 0x02});
     record.setLeaveMe("alone");
 
     // Set up our configuration and clients
-    // This example assumes we already have a DynamoDB client `ddbClient` and AWS KMS client `kmsClient`
+    // This example assumes we already have a DynamoDB client `ddbClient` and AWS KMS client
+    // `kmsClient`
     final DirectKmsMaterialProvider cmp = new DirectKmsMaterialProvider(kmsClient, cmkArn);
     // Encryptor creation
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
     // Mapper Creation
     // Please note the use of SaveBehavior.PUT (SaveBehavior.CLOBBER works as well).
     // Omitting this can result in data-corruption.
-    DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.PUT).build();
-    DynamoDBMapper mapper = new DynamoDBMapper(ddbClient, mapperConfig, new AttributeEncryptor(encryptor));
+    DynamoDBMapperConfig mapperConfig =
+        DynamoDBMapperConfig.builder().withSaveBehavior(SaveBehavior.PUT).build();
+    DynamoDBMapper mapper =
+        new DynamoDBMapper(ddbClient, mapperConfig, new AttributeEncryptor(encryptor));
 
     System.out.println("Plaintext Record: " + record);
     // Save the item to the DynamoDB table
     mapper.save(record);
 
-    // Retrieve the encrypted item (directly without decrypting) from Dynamo so we can see it in our example
+    // Retrieve the encrypted item (directly without decrypting) from Dynamo so we can see it in our
+    // example
     final Map<String, AttributeValue> itemKey = new HashMap<>();
     itemKey.put(PARTITION_ATTRIBUTE, new AttributeValue().withS("is this"));
     itemKey.put(SORT_ATTRIBUTE, new AttributeValue().withN("55"));
-    final Map<String, AttributeValue> encrypted_record = ddbClient.getItem(EXAMPLE_TABLE_NAME, itemKey).getItem();
+    final Map<String, AttributeValue> encrypted_record =
+        ddbClient.getItem(EXAMPLE_TABLE_NAME, itemKey).getItem();
     System.out.println("Encrypted Record: " + encrypted_record);
 
     // Encrypted record fields change as expected
-    assert encrypted_record.get(STRING_FIELD_NAME).getB() != null; // the encrypted string is stored as bytes
-    assert encrypted_record.get(NUMBER_FIELD_NAME).getB() != null; // the encrypted number is stored as bytes
-    assert !ByteBuffer.wrap(record.getSomeBinary()).equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
-    assert record.getLeaveMe().equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
+    assert encrypted_record.get(STRING_FIELD_NAME).getB()
+        != null; // the encrypted string is stored as bytes
+    assert encrypted_record.get(NUMBER_FIELD_NAME).getB()
+        != null; // the encrypted number is stored as bytes
+    assert !ByteBuffer.wrap(record.getSomeBinary())
+        .equals(encrypted_record.get(BINARY_FIELD_NAME).getB()); // the encrypted bytes have updated
+    assert record
+        .getLeaveMe()
+        .equals(encrypted_record.get(IGNORED_FIELD_NAME).getS()); // ignored field is left as is
 
     // Retrieve (and decrypt) it from DynamoDB
     DataPoJo decrypted_record = mapper.load(DataPoJo.class, "is this", 55);
@@ -188,11 +197,19 @@ public class AwsKmsEncryptedObject {
 
     @Override
     public String toString() {
-      return "DataPoJo [partitionAttribute=" + partitionAttribute + ", sortAttribute="
-          + sortAttribute + ", example=" + example + ", someNumbers=" + someNumbers
-          + ", someBinary=" + Arrays.toString(someBinary) + ", leaveMe=" + leaveMe + "]";
+      return "DataPoJo [partitionAttribute="
+          + partitionAttribute
+          + ", sortAttribute="
+          + sortAttribute
+          + ", example="
+          + example
+          + ", someNumbers="
+          + someNumbers
+          + ", someBinary="
+          + Arrays.toString(someBinary)
+          + ", leaveMe="
+          + leaveMe
+          + "]";
     }
-
-
   }
 }

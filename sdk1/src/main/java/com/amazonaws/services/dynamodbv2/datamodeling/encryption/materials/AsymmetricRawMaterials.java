@@ -18,32 +18,31 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.util.Collections;
 import java.util.Map;
-
 import javax.crypto.SecretKey;
 
-/**
- * @author Greg Rubin 
- */
+/** @author Greg Rubin */
 public class AsymmetricRawMaterials extends WrappedRawMaterials {
-    @SuppressWarnings("unchecked")
-    public AsymmetricRawMaterials(KeyPair encryptionKey, KeyPair signingPair)
-            throws GeneralSecurityException {
-        this(encryptionKey, signingPair, Collections.EMPTY_MAP);
-    }
+  @SuppressWarnings("unchecked")
+  public AsymmetricRawMaterials(KeyPair encryptionKey, KeyPair signingPair)
+      throws GeneralSecurityException {
+    this(encryptionKey, signingPair, Collections.EMPTY_MAP);
+  }
 
-    public AsymmetricRawMaterials(KeyPair encryptionKey, KeyPair signingPair, Map<String, String> description)
-            throws GeneralSecurityException {
-        super(encryptionKey.getPublic(), encryptionKey.getPrivate(), signingPair, description);
-    }
+  public AsymmetricRawMaterials(
+      KeyPair encryptionKey, KeyPair signingPair, Map<String, String> description)
+      throws GeneralSecurityException {
+    super(encryptionKey.getPublic(), encryptionKey.getPrivate(), signingPair, description);
+  }
 
-    @SuppressWarnings("unchecked")
-    public AsymmetricRawMaterials(KeyPair encryptionKey, SecretKey macKey)
-            throws GeneralSecurityException {
-        this(encryptionKey, macKey, Collections.EMPTY_MAP);
-    }
+  @SuppressWarnings("unchecked")
+  public AsymmetricRawMaterials(KeyPair encryptionKey, SecretKey macKey)
+      throws GeneralSecurityException {
+    this(encryptionKey, macKey, Collections.EMPTY_MAP);
+  }
 
-    public AsymmetricRawMaterials(KeyPair encryptionKey, SecretKey macKey, Map<String, String> description)
-            throws GeneralSecurityException {
-        super(encryptionKey.getPublic(), encryptionKey.getPrivate(), macKey, description);
-    }
+  public AsymmetricRawMaterials(
+      KeyPair encryptionKey, SecretKey macKey, Map<String, String> description)
+      throws GeneralSecurityException {
+    super(encryptionKey.getPublic(), encryptionKey.getPrivate(), macKey, description);
+  }
 }

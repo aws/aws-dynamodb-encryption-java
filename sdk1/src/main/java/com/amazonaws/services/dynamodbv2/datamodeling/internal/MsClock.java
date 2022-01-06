@@ -14,7 +14,7 @@
 package com.amazonaws.services.dynamodbv2.datamodeling.internal;
 
 interface MsClock {
-    MsClock WALLCLOCK = System::nanoTime;
+  MsClock WALLCLOCK = System::nanoTime;
 
-    public long timestampNano();
+  public long timestampNano();
 }

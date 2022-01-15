@@ -266,9 +266,10 @@ public class AttributeValueMarshallerTest {
       marshall(av);
       Assert.fail("Unexpected success");
     } catch (final NullPointerException npe) {
-      Assert.assertEquals(
-          "Encountered null map value for key NullKeyValue while marshalling attribute value {M: {KeyValue={S: ValueValue,}, NullKeyValue=null},}",
-          npe.getMessage());
+      String expected_v1 = "Encountered null map value for key NullKeyValue while marshalling attribute value {M: {KeyValue={S: ValueValue,}, NullKeyValue=null},}";
+      String expected_v2 = "Encountered null map value for key NullKeyValue while marshalling attribute value {M: {NullKeyValue=null, KeyValue={S: ValueValue,}},}";
+      boolean flag = ((expected_v1.equals(npe.getMessage())) || (expected_v2.equals(npe.getMessage())));
+      Assert.assertTrue(flag);
     }
   }
 

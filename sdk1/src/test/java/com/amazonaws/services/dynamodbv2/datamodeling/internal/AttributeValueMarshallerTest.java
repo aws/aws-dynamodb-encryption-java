@@ -273,11 +273,6 @@ public class AttributeValueMarshallerTest {
       String permutation2 = common + " {M: {NullKeyValue=null, KeyValue={S: ValueValue,}},}";
       boolean flag = ((permutation1.equals(npeMessage)) || (permutation2.equals(npeMessage)));
       Assert.assertTrue(flag);
-      /**
-      Assert.assertEquals(
-          "Encountered null map value for key NullKeyValue while marshalling attribute value {M: {KeyValue={S: ValueValue,}, NullKeyValue=null},}",
-          npe.getMessage());
-      */
     }
   }
 

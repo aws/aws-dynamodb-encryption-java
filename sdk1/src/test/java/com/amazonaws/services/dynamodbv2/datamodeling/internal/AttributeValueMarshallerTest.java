@@ -266,7 +266,7 @@ public class AttributeValueMarshallerTest {
       marshall(av);
       Assert.fail("Unexpected success");
     } catch (final NullPointerException npe) {
-      // Map entries may permute under nondeterministic JAVA API
+      // Map entries may permute under nondeterministic Java API
       String npeMessage = npe.getMessage();
       String common = "Encountered null map value for key NullKeyValue while marshalling attribute value";
       String permutation1 = common + " {M: {KeyValue={S: ValueValue,}, NullKeyValue=null},}";

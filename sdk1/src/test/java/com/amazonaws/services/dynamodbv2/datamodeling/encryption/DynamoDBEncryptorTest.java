@@ -198,7 +198,7 @@ public class DynamoDBEncryptorTest {
     Map<String, AttributeValue> encryptedAttributes =
         encryptor.encryptAllFieldsExcept(
             Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
-    HashMap<String, AttributeValue> beforeDecryption = new HashMap<>(encryptedAttributes);
+    Map<String, AttributeValue> beforeDecryption = new HashMap<>(encryptedAttributes);
     encryptor.decryptAllFieldsExcept(
         Collections.unmodifiableMap(encryptedAttributes),
         context,

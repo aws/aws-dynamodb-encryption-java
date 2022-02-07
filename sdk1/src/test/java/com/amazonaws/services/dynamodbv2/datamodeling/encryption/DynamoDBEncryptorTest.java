@@ -46,6 +46,7 @@ import java.security.SignatureException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -198,7 +199,7 @@ public class DynamoDBEncryptorTest {
     Map<String, AttributeValue> encryptedAttributes =
         encryptor.encryptAllFieldsExcept(
             Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
-    String encryptedString = encryptedAttributes.toString();
+    String encryptedString = new TreeMap<>(encryptedAttributes).toString();
     encryptor.decryptAllFieldsExcept(
         Collections.unmodifiableMap(encryptedAttributes),
         context,
@@ -206,7 +207,7 @@ public class DynamoDBEncryptorTest {
         "rangeKey",
         "version");
 
-    assertEquals(encryptedString, encryptedAttributes.toString());
+    assertEquals(encryptedString, new TreeMap<>(encryptedAttributes).toString());
   }
 
   @Test(expectedExceptions = SignatureException.class)

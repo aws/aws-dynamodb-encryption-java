@@ -199,6 +199,7 @@ public class DynamoDBEncryptorTest {
     Map<String, AttributeValue> encryptedAttributes =
         encryptor.encryptAllFieldsExcept(
             Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
+    // Using TreeMap before casting to string to avoid nondeterministic key orders.
     String encryptedString = new TreeMap<>(encryptedAttributes).toString();
     encryptor.decryptAllFieldsExcept(
         Collections.unmodifiableMap(encryptedAttributes),

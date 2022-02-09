@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 
@@ -119,7 +120,10 @@ public class AttributeValueMarshaller {
         marshall(attr, out);
       }
     } else if (attributeValue.getM() != null) {
-      final Map<String, AttributeValue> m = attributeValue.getM();
+      // Using TreeMap to ensure deterministic entry order
+      final Map<String, AttributeValue> m = new TreeMap<>(attributeValue.getM());
+      // Update the deterministic order to attributeValue
+      attributeValue.setM(m);
       final List<String> mKeys = new ArrayList<String>(m.keySet());
       Collections.sort(mKeys);
       out.writeChar('M');

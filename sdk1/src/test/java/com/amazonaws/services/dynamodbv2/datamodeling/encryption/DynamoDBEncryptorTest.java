@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.crypto.KeyGenerator;
@@ -198,7 +199,8 @@ public class DynamoDBEncryptorTest {
     Map<String, AttributeValue> encryptedAttributes =
         encryptor.encryptAllFieldsExcept(
             Collections.unmodifiableMap(attribs), context, "hashKey", "rangeKey", "version");
-    String encryptedString = encryptedAttributes.toString();
+    // Using TreeMap before casting to string to avoid nondeterministic key orders.
+    String encryptedString = new TreeMap<>(encryptedAttributes).toString();
     encryptor.decryptAllFieldsExcept(
         Collections.unmodifiableMap(encryptedAttributes),
         context,
@@ -206,7 +208,7 @@ public class DynamoDBEncryptorTest {
         "rangeKey",
         "version");
 
-    assertEquals(encryptedString, encryptedAttributes.toString());
+    assertEquals(encryptedString, new TreeMap<>(encryptedAttributes).toString());
   }
 
   @Test(expectedExceptions = SignatureException.class)

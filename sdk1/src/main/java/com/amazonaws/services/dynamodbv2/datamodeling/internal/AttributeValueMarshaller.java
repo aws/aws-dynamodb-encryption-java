@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /** @author Greg Rubin */
 public class AttributeValueMarshaller {
@@ -120,10 +119,7 @@ public class AttributeValueMarshaller {
         marshall(attr, out);
       }
     } else if (attributeValue.getM() != null) {
-      // Using TreeMap to ensure deterministic entry order
-      final Map<String, AttributeValue> m = new TreeMap<>(attributeValue.getM());
-      // Update the deterministic order to attributeValue
-      attributeValue.setM(m);
+      final Map<String, AttributeValue> m = attributeValue.getM();
       final List<String> mKeys = new ArrayList<String>(m.keySet());
       Collections.sort(mKeys);
       out.writeChar('M');

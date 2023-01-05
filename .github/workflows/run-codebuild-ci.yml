@@ -1,0 +1,55 @@
+name: AWS CodeBuild CI
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 0 * * *" # Daily at 00:00 UTC (4 PM PDT)
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  staticAnalysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.CI_AWS_ROLE_ARN }}
+          aws-region: us-west-2
+          role-duration-seconds: 3600
+      - name: Run Static Analysis
+        uses: aws-actions/aws-codebuild-run-build@v1
+        timeout-minutes: 60
+        with:
+          project-name: java-ddb-ec
+          buildspec-override: codebuild/static-analysis.yml
+          image-override: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        platform:
+          - distribution: openjdk
+            image: "aws/codebuild/standard:3.0"
+          - distribution: corretto
+            image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0" # Corretto only runs on AL2
+        version: [ 8, 11 ]
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.CI_AWS_ROLE_ARN }}
+          aws-region: us-west-2
+          role-duration-seconds: 3600
+      - name: Build
+        uses: aws-actions/aws-codebuild-run-build@v1
+        timeout-minutes: 60
+        with:
+          project-name: java-ddb-ec
+          buildspec-override: codebuild/${{ matrix.platform.distribution }}${{ matrix.version }}.yml
+          image-override: ${{ matrix.platform.image }}

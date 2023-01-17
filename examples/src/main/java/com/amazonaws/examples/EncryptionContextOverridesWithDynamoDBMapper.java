@@ -46,7 +46,7 @@ import java.util.Set;
  * "partition_attribute" for Strings and a sort (range) key named "sort_attribute" for numbers.
  */
 public class EncryptionContextOverridesWithDynamoDBMapper {
-  public static final String TABLE_NAME_TO_OVERRIDE = "ExampleTableForEncryptionContextOverrides";
+  public static final String ORIGINAL_TABLE_NAME_TO_OVERRIDE = "ExampleTableForEncryptionContextOverrides";
   public static final String PARTITION_ATTRIBUTE = "partition_attribute";
   public static final String SORT_ATTRIBUTE = "sort_attribute";
 
@@ -78,7 +78,7 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
 
   public static void encryptRecord(
       final String cmkArn,
-      final String newEncryptionContextTableName,
+      final String currentTableName,
       AmazonDynamoDB ddbClient,
       AWSKMS kmsClient)
       throws GeneralSecurityException {
@@ -95,7 +95,7 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
     final DynamoDBEncryptor encryptor = DynamoDBEncryptor.getInstance(cmp);
 
     Map<String, String> tableNameEncryptionContextOverrides = new HashMap<>();
-    tableNameEncryptionContextOverrides.put(TABLE_NAME_TO_OVERRIDE, newEncryptionContextTableName);
+    tableNameEncryptionContextOverrides.put(ORIGINAL_TABLE_NAME_TO_OVERRIDE, currentTableName);
     tableNameEncryptionContextOverrides.put(
         "AnotherExampleTableForEncryptionContextOverrides", "this table doesn't exist");
 
@@ -133,7 +133,7 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
     final EnumSet<EncryptionFlags> encryptAndSign =
         EnumSet.of(EncryptionFlags.ENCRYPT, EncryptionFlags.SIGN);
     final Map<String, AttributeValue> encryptedItem =
-        ddbClient.getItem(TABLE_NAME_TO_OVERRIDE, itemKey).getItem();
+        ddbClient.getItem(ORIGINAL_TABLE_NAME_TO_OVERRIDE, itemKey).getItem();
     System.out.println("Encrypted Record: " + encryptedItem);
 
     Map<String, Set<EncryptionFlags>> encryptionFlags = new HashMap<>();
@@ -151,11 +151,11 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
             new EncryptionContext.Builder()
                 .withHashKeyName(PARTITION_ATTRIBUTE)
                 .withRangeKeyName(SORT_ATTRIBUTE)
-                .withTableName(newEncryptionContextTableName)
+                .withTableName(currentTableName)
                 .build());
     System.out.printf(
         "The example item was encrypted using the table name '%s' in the EncryptionContext%n",
-        newEncryptionContextTableName);
+        currentTableName);
 
     // The decrypted field matches the original field before encryption
     assert record
@@ -163,7 +163,7 @@ public class EncryptionContextOverridesWithDynamoDBMapper {
         .equals(decrypted_without_override_record.get(STRING_FIELD_NAME).getS());
   }
 
-  @DynamoDBTable(tableName = TABLE_NAME_TO_OVERRIDE)
+  @DynamoDBTable(tableName = ORIGINAL_TABLE_NAME_TO_OVERRIDE)
   public static final class ExampleItem {
     private String partitionAttribute;
     private int sortAttribute;

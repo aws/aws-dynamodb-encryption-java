@@ -25,26 +25,33 @@ public class EncryptionContextOperators {
   private EncryptionContextOperators() {}
 
   /**
-   * An operator for overriding EncryptionContext's table name for a specific DynamoDBEncryptor. If
-   * any table names or the encryption context itself is null, then it returns the original
-   * EncryptionContext.
+   * An operator for overriding EncryptionContext's table name for a specific DynamoDBEncryptor.
+   * If any table names or the encryption context is null, it returns the original EncryptionContext.
    *
-   * @param originalTableName the name of the table that should be overridden in the Encryption
-   *     Context
-   * @param newTableName the table name that should be used in the Encryption Context
+   * The client automatically adds the current table name to the encryption context
+   * so it's bound to the ciphertext. 
+   * Use this method when the encryption context of encrypted table items includes a different table name,
+   * such as when a table is backed up, or table items are moved/copied to a different table.
+   * If you don't override the name of the current table
+   * with the table name in the encryption context, decrypt fails. 
+   * This override affects the encryption context of all table items,
+   * including newly encrypted items.  
+   *
+   * @param originalTableName Use this table name in the encryption context
+   * @param currentTableName Override this table name in the encryption context  
    * @return A UnaryOperator that produces a new EncryptionContext with the supplied table name
    */
   public static UnaryOperator<EncryptionContext> overrideEncryptionContextTableName(
-      String originalTableName, String newTableName) {
+      String originalTableName, String currentTableName) {
     return encryptionContext -> {
       if (encryptionContext == null
           || encryptionContext.getTableName() == null
           || originalTableName == null
-          || newTableName == null) {
+          || currentTableName == null) {
         return encryptionContext;
       }
       if (originalTableName.equals(encryptionContext.getTableName())) {
-        return new EncryptionContext.Builder(encryptionContext).withTableName(newTableName).build();
+        return new EncryptionContext.Builder(encryptionContext).withTableName(currentTableName).build();
       } else {
         return encryptionContext;
       }

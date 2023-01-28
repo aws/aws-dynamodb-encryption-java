@@ -22,6 +22,7 @@
   <modules>
       <module>sdk1</module>
       <module>examples</module>
+      <module>sdk2</module>
   </modules>
 
   <licenses>

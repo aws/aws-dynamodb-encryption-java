@@ -131,7 +131,7 @@
         <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
-        <aws.java.sdk.version>2.16.1</aws.java.sdk.version>
+        <aws.java.sdk.version>2.19.26</aws.java.sdk.version>
     </properties>
 
     <developers>
@@ -275,12 +275,6 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-dynamodb-encryption-java</artifactId>
-            <version>2.0.3</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

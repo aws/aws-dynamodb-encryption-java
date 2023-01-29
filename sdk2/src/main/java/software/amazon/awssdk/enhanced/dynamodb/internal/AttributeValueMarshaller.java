@@ -84,7 +84,7 @@ public class AttributeValueMarshaller {
     if (attributeValue.b() != null) {
       out.writeChar('b');
       writeBytes(attributeValue.b().asByteBuffer(), out);
-    } else if (attributeValue.bs() != null) {
+    } else if (attributeValue.hasBs()) {
       out.writeChar('B');
       writeBytesList(attributeValue.bs()
               .stream()
@@ -93,7 +93,7 @@ public class AttributeValueMarshaller {
     } else if (attributeValue.n() != null) {
       out.writeChar('n');
       writeString(trimZeros(attributeValue.n()), out);
-    } else if (attributeValue.ns() != null) {
+    } else if (attributeValue.hasNs()) {
       out.writeChar('N');
 
       final List<String> ns = new ArrayList<String>(attributeValue.ns().size());
@@ -104,7 +104,7 @@ public class AttributeValueMarshaller {
     } else if (attributeValue.s() != null) {
       out.writeChar('s');
       writeString(attributeValue.s(), out);
-    } else if (attributeValue.ss() != null) {
+    } else if (attributeValue.hasSs()) {
       out.writeChar('S');
       writeStringList(attributeValue.ss(), out);
     } else if (attributeValue.bool() != null) {
@@ -112,7 +112,7 @@ public class AttributeValueMarshaller {
       out.writeByte((attributeValue.bool() ? TRUE_FLAG : FALSE_FLAG));
     } else if (Boolean.TRUE.equals(attributeValue.nul())) {
       out.writeChar('\0');
-    } else if (attributeValue.l() != null) {
+    } else if (attributeValue.hasL()) {
       final List<AttributeValue> l = attributeValue.l();
       out.writeChar('L');
       out.writeInt(l.size());
@@ -124,7 +124,7 @@ public class AttributeValueMarshaller {
         }
         marshall(attr, out);
       }
-    } else if (attributeValue.m() != null) {
+    } else if (attributeValue.hasM()) {
       final Map<String, AttributeValue> m = attributeValue.m();
       final List<String> mKeys = new ArrayList<String>(m.keySet());
       Collections.sort(mKeys);

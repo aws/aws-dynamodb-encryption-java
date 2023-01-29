@@ -13,4 +13,12 @@ public final class EncryptionExtensionTags {
     public static StaticAttributeTag attributeTagFor(Signed annotation) {
         return SignedTag.create();
     }
+
+    public static StaticAttributeTag encrypted() {
+        return EncryptedTag.create();
+    }
+
+    public static StaticAttributeTag signed() {
+        return SignedTag.create();
+    }
 }

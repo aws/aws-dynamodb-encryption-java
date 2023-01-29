@@ -28,8 +28,7 @@ public class EncryptedTag implements StaticAttributeTag {
         return metadata -> metadata
                 .addCustomMetadataObject(
                         CUSTOM_METADATA_KEY_PREFIX,
-                        Collections.singleton(attributeName))
-                .markAttributeAsKey(attributeName, attributeValueType);
+                        Collections.singleton(attributeName));
     }
 
 }

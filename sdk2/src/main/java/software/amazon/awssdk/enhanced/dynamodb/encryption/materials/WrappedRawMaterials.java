@@ -14,9 +14,6 @@
  */
 package software.amazon.awssdk.enhanced.dynamodb.encryption.materials;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DelegatedKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.internal.Base64;
-import com.amazonaws.services.dynamodbv2.datamodeling.internal.Utils;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -29,6 +26,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import software.amazon.awssdk.enhanced.dynamodb.encryption.DelegatedKey;
+import software.amazon.awssdk.enhanced.dynamodb.internal.Base64;
+import software.amazon.awssdk.enhanced.dynamodb.internal.Utils;
 
 /**
  * Represents cryptographic materials used to manage unique record-level keys. This class

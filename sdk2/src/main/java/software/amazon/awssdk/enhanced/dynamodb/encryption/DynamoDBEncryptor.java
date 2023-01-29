@@ -77,7 +77,7 @@ public class DynamoDBEncryptor {
         }
       };
 
-  private static final int CURRENT_VERSION = 0;
+  private static final int CURRENT_VERSION = 1;
 
   private String signatureFieldName = DEFAULT_SIGNATURE_FIELD;
   private String materialDescriptionFieldName = DEFAULT_METADATA_FIELD;
@@ -389,10 +389,6 @@ public class DynamoDBEncryptor {
     for (Map.Entry<String, AttributeValue> entry : itemAttributes.entrySet()) {
       Set<EncryptionFlags> flags = attributeFlags.get(entry.getKey());
       if (flags != null && flags.contains(EncryptionFlags.ENCRYPT)) {
-        if (!flags.contains(EncryptionFlags.SIGN)) {
-          throw new IllegalArgumentException(
-              "All encrypted fields must be signed. Bad field: " + entry.getKey());
-        }
         ByteBuffer plainText;
         ByteBuffer cipherText = entry.getValue().b().asByteBuffer().asReadOnlyBuffer();
         cipherText.rewind();
@@ -444,10 +440,6 @@ public class DynamoDBEncryptor {
     for (Map.Entry<String, AttributeValue> entry : itemAttributes.entrySet()) {
       Set<EncryptionFlags> flags = attributeFlags.get(entry.getKey());
       if (flags != null && flags.contains(EncryptionFlags.ENCRYPT)) {
-        if (!flags.contains(EncryptionFlags.SIGN)) {
-          throw new IllegalArgumentException(
-              "All encrypted fields must be signed. Bad field: " + entry.getKey());
-        }
         ByteBuffer plainText = AttributeValueMarshaller.marshall(entry.getValue());
         plainText.rewind();
         ByteBuffer cipherText;

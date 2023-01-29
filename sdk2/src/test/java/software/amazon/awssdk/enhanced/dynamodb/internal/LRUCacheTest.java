@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNull;
-import static org.testng.AssertJUnit.assertTrue;
 
-import org.testng.annotations.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 public class LRUCacheTest {
   @Test
@@ -77,14 +76,16 @@ public class LRUCacheTest {
     assertNull(cache.get("k3"));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void testZeroSize() {
-    new LRUCache<Object>(0);
+    assertThrows(IllegalArgumentException.class, () ->
+      new LRUCache<Object>(0));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void testIllegalArgument() {
-    new LRUCache<Object>(-1);
+    assertThrows(IllegalArgumentException.class, () ->
+    new LRUCache<Object>(-1));
   }
 
   @Test

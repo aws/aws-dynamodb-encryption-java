@@ -14,13 +14,13 @@
  */
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
-import static org.testng.AssertJUnit.assertArrayEquals;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class ByteBufferInputStreamTest {
 

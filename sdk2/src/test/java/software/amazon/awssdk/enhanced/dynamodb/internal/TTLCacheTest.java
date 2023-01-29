@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -9,32 +13,31 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertThrows;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNull;
-import static org.testng.AssertJUnit.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class TTLCacheTest {
 
   private static final long TTL_GRACE_IN_NANO = TimeUnit.MILLISECONDS.toNanos(500);
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void testInvalidSize() {
-    final TTLCache<String> cache = new TTLCache<String>(0, 1000, mock(TTLCache.EntryLoader.class));
+    assertThrows(IllegalArgumentException.class, () ->
+      new TTLCache<String>(0, 1000, mock(TTLCache.EntryLoader.class)));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void testInvalidTTL() {
-    final TTLCache<String> cache = new TTLCache<String>(3, 0, mock(TTLCache.EntryLoader.class));
+    assertThrows(IllegalArgumentException.class, () ->
+            new TTLCache<String>(3, 0, mock(TTLCache.EntryLoader.class)));
   }
 
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test
   public void testNullLoader() {
-    final TTLCache<String> cache = new TTLCache<String>(3, 1000, null);
+    assertThrows(NullPointerException.class, () ->
+            new TTLCache<String>(3, 1000, null));
   }
 
   @Test

@@ -14,7 +14,7 @@
  */
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static software.amazon.awssdk.enhanced.dynamodb.internal.AttributeValueMarshaller.marshall;
 import static software.amazon.awssdk.enhanced.dynamodb.internal.AttributeValueMarshaller.unmarshall;
 
@@ -28,17 +28,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.testng.Assert;
-import org.testng.AssertJUnit;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public class AttributeValueMarshallerTest {
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testEmpty() {
         AttributeValue av = AttributeValue.builder().build();
-        marshall(av);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                        marshall(av));
     }
 
     @Test
@@ -81,7 +82,7 @@ public class AttributeValueMarshallerTest {
         assertEquals(av1, av2);
         ByteBuffer buff1 = marshall(av1);
         ByteBuffer buff2 = marshall(av2);
-        Assert.assertEquals(buff1, buff2);
+        Assertions.assertEquals(buff1, buff2);
     }
 
     @Test
@@ -100,7 +101,7 @@ public class AttributeValueMarshallerTest {
         assertEquals(av1, av2);
         ByteBuffer buff1 = marshall(av1);
         ByteBuffer buff2 = marshall(av2);
-        Assert.assertEquals(buff1, buff2);
+        Assertions.assertEquals(buff1, buff2);
     }
 
     @Test
@@ -136,7 +137,7 @@ public class AttributeValueMarshallerTest {
         assertEquals(av1, av2);
         ByteBuffer buff1 = marshall(av1);
         ByteBuffer buff2 = marshall(av2);
-        Assert.assertEquals(buff1, buff2);
+        Assertions.assertEquals(buff1, buff2);
     }
 
     @Test
@@ -157,9 +158,10 @@ public class AttributeValueMarshallerTest {
         assertEquals(av, unmarshall(marshall(av)));
     }
 
-    @Test(expectedExceptions = NullPointerException.class)
+    @Test
     public void testActualNULL() {
-        unmarshall(marshall(null));
+        assertThrows(NullPointerException.class, () ->
+            unmarshall(marshall(null)));
     }
 
     @Test
@@ -203,9 +205,9 @@ public class AttributeValueMarshallerTest {
 
         try {
             ByteBuffer result = marshall(av);
-            Assert.fail("Unexpected success");
+            Assertions.fail("Unexpected success");
         } catch (final NullPointerException npe) {
-            Assert.assertEquals(
+            Assertions.assertEquals(
                     "Encountered null list entry value while marshalling attribute value AttributeValue(L=[AttributeValue(S=StringValue), AttributeValue(N=1000), AttributeValue(BOOL=true), null])",
                     npe.getMessage());
         }
@@ -223,7 +225,7 @@ public class AttributeValueMarshallerTest {
                         .build();
         AttributeValue result = unmarshall(marshall(av));
         assertEquals(av, result);
-        Assert.assertEquals(4, result.l().size());
+        Assertions.assertEquals(4, result.l().size());
     }
 
     @Test
@@ -278,12 +280,12 @@ public class AttributeValueMarshallerTest {
 
         try {
             marshall(av);
-            Assert.fail("Unexpected success: " + av);
+            Assertions.fail("Unexpected success: " + av);
         } catch (final NullPointerException npe) {
             // Map entries may permute under nondeterministic Java API
             String npeMessage = npe.getMessage();
 
-            Assert.assertEquals(npeMessage,
+            Assertions.assertEquals(npeMessage,
                     "Encountered null map value for key NullKeyValue while marshalling attribute value " +
                             "AttributeValue(M={KeyValue=AttributeValue(S=ValueValue), NullKeyValue=null})");
         }
@@ -305,7 +307,7 @@ public class AttributeValueMarshallerTest {
 
         ByteBuffer buff1 = marshall(av1);
         ByteBuffer buff2 = marshall(av2);
-        Assert.assertEquals(buff1, buff2);
+        Assertions.assertEquals(buff1, buff2);
         assertEquals(av1, unmarshall(buff1));
         assertEquals(av1, unmarshall(buff2));
         assertEquals(av2, unmarshall(buff1));
@@ -326,7 +328,7 @@ public class AttributeValueMarshallerTest {
         AttributeValue newObject = buildComplexAttributeValue();
         byte[] oldBytes = Base64.decode(COMPLEX_ATTRIBUTE_MARSHALLED);
         byte[] newBytes = marshall(newObject).array();
-        AssertJUnit.assertArrayEquals(oldBytes, newBytes);
+        Assertions.assertArrayEquals(oldBytes, newBytes);
 
         AttributeValue oldObject = unmarshall(ByteBuffer.wrap(oldBytes));
         assertEquals(oldObject, newObject);
@@ -394,30 +396,30 @@ public class AttributeValueMarshallerTest {
     }
 
     private void assertEquals(AttributeValue o1, AttributeValue o2) {
-        Assert.assertEquals(o1.b(), o2.b());
+        Assertions.assertEquals(o1.b(), o2.b());
         assertSetsEqual(o1.bs(), o2.bs());
-        Assert.assertEquals(o1.n(), o2.n());
+        Assertions.assertEquals(o1.n(), o2.n());
         assertSetsEqual(o1.ns(), o2.ns());
-        Assert.assertEquals(o1.s(), o2.s());
+        Assertions.assertEquals(o1.s(), o2.s());
         assertSetsEqual(o1.ss(), o2.ss());
-        Assert.assertEquals(o1.bool(), o2.bool());
-        Assert.assertEquals(o1.nul(), o2.nul());
+        Assertions.assertEquals(o1.bool(), o2.bool());
+        Assertions.assertEquals(o1.nul(), o2.nul());
 
         if (o1.l() != null) {
-            Assert.assertNotNull(o2.l());
+            Assertions.assertNotNull(o2.l());
             final List<AttributeValue> l1 = o1.l();
             final List<AttributeValue> l2 = o2.l();
-            Assert.assertEquals(l1.size(), l2.size());
+            Assertions.assertEquals(l1.size(), l2.size());
             for (int x = 0; x < l1.size(); ++x) {
                 assertEquals(l1.get(x), l2.get(x));
             }
         }
 
         if (o1.hasM()) {
-            Assert.assertTrue(o2.hasM());
+            Assertions.assertTrue(o2.hasM());
             final Map<String, AttributeValue> m1 = o1.m();
             final Map<String, AttributeValue> m2 = o2.m();
-            Assert.assertEquals(m1.size(), m2.size());
+            Assertions.assertEquals(m1.size(), m2.size());
             for (Map.Entry<String, AttributeValue> entry : m1.entrySet()) {
                 assertEquals(entry.getValue(), m2.get(entry.getKey()));
             }
@@ -425,11 +427,11 @@ public class AttributeValueMarshallerTest {
     }
 
     private <T> void assertSetsEqual(Collection<T> c1, Collection<T> c2) {
-        Assert.assertFalse(c1 == null ^ c2 == null);
+        Assertions.assertFalse(c1 == null ^ c2 == null);
         if (c1 != null) {
             Set<T> s1 = new HashSet<T>(c1);
             Set<T> s2 = new HashSet<T>(c2);
-            Assert.assertEquals(s1, s2);
+            Assertions.assertEquals(s1, s2);
         }
     }
 }

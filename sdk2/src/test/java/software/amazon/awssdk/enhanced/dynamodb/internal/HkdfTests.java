@@ -12,9 +12,10 @@
  */
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
-import static org.testng.AssertJUnit.assertArrayEquals;
 
-import org.testng.annotations.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class HkdfTests {
   private static final testCase[] testCases =
@@ -136,7 +137,7 @@ public class HkdfTests {
       Hkdf kdf = Hkdf.getInstance(trial.algo);
       kdf.init(trial.ikm, trial.salt);
       byte[] result = kdf.deriveKey(trial.info, trial.expected.length);
-      assertArrayEquals("Trial A." + x, trial.expected, result);
+      assertArrayEquals(trial.expected, result, "Trial A." + x);
     }
   }
 

@@ -16,6 +16,7 @@ package software.amazon.awssdk.enhanced.dynamodb.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.quicktheories.QuickTheory.qt;
 import static org.quicktheories.generators.Generate.byteArrays;
 import static org.quicktheories.generators.Generate.bytes;
@@ -23,7 +24,7 @@ import static org.quicktheories.generators.SourceDSL.integers;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /** Tests for the Base64 interface used by the DynamoDBEncryptionClient */
 public class Base64Tests {
@@ -71,11 +72,12 @@ public class Base64Tests {
     assertThat(software.amazon.awssdk.enhanced.dynamodb.internal.Base64.decode(encodingWithoutPadding), equalTo(testInput.getBytes()));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void testBase64PaddingBehaviorSdk1() {
     String testInput = "another one bites the dust";
     String encodingWithoutPadding = "YW5vdGhlciBvbmUgYml0ZXMgdGhlIGR1c3Q";
-    com.amazonaws.util.Base64.decode(encodingWithoutPadding);
+    assertThrows(IllegalArgumentException.class, () ->
+      com.amazonaws.util.Base64.decode(encodingWithoutPadding));
   }
 
   @Test

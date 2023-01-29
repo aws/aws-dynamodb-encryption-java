@@ -18,10 +18,12 @@ package software.amazon.awssdk.enhanced.dynamodb;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static software.amazon.awssdk.enhanced.dynamodb.internal.tags.EncryptionExtensionTags.encrypted;
 import static software.amazon.awssdk.enhanced.dynamodb.internal.tags.EncryptionExtensionTags.signed;
 import static software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags.primaryPartitionKey;
@@ -32,9 +34,9 @@ import java.util.Objects;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.providers.EncryptionMaterialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.providers.SymmetricStaticProvider;
 import software.amazon.awssdk.enhanced.dynamodb.extensions.ReadModification;
@@ -57,7 +59,7 @@ public class EncryptedRecordExtensionTest {
     private static SecretKey encryptionKey;
     private static SecretKey macKey;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         KeyGenerator aesGen = KeyGenerator.getInstance("AES");
         aesGen.init(128, Utils.getRng());
@@ -68,7 +70,7 @@ public class EncryptedRecordExtensionTest {
         macKey = macGen.generateKey();
     }
 
-    @BeforeMethod(alwaysRun = true)
+    @BeforeEach
     public void setUp() {
         EncryptionMaterialsProvider materials = new SymmetricStaticProvider(encryptionKey, macKey, Collections.<String, String>emptyMap());
         extension = EncryptedRecordExtension.builder()
@@ -252,7 +254,7 @@ public class EncryptedRecordExtensionTest {
         assertThat(roundtripItem, equalTo(cryptoItem));
     }
 
-    @Test(expectedExceptions = EncryptionException.class, expectedExceptionsMessageRegExp = ".*Bad signature")
+    @Test
     public void signature_change_signed() {
         CryptoItem cryptoItem = new CryptoItem();
         cryptoItem.setId(RECORD_ID);
@@ -275,14 +277,17 @@ public class EncryptedRecordExtensionTest {
                 .build());
 
 
-        extension.afterRead(DefaultDynamoDbExtensionContext.builder()
-                .items(transformedItem)
-                .tableMetadata(ITEM_MAPPER.tableMetadata())
-                .operationContext(PRIMARY_CONTEXT)
-                .build());
+        Exception exception = assertThrows(EncryptionException.class, () ->
+            extension.afterRead(DefaultDynamoDbExtensionContext.builder()
+                    .items(transformedItem)
+                    .tableMetadata(ITEM_MAPPER.tableMetadata())
+                    .operationContext(PRIMARY_CONTEXT)
+                    .build()));
+
+        assertThat(exception.getMessage(), containsString("Bad signature"));
     }
 
-    @Test(expectedExceptions = EncryptionException.class, expectedExceptionsMessageRegExp = ".*Bad signature")
+    @Test
     public void signature_change_encrypted_and_signed() {
         CryptoItem cryptoItem = new CryptoItem();
         cryptoItem.setId(RECORD_ID);
@@ -304,11 +309,14 @@ public class EncryptedRecordExtensionTest {
                 .s(cryptoItem.encryptedAndSignedString)
                 .build());
 
-        extension.afterRead(DefaultDynamoDbExtensionContext.builder()
-                .items(transformedItem)
-                .tableMetadata(ITEM_MAPPER.tableMetadata())
-                .operationContext(PRIMARY_CONTEXT)
-                .build());
+        Exception exception = assertThrows(EncryptionException.class, () ->
+                extension.afterRead(DefaultDynamoDbExtensionContext.builder()
+                        .items(transformedItem)
+                        .tableMetadata(ITEM_MAPPER.tableMetadata())
+                        .operationContext(PRIMARY_CONTEXT)
+                        .build()));
+
+        assertThat(exception.getMessage(), containsString("Bad signature"));
     }
 
     private static class CryptoItem {

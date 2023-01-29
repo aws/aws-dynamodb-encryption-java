@@ -1,5 +1,6 @@
 package software.amazon.awssdk.enhanced.dynamodb.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -9,7 +10,7 @@ import static org.mockito.Mockito.when;
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;
 import java.util.concurrent.TimeUnit;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /* Test specific thread interleavings with behaviors we care about in the
  * TTLCache.

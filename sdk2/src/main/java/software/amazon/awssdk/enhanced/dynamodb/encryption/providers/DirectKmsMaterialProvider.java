@@ -17,7 +17,6 @@ package software.amazon.awssdk.enhanced.dynamodb.encryption.providers;
 import static software.amazon.awssdk.enhanced.dynamodb.encryption.materials.WrappedRawMaterials.CONTENT_KEY_ALGORITHM;
 import static software.amazon.awssdk.enhanced.dynamodb.encryption.materials.WrappedRawMaterials.ENVELOPE_KEY;
 import static software.amazon.awssdk.enhanced.dynamodb.encryption.materials.WrappedRawMaterials.KEY_WRAPPING_ALGORITHM;
-import static software.amazon.awssdk.enhanced.dynamodb.internal.Utils.loadVersion;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.enhanced.dynamodb.EncryptionException;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.EncryptionContext;
@@ -52,7 +50,7 @@ import software.amazon.awssdk.services.kms.model.GenerateDataKeyResponse;
  */
 public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
   static final String USER_AGENT_PREFIX = "DynamodbEncryptionSdkJava/";
-  private static final String USER_AGENT = USER_AGENT_PREFIX + loadVersion();
+
   private static final String COVERED_ATTR_CTX_KEY = "aws-kms-ec-attr";
   private static final String SIGNING_KEY_ALGORITHM = "amzn-ddb-sig-alg";
   private static final String TABLE_NAME_EC_KEY = "*aws-kms-table*";
@@ -88,18 +86,14 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
             : Collections.<String, String>emptyMap();
 
     dataKeyDesc =
-        description.containsKey(CONTENT_KEY_ALGORITHM)
-            ? description.get(CONTENT_KEY_ALGORITHM)
-            : DEFAULT_ENC_ALG;
+            description.getOrDefault(CONTENT_KEY_ALGORITHM, DEFAULT_ENC_ALG);
 
     String[] parts = dataKeyDesc.split("/", 2);
     this.dataKeyAlg = parts[0];
     this.dataKeyLength = parts.length == 2 ? Integer.parseInt(parts[1]) : 256;
 
     sigKeyDesc =
-        description.containsKey(SIGNING_KEY_ALGORITHM)
-            ? description.get(SIGNING_KEY_ALGORITHM)
-            : DEFAULT_SIG_ALG;
+            description.getOrDefault(SIGNING_KEY_ALGORITHM, DEFAULT_SIG_ALG);
 
     parts = sigKeyDesc.split("/", 2);
     this.sigKeyAlg = parts[0];
@@ -163,7 +157,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
     populateKmsEcFromEc(context, ec);
 
     final String keyId = selectEncryptionKeyId(context);
-    if (keyId != null && !keyId.isEmpty()) {
+    if (keyId == null || keyId.isEmpty()) {
       throw new EncryptionException("Encryption key id is empty.");
     }
 
@@ -176,8 +170,7 @@ public class DirectKmsMaterialProvider implements EncryptionMaterialsProvider {
             .build();
     final GenerateDataKeyResponse dataKeyResult = generateDataKey(req, context);
 
-    final Map<String, String> materialDescription = new HashMap<>();
-    materialDescription.putAll(description);
+    final Map<String, String> materialDescription = new HashMap<>(description);
     materialDescription.put(COVERED_ATTR_CTX_KEY, KEY_COVERAGE);
     materialDescription.put(KEY_WRAPPING_ALGORITHM, "kms");
     materialDescription.put(CONTENT_KEY_ALGORITHM, dataKeyDesc);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 -- TBD
+
+Support for AWS SDK v2
+
 ## 2.0.3 -- 2021-10-14
 
 ### Fixes

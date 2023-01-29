@@ -1,4 +1,4 @@
-package software.amazon.awssdk.enhanced.dynamodb.providers;
+package software.amazon.awssdk.enhanced.dynamodb.encryption.providers;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

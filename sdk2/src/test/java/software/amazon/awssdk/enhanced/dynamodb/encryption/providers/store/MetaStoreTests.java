@@ -10,20 +10,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package software.amazon.awssdk.enhanced.dynamodb.providers.store;
+package software.amazon.awssdk.enhanced.dynamodb.encryption.providers.store;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbLocalTest;
+import software.amazon.awssdk.enhanced.dynamodb.EncryptionException;
 import software.amazon.awssdk.enhanced.dynamodb.LocalDynamoDb;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.DynamoDBEncryptor;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.EncryptionContext;
@@ -68,7 +68,7 @@ public class MetaStoreTests implements DynamoDbLocalTest {
     private static final DynamoDBEncryptor TARGET_ENCRYPTOR =
             DynamoDBEncryptor.getInstance(TARGET_BASE_PROVIDER);
 
-    private static int testCounter = 0;
+    private static AtomicInteger testCounter = new AtomicInteger(0);
 
     private LocalDynamoDb targetDynamoDb = new LocalDynamoDb();
     private DynamoDbClient client;
@@ -118,9 +118,10 @@ public class MetaStoreTests implements DynamoDbLocalTest {
         client = synchronize(dynamoDbClient(), DynamoDbClient.class);
         targetClient = synchronize(targetDynamoDb.createClient(), DynamoDbClient.class);
 
-       sourceTable = SOURCE_TABLE_NAME_PREFIX + testCounter;
-       destinationTable = DESTINATION_TABLE_NAME_PREFIX + testCounter;
-       ++testCounter;
+        int currentTest = testCounter.incrementAndGet();
+
+       sourceTable = SOURCE_TABLE_NAME_PREFIX + currentTest;
+       destinationTable = DESTINATION_TABLE_NAME_PREFIX + currentTest;
 
         MetaStore.createTable(client, sourceTable,
                 ProvisionedThroughput.builder()
@@ -224,12 +225,9 @@ public class MetaStoreTests implements DynamoDbLocalTest {
         final SecretKey encryptionKey = eMat.getEncryptionKey();
         assertNotNull(encryptionKey);
 
-        try {
-            prov2.getDecryptionMaterials(ctx(eMat));
-            fail("Missing expected exception");
-        } catch (final DynamoDBMappingException ex) {
-            // Expected Exception
-        }
+        assertThrows(EncryptionException.class, () ->
+            prov2.getDecryptionMaterials(ctx(eMat)));
+
         final EncryptionMaterials eMat2 = prov2.getEncryptionMaterials(ctx);
         assertEquals(1, store.getVersionFromMaterialDescription(eMat2.getMaterialDescription()));
     }

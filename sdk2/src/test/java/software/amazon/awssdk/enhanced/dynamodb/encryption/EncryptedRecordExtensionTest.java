@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package software.amazon.awssdk.enhanced.dynamodb;
+package software.amazon.awssdk.enhanced.dynamodb.encryption;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -37,6 +37,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.enhanced.dynamodb.EncryptedRecordExtension;
+import software.amazon.awssdk.enhanced.dynamodb.EncryptionException;
+import software.amazon.awssdk.enhanced.dynamodb.OperationContext;
+import software.amazon.awssdk.enhanced.dynamodb.TableMetadata;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.providers.EncryptionMaterialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.providers.SymmetricStaticProvider;
 import software.amazon.awssdk.enhanced.dynamodb.extensions.ReadModification;

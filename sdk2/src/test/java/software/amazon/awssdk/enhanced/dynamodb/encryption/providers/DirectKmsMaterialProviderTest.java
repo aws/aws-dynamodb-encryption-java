@@ -10,10 +10,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package software.amazon.awssdk.enhanced.dynamodb.providers;
+package software.amazon.awssdk.enhanced.dynamodb.encryption.providers;
 
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -30,15 +31,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.crypto.SecretKey;
+import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.enhanced.dynamodb.EncryptionException;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.EncryptionContext;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.materials.DecryptionMaterials;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.materials.EncryptionMaterials;
 import software.amazon.awssdk.enhanced.dynamodb.encryption.materials.WrappedRawMaterials;
-import software.amazon.awssdk.enhanced.dynamodb.encryption.providers.DirectKmsMaterialProvider;
-import software.amazon.awssdk.enhanced.dynamodb.utils.FakeKmsClient;
+import software.amazon.awssdk.enhanced.dynamodb.testing.FakeKmsClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.DecryptRequest;
@@ -320,7 +322,7 @@ public class DirectKmsMaterialProviderTest {
   }
 
   @Test
-  public void encryptionKeyIdMismatch() throws GeneralSecurityException {
+  public void encryptionKeyIdMismatch() {
     DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, keyId);
     String customKeyId = kms.createKey().keyMetadata().keyId();
 
@@ -351,6 +353,54 @@ public class DirectKmsMaterialProviderTest {
 
     assertThrows(DynamoDBMappingException.class, () ->
     extendedProvider.getDecryptionMaterials(dCtx));
+  }
+
+  @Test
+  public void encryptionKeyNull() {
+    DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, null);
+    String customKeyId = kms.createKey().keyMetadata().keyId();
+
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", AttributeValue.builder().n("10").build());
+    attrVals.put("rk", AttributeValue.builder().n("20").build());
+    attrVals.put("encryptionKeyId", AttributeValue.builder().s(customKeyId).build());
+
+    ctx =
+            new EncryptionContext.Builder()
+                    .withHashKeyName("hk")
+                    .withRangeKeyName("rk")
+                    .withTableName("KmsTableName")
+                    .withAttributeValues(attrVals)
+                    .build();
+
+    Exception ex = assertThrows(EncryptionException.class, () ->
+       directProvider.getEncryptionMaterials(ctx));
+
+    assertThat(ex.getMessage(), new StringContains("Encryption key id is empty."));
+  }
+
+  @Test
+  public void encryptionKeyEmpty() {
+    DirectKmsMaterialProvider directProvider = new DirectKmsMaterialProvider(kms, "");
+    String customKeyId = kms.createKey().keyMetadata().keyId();
+
+    Map<String, AttributeValue> attrVals = new HashMap<>();
+    attrVals.put("hk", AttributeValue.builder().n("10").build());
+    attrVals.put("rk", AttributeValue.builder().n("20").build());
+    attrVals.put("encryptionKeyId", AttributeValue.builder().s(customKeyId).build());
+
+    ctx =
+            new EncryptionContext.Builder()
+                    .withHashKeyName("hk")
+                    .withRangeKeyName("rk")
+                    .withTableName("KmsTableName")
+                    .withAttributeValues(attrVals)
+                    .build();
+
+    Exception ex = assertThrows(EncryptionException.class, () ->
+            directProvider.getEncryptionMaterials(ctx));
+
+    assertThat(ex.getMessage(), new StringContains("Encryption key id is empty."));
   }
 
   @Test

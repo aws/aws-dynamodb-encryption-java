@@ -123,7 +123,7 @@ automatically.
 Whenever you change your data model, that is, when you add or remove attributes from your table items, you need to take
 additional steps to safely migrate the client-side encryption configuration.
 
-For guidance on this process, please see the developer guide on [Changing Your Data Model](https://docs.aws.amazon.com/dynamodb-encryption-client/latest/devguide/data-model.html).
+For guidance on this process, please see the developer guide on [Changing Your Data Model](https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/data-model.html).
 
 ### Downloads
 

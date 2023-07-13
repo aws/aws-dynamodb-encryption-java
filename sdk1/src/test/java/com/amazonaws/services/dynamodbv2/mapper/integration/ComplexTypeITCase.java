@@ -21,6 +21,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.JsonMarshaller;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.NumberAttributeTestClass;
 import com.amazonaws.services.dynamodbv2.mapper.encryption.TestDynamoDBMapperFactory;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
+import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,11 +35,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.testng.annotations.Test;
 
 /** Tests of the configuration object */
 public class ComplexTypeITCase extends DynamoDBMapperCryptoIntegrationTestBase {
+
+  protected static Logger LOGGER = Logger.getLogger("ComplexTypeITCase");
 
   // We don't start with the current system millis like other tests because
   // it's out of the range of some data types
@@ -49,6 +58,11 @@ public class ComplexTypeITCase extends DynamoDBMapperCryptoIntegrationTestBase {
 
     ComplexClass obj = getUniqueObject();
     util.save(obj);
+    Map<String, AttributeValue> map = new HashMap<>(1);
+    map.put("key", new AttributeValue().withS(obj.getKey()));
+    GetItemRequest request = new GetItemRequest("aws-java-sdk-util-crypto", map);
+    GetItemResult getItemResult = dynamo.getItem(request);
+    LOGGER.severe(String.format("Get Item Result: %s", getItemResult.getItem()));
     ComplexClass loaded = util.load(ComplexClass.class, obj.getKey());
     assertEquals(obj, loaded);
   }

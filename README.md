@@ -1,5 +1,9 @@
 # Client-side Encryption for Amazon DynamoDB
 
+📣 Note: Version 3.x of this library is available,
+and has been renamed to the AWS Database Encryption SDK.
+See the [AWS Database Encryption SDK 3.x](#aws-database-encryption-sdk-3.x) section for more information.
+
 The **[Amazon DynamoDB][ddb] Client-side Encryption in Java** supports encryption and signing of your data when stored in Amazon DynamoDB.
 
 A typical use of this library is when you are using [DynamoDBMapper][ddbmapper], where transparent protection of all objects serialized through the mapper can be enabled via configuring an [AttributeEncryptor][attrencryptor].
@@ -12,6 +16,15 @@ For more advanced use cases where tighter control over the encryption and signin
 [Security issue notifications](./CONTRIBUTING.md#security-issue-notifications)
 
 See [Support Policy](./SUPPORT_POLICY.rst) for for details on the current support status of all major versions of this library.
+
+## AWS Database Encryption SDK 3.x
+
+The 3.x version of this library is generally available, and has been [renamed to the AWS Database Encryption SDK](https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/DDBEC-rename.html).
+It is a major rewrite of the DynamoDB Encryption Client for Java
+and includes many updates, such as a new structured data format, improved multitenancy support, seamless schema changes, and searchable encryption support.
+
+For more information see the [AWS Database Encryption SDK Developer Guide](https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/what-is-database-encryption-sdk.html).
+or check the project repository at [https://github.com/aws/aws-database-encryption-sdk-dynamodb-java/](https://github.com/aws/aws-database-encryption-sdk-dynamodb-java/).
 
 ## Getting Started
 

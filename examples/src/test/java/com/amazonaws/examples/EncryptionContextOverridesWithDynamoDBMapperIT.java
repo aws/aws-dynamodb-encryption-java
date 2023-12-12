@@ -26,7 +26,7 @@ public class EncryptionContextOverridesWithDynamoDBMapperIT {
     final AmazonDynamoDB ddb = DynamoDBEmbedded.create();
 
     // Create the table under test
-    createDDBTable(ddb, TABLE_NAME_TO_OVERRIDE, PARTITION_ATTRIBUTE, SORT_ATTRIBUTE);
+    createDDBTable(ddb, OVERRIDE_TABLE_NAME, PARTITION_ATTRIBUTE, SORT_ATTRIBUTE);
 
     EncryptionContextOverridesWithDynamoDBMapper.encryptRecord(
         US_WEST_2_KEY_ID, OVERRIDE_TABLE_NAME, ddb, kms);

@@ -46,7 +46,8 @@ import java.util.Set;
  * "partition_attribute" for Strings and a sort (range) key named "sort_attribute" for numbers.
  */
 public class EncryptionContextOverridesWithDynamoDBMapper {
-  public static final String ORIGINAL_TABLE_NAME_TO_OVERRIDE = "ExampleTableForEncryptionContextOverrides";
+  public static final String ORIGINAL_TABLE_NAME_TO_OVERRIDE =
+      "ExampleTableForEncryptionContextOverrides";
   public static final String PARTITION_ATTRIBUTE = "partition_attribute";
   public static final String SORT_ATTRIBUTE = "sort_attribute";
 

@@ -3,6 +3,7 @@
 
 package com.amazonaws.examples;
 
+import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.ORIGINAL_TABLE_NAME_TO_OVERRIDE;
 import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.PARTITION_ATTRIBUTE;
 import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.SORT_ATTRIBUTE;
 import static com.amazonaws.examples.TestUtils.US_WEST_2;
@@ -25,7 +26,7 @@ public class EncryptionContextOverridesWithDynamoDBMapperIT {
     final AmazonDynamoDB ddb = DynamoDBEmbedded.create();
 
     // Create the table under test
-    createDDBTable(ddb, OVERRIDE_TABLE_NAME, PARTITION_ATTRIBUTE, SORT_ATTRIBUTE);
+    createDDBTable(ddb, ORIGINAL_TABLE_NAME_TO_OVERRIDE, PARTITION_ATTRIBUTE, SORT_ATTRIBUTE);
 
     EncryptionContextOverridesWithDynamoDBMapper.encryptRecord(
         US_WEST_2_KEY_ID, OVERRIDE_TABLE_NAME, ddb, kms);

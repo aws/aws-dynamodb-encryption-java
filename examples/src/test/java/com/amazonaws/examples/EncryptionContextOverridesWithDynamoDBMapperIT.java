@@ -5,7 +5,6 @@ package com.amazonaws.examples;
 
 import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.PARTITION_ATTRIBUTE;
 import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.SORT_ATTRIBUTE;
-import static com.amazonaws.examples.EncryptionContextOverridesWithDynamoDBMapper.TABLE_NAME_TO_OVERRIDE;
 import static com.amazonaws.examples.TestUtils.US_WEST_2;
 import static com.amazonaws.examples.TestUtils.US_WEST_2_KEY_ID;
 import static com.amazonaws.examples.TestUtils.createDDBTable;

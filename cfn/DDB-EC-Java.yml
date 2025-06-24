@@ -1,0 +1,423 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Template to build a CodeBuild Project, assumes that GitHub credentials are already set up."
+Parameters:
+  ProjectName:
+    Type: String
+    Description: The name of the CodeBuild Project
+  ProjectDescription:
+    Type: String
+    Description: The description for the CodeBuild Project
+  SourceLocation:
+    Type: String
+    Description: The https GitHub URL for the project
+  NumberOfBuildsInBatch:
+    Type: Number
+    MaxValue: 100
+    MinValue: 1
+    Default: 4
+    Description: The number of builds you expect to run in a batch
+  CodeArtifactRegion:
+    Type: String
+    Description: Region for CodeArtifact
+    Default: "us-east-1"
+  CodeArtifactAccount:
+    Type: String
+    Description: AWS Account with CodeArtifact Resources
+    Default: 587316601012
+  CodeArtifactDomain:
+    Type: String
+    Description: Domain for CodeArtifact GetAuthToken
+    Default: "crypto-tools-internal"
+  CodeArtifactStagingRepo:
+    Type: String
+    Description: Staging Repo for CodeArtifact
+    Default: "java-ddbec-staging"
+
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Crypto Tools CodeBuild Project Template"
+        Parameters:
+          - ProjectName
+          - ProjectDescription
+          - SourceLocation
+      -
+        Label:
+          default: "Crypto Tools CodeArtifact Parameters"
+        Parameters:
+          - CodeArtifactRegion
+          - CodeArtifactAccount
+          - CodeArtifactDomain
+          - CodeArtifactStagingRepo
+
+Resources:
+  CodeBuildProject:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Ref ProjectName
+      Description: !Ref ProjectDescription
+      Source:
+        Location: !Ref SourceLocation
+        GitCloneDepth: 1
+        GitSubmodulesConfig:
+          FetchSubmodules: true
+        InsecureSsl: false
+        ReportBuildStatus: false
+        Type: "GITHUB"
+      Artifacts:
+        Type: "NO_ARTIFACTS"
+      Cache:
+        Type: "NO_CACHE"
+      Environment:
+        ComputeType: "BUILD_GENERAL1_LARGE"
+        Image: "aws/codebuild/standard:3.0"
+        ImagePullCredentialsType: "CODEBUILD"
+        PrivilegedMode: false
+        Type: "LINUX_CONTAINER"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      TimeoutInMinutes: 60
+      QueuedTimeoutInMinutes: 480
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3"
+      BadgeEnabled: false
+      BuildBatchConfig:
+        ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+        Restrictions:
+          MaximumBuildsAllowed: !Ref NumberOfBuildsInBatch
+          ComputeTypesAllowed:
+            - BUILD_GENERAL1_SMALL
+            - BUILD_GENERAL1_MEDIUM
+            - BUILD_GENERAL1_LARGE
+        TimeoutInMins: 480
+      LogsConfig:
+        CloudWatchLogs:
+          Status: "ENABLED"
+        S3Logs:
+          Status: "DISABLED"
+          EncryptionDisabled: false
+
+  CodeBuildProjectTestRelease:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Sub "${ProjectName}-test-release"
+      Description: !Sub "CodeBuild project for ${ProjectName} to release to test repository."
+      Source:
+        Location: !Ref SourceLocation
+        BuildSpec: "codebuild/release/release-staging.yml"
+        GitCloneDepth: 1
+        GitSubmodulesConfig:
+          FetchSubmodules: false
+        InsecureSsl: false
+        ReportBuildStatus: false
+        Type: "GITHUB"
+      Artifacts:
+        Type: "NO_ARTIFACTS"
+      Cache:
+        Type: "NO_CACHE"
+      Environment:
+        ComputeType: "BUILD_GENERAL1_LARGE"
+        Image: "aws/codebuild/standard:3.0"
+        ImagePullCredentialsType: "CODEBUILD"
+        PrivilegedMode: false
+        Type: "LINUX_CONTAINER"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      TimeoutInMinutes: 60
+      QueuedTimeoutInMinutes: 480
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3"
+      BadgeEnabled: false
+      BuildBatchConfig:
+        ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+        Restrictions:
+          MaximumBuildsAllowed: !Ref NumberOfBuildsInBatch
+          ComputeTypesAllowed:
+            - BUILD_GENERAL1_SMALL
+            - BUILD_GENERAL1_MEDIUM
+            - BUILD_GENERAL1_LARGE
+        TimeoutInMins: 480
+      LogsConfig:
+        CloudWatchLogs:
+          Status: "ENABLED"
+        S3Logs:
+          Status: "DISABLED"
+          EncryptionDisabled: false
+
+  CodeBuildProjectProdRelease:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: !Sub "${ProjectName}-prod-release"
+      Description: !Sub "CodeBuild project for ${ProjectName} to release to prod repository."
+      Source:
+        Location: !Ref SourceLocation
+        BuildSpec: "codebuild/release/release-prod.yml"
+        GitCloneDepth: 1
+        GitSubmodulesConfig:
+          FetchSubmodules: false
+        InsecureSsl: false
+        ReportBuildStatus: false
+        Type: "GITHUB"
+      Artifacts:
+        Type: "NO_ARTIFACTS"
+      Cache:
+        Type: "NO_CACHE"
+      Environment:
+        ComputeType: "BUILD_GENERAL1_LARGE"
+        Image: "aws/codebuild/standard:3.0"
+        ImagePullCredentialsType: "CODEBUILD"
+        PrivilegedMode: false
+        Type: "LINUX_CONTAINER"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      TimeoutInMinutes: 60
+      QueuedTimeoutInMinutes: 480
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3"
+      BadgeEnabled: false
+      BuildBatchConfig:
+        ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+        Restrictions:
+          MaximumBuildsAllowed: !Ref NumberOfBuildsInBatch
+          ComputeTypesAllowed:
+            - BUILD_GENERAL1_SMALL
+            - BUILD_GENERAL1_MEDIUM
+            - BUILD_GENERAL1_LARGE
+        TimeoutInMins: 480
+      LogsConfig:
+        CloudWatchLogs:
+          Status: "ENABLED"
+        S3Logs:
+          Status: "DISABLED"
+          EncryptionDisabled: false
+
+  CodeBuildServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/service-role/"
+      RoleName: !Sub "codebuild-${ProjectName}-service-role"
+      AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"codebuild.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"},{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::587316601012:oidc-provider/token.actions.githubusercontent.com\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:aud\":\"sts.amazonaws.com\"},\"StringLike\":{\"token.actions.githubusercontent.com:sub\":\"repo:aws/aws-dynamodb-encryption-java:*\"}}}]}"
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - !Ref CryptoToolsKMS
+        - !Ref CodeBuildBatchPolicy
+        - !Ref CodeBuildBasePolicy
+        - !Ref SecretsManagerPolicy
+        - !Ref ParameterStorePolicy
+        - !Ref DDBPolicy
+        - "arn:aws:iam::aws:policy/AWSCodeArtifactReadOnlyAccess"
+        - !Ref CodeArtifactRepoLimitedReadWriteAuthToken
+
+  CodeArtifactRepoLimitedReadWriteAuthToken:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CodeArtifactRepoLimitedReadWriteAuthToken-${ProjectName}-${CodeArtifactStagingRepo}"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "codeartifact:UntagResource",
+                        "codeartifact:GetPackageVersionReadme",
+                        "codeartifact:PutRepositoryPermissionsPolicy",
+                        "codeartifact:ListTagsForResource",
+                        "codeartifact:DescribeRepository",
+                        "codeartifact:ListPackageVersionAssets",
+                        "codeartifact:DeletePackageVersions",
+                        "codeartifact:UpdateRepository",
+                        "codeartifact:CopyPackageVersions",
+                        "codeartifact:PutPackageMetadata",
+                        "codeartifact:DisposePackageVersions",
+                        "codeartifact:ListPackageVersionDependencies",
+                        "codeartifact:TagResource",
+                        "codeartifact:UpdatePackageVersionsStatus",
+                        "codeartifact:ListPackages",
+                        "codeartifact:ReadFromRepository",
+                        "codeartifact:GetRepositoryEndpoint",
+                        "codeartifact:PublishPackageVersion",
+                        "codeartifact:GetPackageVersionAsset",
+                        "codeartifact:GetRepositoryPermissionsPolicy",
+                        "codeartifact:ListPackageVersions",
+                        "codeartifact:GetAuthorizationToken"
+                    ],
+                    "Resource": [
+                        "arn:aws:codeartifact:${CodeArtifactRegion}:${CodeArtifactAccount}:domain/${CodeArtifactDomain}",
+                        "arn:aws:codeartifact:${CodeArtifactRegion}:${CodeArtifactAccount}:*/crypto-tools-internal/${CodeArtifactStagingRepo}",
+                        "arn:aws:codeartifact:${CodeArtifactRegion}:${CodeArtifactAccount}:*/crypto-tools-internal/${CodeArtifactStagingRepo}/*",
+                        "arn:aws:codeartifact:${CodeArtifactRegion}:${CodeArtifactAccount}:*/crypto-tools-internal/${CodeArtifactStagingRepo}/*/*",
+                        "arn:aws:codeartifact:${CodeArtifactRegion}:${CodeArtifactAccount}:*/crypto-tools-internal/${CodeArtifactStagingRepo}/*/*/*"
+                    ]
+                }
+            ]
+        }
+
+
+  CodeBuildBatchPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CodeBuildBuildBatchPolicy-${ProjectName}-${AWS::Region}-codebuild-${ProjectName}-service-role"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}-test-release",
+                "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}-prod-release",
+                "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${ProjectName}"
+              ],
+              "Action": [
+                "codebuild:StartBuild",
+                "codebuild:StopBuild",
+                "codebuild:RetryBuild",
+                "codebuild:BatchGetBuilds"
+              ]
+            }
+          ]
+        }
+
+  CodeBuildBasePolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CodeBuildBasePolicy-${ProjectName}-${AWS::Region}"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}",
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}:*",
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-test-release",
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-test-release:*",
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-prod-release",
+                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-prod-release:*"
+              ],
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:s3:::codepipeline-${AWS::Region}-*"
+              ],
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:GetBucketAcl",
+                "s3:GetBucketLocation"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "codebuild:CreateReportGroup",
+                "codebuild:CreateReport",
+                "codebuild:UpdateReport",
+                "codebuild:BatchPutTestCases",
+                "codebuild:BatchPutCodeCoverages"
+              ],
+              "Resource": [
+                "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/${ProjectName}-*"
+              ]
+            }
+          ]
+        }
+
+
+  SecretsManagerPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CryptoTools-SecretsManager-${ProjectName}-release"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:secretsmanager:us-west-2:${AWS::AccountId}:secret:Maven-GPG-Keys-GC6h0A",
+                "arn:aws:secretsmanager:us-west-2:${AWS::AccountId}:secret:Sonatype-Team-Account-0tWvZm",
+                "arn:aws:secretsmanager:us-west-2:${AWS::AccountId}:secret:Sonatype-Central-Portal-XrYUs2",
+                "arn:aws:secretsmanager:us-west-2:587316601012:secret:Maven-GPG-Keys-Credentials-C0wCzI"
+              ],
+              "Action": "secretsmanager:GetSecretValue"
+            }
+          ]
+        }
+
+  DDBPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CryptoTools-DynamoDB-${ProjectName}-CI"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:dynamodb:us-east-1:587316601012:table/ddbec-mrk-testing",
+                "arn:aws:dynamodb:us-west-2:587316601012:table/ddbec-mrk-testing"
+              ],
+              "Action": "*"
+            }
+          ]
+        }
+
+  # There exist public AWS KMS CMKs that are used for testing
+  # Take care with these CMKs they are **ONLY** for testing!!!
+  CryptoToolsKMS:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CrypotToolsKMSPolicy-${ProjectName}-${AWS::Region}-codebuild-${ProjectName}-service-role"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:kms:*:658956600833:key/*",
+                "arn:aws:kms:*:658956600833:alias/*"
+              ],
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
+              ]
+            }
+          ]
+        }
+
+  # As of 2021/07/06, there is only 1 parameter stored, CodeBuild/AccountId, and it's created by ESDK-Java
+  ParameterStorePolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: !Sub "CryptoTools-ParameterStore-${ProjectName}-release"
+      Path: "/service-role/"
+      PolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CodeBuild/*"
+              ],
+              "Action": "ssm:GetParameters"
+            }
+          ]
+        }

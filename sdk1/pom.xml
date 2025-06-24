@@ -63,8 +63,8 @@
 
             <distributionManagement>
                 <snapshotRepository>
-                    <id>sonatype-nexus-staging</id>
-                    <url>https://aws.oss.sonatype.org/content/repositories/snapshots</url>
+                    <id>central</id>
+                    <url>https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots</url>
                 </snapshotRepository>
             </distributionManagement>
 

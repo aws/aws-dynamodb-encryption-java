@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: "2010-09-09" 
 Description: "Template to build a CodeBuild Project, assumes that GitHub credentials are already set up."
 Parameters:
   ProjectName:

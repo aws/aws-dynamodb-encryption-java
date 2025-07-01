@@ -22,12 +22,12 @@ This table describes the current support status of each major version of the AWS
       - Next status
       - Next status date
     * - 1.x
-      - Maintenance
       - End of Support
-      - 2022-07-08
+      - n/a
+      - n/a
     * - 2.x
       - Generally Available
-      -
-      -
+      - Maintenance
+      - 2024-12-16
 
 .. _AWS SDKs and Tools Maintenance Policy: https://docs.aws.amazon.com/sdkref/latest/guide/maint-policy.html#version-life-cycle

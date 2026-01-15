@@ -53,6 +53,5 @@ jobs:
           project-name: java-ddb-ec
           buildspec-override: codebuild/${{ matrix.platform.distribution }}.yml
           image-override: ${{ matrix.platform.image }}
-          env-vars-for-codebuild: JAVA_VERSION
         env:
           JAVA_VERSION: ${{ matrix.version }}

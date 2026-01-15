@@ -23,7 +23,6 @@ import java.security.Provider;
 import java.util.Arrays;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -193,36 +192,7 @@ public final class Hkdf {
    */
   public byte[] deriveKey(final byte[] info, final int length) throws IllegalStateException {
     byte[] result = new byte[length];
-    try {
-      deriveKey(info, length, result, 0);
-    } catch (ShortBufferException ex) {
-      // This exception is impossible as we ensure the buffer is long
-      // enough
-      throw new RuntimeException(ex);
-    }
-    return result;
-  }
-
-  /**
-   * Derives a pseudorandom key of <code>length</code> bytes and stores the result in <code>output
-   * </code>.
-   *
-   * @param info optional context and application specific information (can be a zero-length array).
-   * @param length the length of the output key in bytes
-   * @param output the buffer where the pseudorandom key will be stored
-   * @param offset the offset in <code>output</code> where the key will be stored
-   * @throws ShortBufferException if the given output buffer is too small to hold the result
-   * @throws IllegalStateException if this object has not been initialized
-   */
-  public void deriveKey(final byte[] info, final int length, final byte[] output, final int offset)
-      throws ShortBufferException, IllegalStateException {
     assertInitialized();
-    if (length < 0) {
-      throw new IllegalArgumentException("Length must be a non-negative value.");
-    }
-    if (output.length < offset + length) {
-      throw new ShortBufferException();
-    }
     Mac mac = createMac();
 
     if (length > 255 * mac.getMacLength()) {
@@ -241,7 +211,7 @@ public final class Hkdf {
         t = mac.doFinal();
 
         for (int x = 0; x < t.length && loc < length; x++, loc++) {
-          output[loc] = t[x];
+          result[loc] = t[x];
         }
 
         i++;
@@ -249,6 +219,7 @@ public final class Hkdf {
     } finally {
       Arrays.fill(t, (byte) 0); // Zeroize temporary array
     }
+    return result;
   }
 
   private Mac createMac() {

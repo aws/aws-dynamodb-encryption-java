@@ -332,7 +332,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED</argLine>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <includes>
                         <include>**/Test*.java</include>

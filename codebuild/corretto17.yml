@@ -3,7 +3,7 @@ version: 0.2
 phases:
     install:
         runtime-versions:
-            java: openjdk11
+            java: corretto17
     build:
         commands:
           - mvn install

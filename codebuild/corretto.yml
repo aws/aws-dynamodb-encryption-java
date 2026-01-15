@@ -1,9 +1,0 @@
-version: 0.2
-
-phases:
-    install:
-        runtime-versions:
-            java: corretto$JAVA_VERSION
-    build:
-        commands:
-          - mvn install

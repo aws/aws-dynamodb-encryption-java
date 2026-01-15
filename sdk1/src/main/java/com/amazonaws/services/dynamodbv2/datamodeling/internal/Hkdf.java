@@ -23,7 +23,6 @@ import java.security.Provider;
 import java.util.Arrays;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -198,7 +197,7 @@ public final class Hkdf {
 
     if (length > 255 * mac.getMacLength()) {
       throw new IllegalArgumentException(
-              "Requested keys may not be longer than 255 times the underlying HMAC length.");
+          "Requested keys may not be longer than 255 times the underlying HMAC length.");
     }
 
     byte[] t = EMPTY_ARRAY;

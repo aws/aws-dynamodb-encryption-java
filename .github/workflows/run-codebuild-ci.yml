@@ -49,5 +49,7 @@ jobs:
         timeout-minutes: 60
         with:
           project-name: java-ddb-ec
-          buildspec-override: codebuild/${{ matrix.platform.distribution }}${{ matrix.version }}.yml
+          buildspec-override: codebuild/${{ matrix.platform.distribution }}.yml
           image-override: ${{ matrix.platform.image }}
+        env:
+          JAVA_VERSION: ${{ matrix.version }}

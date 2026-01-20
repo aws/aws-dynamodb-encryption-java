@@ -36,7 +36,7 @@ jobs:
         platform:
           - distribution: corretto
             image: "aws/codebuild/standard:7.0"
-        version: [ 8, 11 ]
+        version: [ 8, 11, 17, 21 ]
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -49,5 +49,9 @@ jobs:
         timeout-minutes: 60
         with:
           project-name: java-ddb-ec
-          buildspec-override: codebuild/${{ matrix.platform.distribution }}${{ matrix.version }}.yml
+          buildspec-override: codebuild/corretto.yml
           image-override: ${{ matrix.platform.image }}
+          env-vars-for-codebuild: |
+            JAVA_VERSION
+        env:
+          JAVA_VERSION: ${{ matrix.version }}

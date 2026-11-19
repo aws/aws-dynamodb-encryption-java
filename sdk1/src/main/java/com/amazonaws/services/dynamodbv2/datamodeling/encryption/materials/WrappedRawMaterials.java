@@ -40,6 +40,10 @@ import javax.crypto.SecretKey;
  * <p>Other possibly implementations might use a Key-Derivation Function to derive a unique key per
  * record.
  *
+ * <p>This class is only as strong as the security of the wrapping/unwrapping keys' underlying
+ * cryptographic algorithm. We recommend using an AES or RSA key, though other algorithms may also
+ * be used.
+ *
  * @author Greg Rubin
  */
 public class WrappedRawMaterials extends AbstractRawMaterials {
@@ -117,6 +121,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
         throw new IllegalStateException("No private decryption key provided.");
       }
       byte[] encryptedKey = Base64.decode(description.get(ENVELOPE_KEY));
+      // The wrapping/unwrapping keys can be of any algorithm of the user's choice, so no check is needed/possible here.
       String wrappingAlgorithm = unwrappingKey.getAlgorithm();
       if (description.containsKey(KEY_WRAPPING_ALGORITHM)) {
         wrappingAlgorithm = description.get(KEY_WRAPPING_ALGORITHM);
@@ -128,13 +133,16 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
               ? generateContentKey(description.get(CONTENT_KEY_ALGORITHM))
               : generateContentKey(DEFAULT_ALGORITHM);
 
+      // The wrapping/unwrapping keys can be of any algorithm of the user's choice, so no check is needed/possible here.
       String wrappingAlg =
           description.containsKey(KEY_WRAPPING_ALGORITHM)
               ? description.get(KEY_WRAPPING_ALGORITHM)
               : getTransformation(wrappingKey.getAlgorithm());
+      String contentKeyAlg = key.getAlgorithm();
+
       byte[] encryptedKey = wrapKey(key, wrappingAlg);
       description.put(ENVELOPE_KEY, Base64.encodeToString(encryptedKey));
-      description.put(CONTENT_KEY_ALGORITHM, key.getAlgorithm());
+      description.put(CONTENT_KEY_ALGORITHM, contentKeyAlg);
       description.put(KEY_WRAPPING_ALGORITHM, wrappingAlg);
       setMaterialDescription(description);
       return key;
@@ -147,6 +155,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
     if (wrappingKey instanceof DelegatedKey) {
       return ((DelegatedKey) wrappingKey).wrap(key, null, wrappingAlg);
     } else {
+      // The wrapping key can be of any algorithm of the user's choice, so no check is needed/possible here.
       Cipher cipher = Cipher.getInstance(wrappingAlg);
       cipher.init(Cipher.WRAP_MODE, wrappingKey, Utils.getRng());
       byte[] encryptedKey = cipher.wrap(key);
@@ -167,6 +176,7 @@ public class WrappedRawMaterials extends AbstractRawMaterials {
                   null,
                   wrappingAlgorithm);
     } else {
+      // The unwrapping key can be of any algorithm of the user's choice, so no check is needed/possible here.
       Cipher cipher = Cipher.getInstance(wrappingAlgorithm);
 
       // This can be of the form "AES/256" as well as "AES" e.g.,

@@ -38,6 +38,10 @@ import javax.crypto.SecretKey;
  * <p>This is generally a more secure way of encrypting data than with the {@link
  * SymmetricStaticProvider}.
  *
+ * <p>This class is only as strong as the security of the wrapping/unwrapping keys' underlying
+ * cryptographic algorithm. We recommend using an AES or RSA key, though other algorithms may also
+ * be used.
+ *
  * @see WrappedRawMaterials
  * @author Greg Rubin
  */
